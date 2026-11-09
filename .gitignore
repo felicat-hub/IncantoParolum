@@ -1,0 +1,4 @@
+# i backup contengono i progressi personali: non vanno mai nel repository
+*backup*.json
+src/dist/
+src/index.html
