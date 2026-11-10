@@ -391,4 +391,38 @@ const ITEMS = [
   { id: "z16", s: "ort_z", t: "type", q: "Ho perso un ___ del puzzle.", hint: "una parte", say: "pezzo", a: ["pezzo"], x: "«pezzo» ha due z." },
   { id: "z17", s: "ort_z", t: "mc", q: "In quale parola c'è un errore?", o: ["stazzione", "stazione", "lezione", "attenzione"], x: "Si scrive «stazione»: davanti a -ione la z è una sola." },
   { id: "z18", s: "ort_z", t: "type", q: "La ___ dei nonni è in campagna, vicino al bosco.", hint: "dove si abita (sinonimo di casa, finisce in -zione)", say: "abitazione", a: ["abitazione"], x: "Davanti a -ione la z è una sola: abitazione." },
+
+  // ---------------- v1.3: TROVA IL VERBO (frasi insidiose) ----------------
+  // verbi composti: ausiliare + participio formano UN solo verbo
+  { id: "vb11", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Ieri", "Marco", "ha mangiato", "una pizza."], a: 2, x: "«ha mangiato» è un verbo composto: ausiliare (ha) + participio (mangiato) formano un solo verbo." },
+  { id: "vb12", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["I miei cugini", "sono partiti", "stamattina."], a: 1, x: "«sono partiti» è un verbo composto con l'ausiliare essere." },
+  { id: "vb13", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Noi", "siamo rimasti", "a casa", "tutto il giorno."], a: 1, x: "«siamo rimasti» viene da rimanere: verbo composto." },
+  { id: "vb14", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["I ragazzi", "avevano già finito", "i compiti."], a: 1, x: "Il verbo è «avevano finito» (trapassato prossimo): «già» si infila in mezzo, ma il verbo è uno solo." },
+  { id: "vb15", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Che", "bella", "sorpresa", "mi", "hai fatto!"], a: 4, x: "«hai fatto» (da fare) è il verbo, anche se arriva in fondo alla frase." },
+  { id: "vb16", s: "gr_verbo", t: "mc", q: "Quante parole formano il verbo in «I vincitori sono stati premiati»?", o: ["3", "1", "2"], x: "«sono stati premiati» è un solo verbo (passivo) formato da tre parole." },
+  // verbo in posizioni insolite
+  { id: "vb17", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Una storia", "alla sera", "racconta", "la nonna."], a: 2, x: "«racconta» è il verbo: chi racconta? la nonna, che sta in fondo." },
+  { id: "vb18", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["In fondo al corridoio,", "dietro la porta,", "dorme", "il gatto."], a: 2, x: "«dorme» è il verbo, prima del soggetto. Attenzione: qui «porta» è un nome!" },
+  { id: "vb19", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Ama", "la musica", "più di ogni cosa."], a: 0, x: "«Ama» è il verbo, all'inizio della frase. Il soggetto (lui o lei) è sottinteso." },
+  // parole che possono essere nome o verbo
+  { id: "vb20", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Luca", "porta", "lo zaino", "a scuola."], a: 1, x: "Qui «porta» è il verbo portare: Luca porta lo zaino." },
+  { id: "vb21", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Il mio", "gioco", "preferito", "è", "il calcio."], a: 3, x: "Qui «gioco» è un nome (il gioco); il verbo è «è»." },
+  { id: "vb22", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Io", "gioco", "a calcio", "ogni sabato."], a: 1, x: "Qui «gioco» è il verbo giocare: io gioco." },
+  { id: "vb23", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["La", "pesca", "è", "il mio frutto preferito."], a: 2, x: "Qui «pesca» è un frutto, quindi un nome; il verbo è «è»." },
+  { id: "vb24", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Mio zio", "pesca", "nel lago."], a: 1, x: "Qui «pesca» è il verbo pescare: mio zio pesca." },
+  { id: "vb25", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["L'amo", "da pesca", "si è rotto."], a: 2, x: "Qui «amo» è un nome (l'amo per pescare) e «pesca» pure; il verbo è «si è rotto»." },
+  { id: "vb26", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Il", "ritorno", "a casa", "fu", "lunghissimo."], a: 3, x: "«ritorno» qui è un nome (il ritorno); il verbo è «fu», passato remoto di essere." },
+  { id: "vb27", s: "gr_verbo", t: "mc", q: "In «Il canto degli uccelli è dolce», la parola «canto» è:", o: ["un nome", "un verbo"], x: "«il canto»: c'è l'articolo davanti, quindi è un nome. Il verbo è «è»." },
+  { id: "vb28", s: "gr_verbo", t: "mc", q: "In «Io canto una canzone», la parola «canto» è:", o: ["un verbo", "un nome"], x: "«io canto»: è il verbo cantare." },
+  // verbi irregolari da riconoscere
+  { id: "vb29", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Dante", "visse", "a Firenze."], a: 1, x: "«visse» è il passato remoto di vivere." },
+  { id: "vb30", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Ieri", "colsi", "una mela", "dall'albero."], a: 1, x: "«colsi» è il passato remoto di cogliere." },
+  { id: "vb31", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["La neve", "cadde", "per tutta la notte."], a: 1, x: "«cadde» è il passato remoto di cadere." },
+  { id: "vb32", s: "gr_verbo", t: "mc", q: "L'infinito di «vissi» è:", o: ["vivere", "vissere", "visire"], x: "vissi → vivere." },
+  { id: "vb33", s: "gr_verbo", t: "mc", q: "L'infinito di «colsi» è:", o: ["cogliere", "colsere", "collere"], x: "colsi → cogliere." },
+  { id: "vb34", s: "gr_verbo", t: "mc", q: "L'infinito di «rimasto» è:", o: ["rimanere", "rimastare", "rimasere"], x: "rimasto → rimanere." },
+  { id: "vb35", s: "gr_verbo", t: "mc", q: "L'infinito di «posero» è:", o: ["porre", "posere", "posare"], x: "posero → porre (essi posero). Attenzione: «posare» è un altro verbo." },
+  { id: "vb36", s: "gr_verbo", t: "type", q: "«Ieri caddi dalla bici»: il verbo «caddi» viene da ___.", a: ["cadere"], x: "caddi → cadere (passato remoto)." },
+  { id: "vb37", s: "gr_verbo", t: "type", q: "«Il professore spiegò la lezione»: l'infinito del verbo è ___.", a: ["spiegare"], x: "spiegò → spiegare." },
+  { id: "vb38", s: "gr_verbo", t: "type", q: "«Nessuno seppe la risposta»: l'infinito del verbo è ___.", a: ["sapere"], x: "seppe → sapere (passato remoto)." },
 ];
