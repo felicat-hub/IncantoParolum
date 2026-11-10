@@ -61,6 +61,7 @@ h1{font-size:2rem;margin:.2em 0;font-weight:900}h2{font-size:1.45rem;margin:.2em
 .node.done{border-color:var(--gold)}.node.focus{border-color:var(--c);box-shadow:0 3px 0 var(--c)}
 /* esercizi */
 .qcard{border-color:var(--s)}
+.qtag.sfida{background:#fff1e0;color:#c2410c;margin-left:6px}
 .qtag{display:inline-block;background:var(--s);color:var(--c);font-weight:800;font-size:.85rem;border-radius:99px;padding:3px 12px}
 .q{font-size:1.3rem;font-weight:800;margin:16px 0}
 .q.cloze{font-size:1.45rem}
@@ -852,6 +853,243 @@ const ITEMS = [
   { id: "cg56", s: "gr_cong", t: "pick", q: "Tocca il verbo al CONGIUNTIVO:", c: ["È importante", "che", "tutti", "ascoltino", "la lezione."], a: 3, x: "«ascoltino» è congiuntivo presente (che tutti ascoltino)." },
   { id: "cg57", s: "gr_cong", t: "type", q: "Se ci ___ il sole, andremmo al mare. (essere · cong. imperfetto)", a: ["fosse"], x: "Se + congiuntivo imperfetto: se ci fosse." },
   { id: "cg58", s: "gr_cong", t: "type", q: "Se tu ___ attento, non avresti sbagliato. (stare · cong. trapassato)", a: ["fossi stato", "fossi stata"], x: "Congiuntivo trapassato di stare: se tu fossi stato." },
+
+  // ======================= v1.8: L'H MUTA (ampliamento) =======================
+  { id: "h12", s: "ort_h", t: "cloze", lv: 1, q: "Loro ___ due gatti e un cane.", o: ["hanno", "anno"], x: "Loro avevano due gatti ✔: verbo avere, con l'h." },
+  { id: "h13", s: "ort_h", t: "cloze", lv: 1, q: "Oggi vado ___ casa di Luca.", o: ["a", "ha"], x: "«a» indica il luogo: preposizione, senza h." },
+  { id: "h14", s: "ort_h", t: "cloze", lv: 1, q: "___ fame o sete?", o: ["Hai", "Ai"], x: "Tu avevi fame ✔: verbo avere, con l'h." },
+  { id: "h15", s: "ort_h", t: "cloze", lv: 1, q: "Ho regalato i fiori ___ nonni.", o: ["ai", "hai"], x: "«ai» = a + i: preposizione articolata, senza h." },
+  { id: "h16", s: "ort_h", t: "type", lv: 2, q: "Io ___ dodici anni.", hint: "verbo avere", a: ["ho"], x: "Io avevo dodici anni ✔: «ho», con l'h." },
+  { id: "h17", s: "ort_h", t: "type", lv: 2, q: "Tu ___ già mangiato?", hint: "verbo avere", a: ["hai"], x: "Tu avevi già mangiato ✔: «hai», con l'h." },
+  { id: "h18", s: "ort_h", t: "type", lv: 2, q: "Il compleanno è il giorno più bello dell'___.", hint: "dodici mesi", a: ["anno"], x: "«anno» (dodici mesi) è un nome: senza h." },
+  { id: "h19", s: "ort_h", t: "type", lv: 2, q: "Ieri mi ___ telefonato la nonna.", hint: "verbo avere", a: ["ha"], x: "Mi aveva telefonato ✔: «ha», con l'h." },
+  { id: "h20", s: "ort_h", t: "type", lv: 2, q: "Gli alunni ___ finito la verifica.", hint: "verbo avere", a: ["hanno"], x: "Gli alunni avevano finito ✔: «hanno», con l'h." },
+  { id: "h21", s: "ort_h", t: "mc", lv: 3, q: "In quale frase c'è un errore?", o: ["Ho detto ha Marco di venire.", "Ho detto a Marco di venire.", "Marco ha detto di venire."], x: "«a Marco» è una preposizione: senza h. «Ha detto» invece è il verbo avere." },
+  { id: "h22", s: "ort_h", t: "mc", lv: 3, q: "In quale frase c'è un errore?", o: ["Quest'hanno andrò in Francia.", "Quest'anno andrò in Francia.", "Hanno deciso di partire."], x: "«quest'anno» (il periodo di 12 mesi) va senza h." },
+  { id: "h23", s: "ort_h", t: "mc", lv: 1, q: "Quale frase è corretta?", o: ["Ho freddo, mi presti la felpa?", "O freddo, mi presti la felpa?"], x: "Io avevo freddo ✔: «ho», con l'h." },
+  { id: "h24", s: "ort_h", t: "pick", lv: 3, q: "Tocca la parola SBAGLIATA:", c: ["Luca", "ha", "regalato", "un libro", "ha", "Sara."], a: 4, x: "Il secondo «ha» è sbagliato: «a Sara» è una preposizione, senza h. Il primo è giusto (Luca aveva regalato)." },
+  { id: "h25", s: "ort_h", t: "pick", lv: 2, q: "Tocca la parola SBAGLIATA:", c: ["I miei amici", "anno", "vinto", "la partita."], a: 1, x: "Si scrive «hanno vinto»: verbo avere, con l'h." },
+  { id: "h26", s: "ort_h", t: "cloze", lv: 3, q: "___, che dolore! Mi sono fatto male.", o: ["Ahi", "Ai"], x: "Le esclamazioni come ahi, ah, oh, eh vogliono l'h." },
+  { id: "h27", s: "ort_h", t: "cloze", lv: 3, q: "___! Guarda che bel tramonto!", o: ["Oh", "O"], x: "Le esclamazioni vogliono l'h: oh! «O» senza h vuol dire «oppure»." },
+  { id: "h28", s: "ort_h", t: "type", lv: 2, q: "Dove ___ messo le chiavi?", hint: "verbo avere, tu", a: ["hai"], x: "Dove avevi messo ✔: «hai», con l'h." },
+  { id: "h29", s: "ort_h", t: "cloze", lv: 1, q: "Mio padre va al lavoro ___ piedi.", o: ["a", "ha"], x: "«a piedi»: preposizione, senza h." },
+  { id: "h30", s: "ort_h", t: "cloze", lv: 1, q: "Gli ospiti ___ portato un dolce.", o: ["hanno", "anno"], x: "Gli ospiti avevano portato ✔: con l'h." },
+  { id: "h31", s: "ort_h", t: "mc", lv: 3, q: "In quale frase c'è un errore?", o: ["Ai ragione tu!", "Hai ragione tu!", "Ai ragazzi piace il calcio."], x: "Tu avevi ragione ✔: si scrive «hai ragione». «Ai ragazzi» invece è giusto (a + i)." },
+  { id: "h32", s: "ort_h", t: "cloze", lv: 1, q: "Vuoi venire al cinema ___ restare a casa?", o: ["o", "ho"], x: "«o» = oppure: senza h." },
+  { id: "h33", s: "ort_h", t: "type", lv: 2, q: "Chi ___ rotto il vaso?", hint: "verbo avere, lui", a: ["ha"], x: "Chi aveva rotto ✔: «ha», con l'h." },
+  { id: "h34", s: "ort_h", t: "cloze", lv: 1, q: "Oggi ___ visto un film bellissimo.", o: ["ho", "o"], x: "Io avevo visto ✔: «ho», con l'h." },
+  { id: "h35", s: "ort_h", t: "mc", lv: 3, q: "Quale frase è tutta corretta?", o: ["L'anno scorso i vicini ci hanno accolto benissimo.", "L'hanno scorso i vicini ci anno accolto benissimo.", "L'anno scorso i vicini ci anno accolto benissimo."], x: "«anno» (12 mesi) senza h; «hanno accolto» (verbo avere) con l'h." },
+
+  // ======================= v1.8: GLI ACCENTI (ampliamento) =======================
+  { id: "acc13", s: "ort_acc", t: "cloze", lv: 1, q: "Domani ___ festa a scuola.", o: ["è", "e"], x: "Domani era festa ✔: verbo essere, con l'accento." },
+  { id: "acc14", s: "ort_acc", t: "cloze", lv: 1, q: "Luca ___ Marco sono amici.", o: ["e", "è"], x: "«e» unisce due nomi: senza accento." },
+  { id: "acc15", s: "ort_acc", t: "cloze", lv: 1, q: "Il gatto ___ salito sull'albero.", o: ["è", "e"], x: "«è salito»: verbo essere, con l'accento." },
+  { id: "acc16", s: "ort_acc", t: "cloze", lv: 2, q: "Vieni ___, vicino a me!", o: ["qui", "quì"], x: "«qui» e «qua» NON vogliono l'accento!" },
+  { id: "acc17", s: "ort_acc", t: "cloze", lv: 2, q: "Il pallone è ___, sotto il tavolo.", o: ["lì", "li"], x: "«lì» indica un luogo: con l'accento." },
+  { id: "acc18", s: "ort_acc", t: "cloze", lv: 2, q: "I quaderni? ___ ho lasciati a casa.", o: ["Li", "Lì"], x: "Qui «li» è un pronome (= loro): senza accento." },
+  { id: "acc19", s: "ort_acc", t: "cloze", lv: 2, q: "Lo zio ___ un passaggio a Sara.", o: ["dà", "da"], x: "«dà» è il verbo dare: con l'accento." },
+  { id: "acc20", s: "ort_acc", t: "mc", lv: 1, q: "Come si scrive?", o: ["città", "citta", "cittá"], x: "«città»: accento sulla a finale." },
+  { id: "acc21", s: "ort_acc", t: "mc", lv: 2, q: "Come si scrive?", o: ["caffè", "caffé", "caffe"], x: "«caffè» ha l'accento grave (è aperta)." },
+  { id: "acc22", s: "ort_acc", t: "mc", lv: 3, q: "Come si scrive?", o: ["poiché", "poichè", "poiche"], x: "«poiché», come «perché» e «benché», ha l'accento acuto (é chiusa)." },
+  { id: "acc23", s: "ort_acc", t: "mc", lv: 3, q: "Come si scrive?", o: ["ventitré", "ventitre", "ventitrè"], x: "Da solo «tre» non ha accento, ma i composti sì: ventitré, trentatré." },
+  { id: "acc24", s: "ort_acc", t: "mc", lv: 2, q: "Come si scrive?", o: ["blu", "blù"], x: "«blu» non vuole l'accento (parola di una sola sillaba, senza ambiguità)." },
+  { id: "acc25", s: "ort_acc", t: "mc", lv: 3, q: "Quale frase è corretta?", o: ["Bevo un tè caldo.", "Bevo un te caldo."], x: "«tè» (la bevanda) ha l'accento; «te» (pronome) no." },
+  { id: "acc26", s: "ort_acc", t: "cloze", lv: 2, q: "Questo regalo è per ___.", o: ["te", "tè"], x: "Qui «te» è un pronome: senza accento." },
+  { id: "acc27", s: "ort_acc", t: "cloze", lv: 3, q: "Ognuno pensa per ___.", o: ["sé", "se"], x: "«sé» pronome (sé stesso) vuole l'accento; «se» congiunzione no." },
+  { id: "acc28", s: "ort_acc", t: "cloze", lv: 2, q: "___ vuoi, ti accompagno.", o: ["Se", "Sé"], x: "«se» = nel caso che: congiunzione, senza accento." },
+  { id: "acc29", s: "ort_acc", t: "type", lv: 2, q: "La ___ di Roma è bellissima.", hint: "un grande centro abitato", say: "città", a: ["città"], x: "«città» ha l'accento sulla a." },
+  { id: "acc30", s: "ort_acc", t: "type", lv: 2, q: "Al bar papà ha bevuto un ___.", hint: "bevanda nera in tazzina", say: "caffè", a: ["caffè"], x: "«caffè» ha l'accento grave sulla e." },
+  { id: "acc31", s: "ort_acc", t: "type", lv: 2, q: "Stasera torno ___ tardi del solito.", hint: "di più", say: "più", a: ["più"], x: "«più» ha sempre l'accento." },
+  { id: "acc32", s: "ort_acc", t: "type", lv: 2, q: "Hai ___ finito i compiti?", hint: "prima del previsto", say: "già", a: ["già"], x: "«già» ha sempre l'accento." },
+  { id: "acc33", s: "ort_acc", t: "type", lv: 2, q: "___ non sei venuto alla festa?", hint: "per chiedere il motivo", say: "perché", a: ["perché"], x: "«perché» ha l'accento acuto (é)." },
+  { id: "acc34", s: "ort_acc", t: "type", lv: 2, q: "Sono andato al mare, ___ pioveva.", hint: "ma, tuttavia", say: "però", a: ["però"], x: "«però» ha l'accento sulla o." },
+  { id: "acc35", s: "ort_acc", t: "mc", lv: 3, q: "In quale frase c'è un errore?", o: ["Mio zio mi da sempre buoni consigli.", "Mio zio mi dà sempre buoni consigli.", "Torno da scuola alle due."], x: "«mi dà» (verbo dare) vuole l'accento." },
+  { id: "acc36", s: "ort_acc", t: "mc", lv: 3, q: "In quale frase c'è un errore?", o: ["Si, vengo anch'io!", "Sì, vengo anch'io!", "Luca si veste da solo."], x: "Il «sì» della risposta vuole l'accento." },
+  { id: "acc37", s: "ort_acc", t: "mc", lv: 3, q: "In quale frase c'è un errore?", o: ["Non ho visto ne Marco ne Luca.", "Non ho visto né Marco né Luca.", "Quanti libri? Ne ho due."], x: "«né… né…» (= e non) vuole l'accento." },
+  { id: "acc38", s: "ort_acc", t: "mc", lv: 3, q: "Quale frase è tutta corretta?", o: ["Il gatto è salito sul tetto e non vuole scendere.", "Il gatto e salito sul tetto è non vuole scendere.", "Il gatto è salito sul tetto è non vuole scendere."], x: "«è salito» è il verbo essere (accento); «e non vuole» è la congiunzione (senza accento)." },
+
+  // ======================= v1.8: L'APOSTROFO (ampliamento) =======================
+  { id: "apo11", s: "ort_apo", t: "cloze", lv: 1, q: "Ho comprato ___ ombrello nuovo.", o: ["un", "un'"], x: "«ombrello» è maschile: un ombrello, senza apostrofo." },
+  { id: "apo12", s: "ort_apo", t: "cloze", lv: 1, q: "Nel cielo volava ___ aquila.", o: ["un'", "un"], x: "«aquila» è femminile: un'aquila." },
+  { id: "apo13", s: "ort_apo", t: "cloze", lv: 2, q: "Mi serve ___ altra matita.", o: ["un'", "un"], x: "«altra matita» è femminile: un'altra." },
+  { id: "apo14", s: "ort_apo", t: "cloze", lv: 2, q: "Ho scritto ___ altro tema.", o: ["un", "un'"], x: "«altro tema» è maschile: un altro, senza apostrofo." },
+  { id: "apo15", s: "ort_apo", t: "cloze", lv: 1, q: "___ albero del giardino è altissimo.", o: ["L'", "Lo"], x: "Davanti a vocale «lo» diventa l': l'albero." },
+  { id: "apo16", s: "ort_apo", t: "cloze", lv: 1, q: "Ho perso ___ orologio.", o: ["l'", "lo"], x: "Davanti a vocale: l'orologio." },
+  { id: "apo17", s: "ort_apo", t: "cloze", lv: 3, q: "Ho incontrato la professoressa: è ___ insegnante bravissima.", o: ["un'", "un"], x: "Qui «insegnante» è una donna: un'insegnante. Per un uomo: un insegnante." },
+  { id: "apo18", s: "ort_apo", t: "cloze", lv: 3, q: "Il nuovo allenatore è ___ ex calciatore.", o: ["un", "un'"], x: "«ex calciatore» è maschile: un ex, senza apostrofo." },
+  { id: "apo19", s: "ort_apo", t: "cloze", lv: 1, q: "Mi dai un ___ di pane?", o: ["po'", "pò"], x: "«po'» si scrive sempre con l'apostrofo." },
+  { id: "apo20", s: "ort_apo", t: "type", lv: 2, q: "Aspetta un ___!", hint: "un pochino", a: ["po'"], x: "«po'» con l'apostrofo (è «poco» accorciato)." },
+  { id: "apo21", s: "ort_apo", t: "mc", lv: 1, q: "Come si scrive?", o: ["dell'acqua", "del'acqua", "dellacqua"], x: "della + acqua → dell'acqua." },
+  { id: "apo22", s: "ort_apo", t: "mc", lv: 1, q: "Come si scrive?", o: ["c'è", "cè", "c è"], x: "ci + è → c'è." },
+  { id: "apo23", s: "ort_apo", t: "mc", lv: 1, q: "Come si scrive?", o: ["dov'è", "dovè", "dov è"], x: "dove + è → dov'è." },
+  { id: "apo24", s: "ort_apo", t: "mc", lv: 1, q: "Come si scrive?", o: ["com'è", "comè", "come'"], x: "come + è → com'è." },
+  { id: "apo25", s: "ort_apo", t: "mc", lv: 2, q: "Come si scrive?", o: ["tutt'altro", "tuttaltro", "tutt altro"], x: "tutto + altro → tutt'altro." },
+  { id: "apo26", s: "ort_apo", t: "type", lv: 2, q: "___ un gatto sul tetto!", hint: "ci + è", a: ["c'è"], x: "ci + è → c'è." },
+  { id: "apo27", s: "ort_apo", t: "type", lv: 2, q: "___ il mio zaino?", hint: "dove + è", a: ["dov'è"], x: "dove + è → dov'è." },
+  { id: "apo28", s: "ort_apo", t: "mc", lv: 2, q: "In quale frase c'è un errore?", o: ["Qual'è il tuo nome?", "Qual è il tuo nome?", "Dov'è il tuo nome?"], x: "«qual è» si scrive SEMPRE senza apostrofo." },
+  { id: "apo29", s: "ort_apo", t: "mc", lv: 3, q: "In quale frase c'è un errore?", o: ["Ho un'amico simpatico.", "Ho un'amica simpatica.", "Ho un amico simpatico."], x: "«amico» è maschile: un amico, senza apostrofo." },
+  { id: "apo30", s: "ort_apo", t: "mc", lv: 3, q: "In quale frase c'è un errore?", o: ["È un'altro giorno.", "È un altro giorno.", "È un'altra storia."], x: "«altro giorno» è maschile: un altro, senza apostrofo." },
+  { id: "apo31", s: "ort_apo", t: "mc", lv: 2, q: "Quale frase è corretta?", o: ["Dammi un po' di tempo.", "Dammi un pò di tempo."], x: "«po'» con l'apostrofo, mai con l'accento." },
+  { id: "apo32", s: "ort_apo", t: "cloze", lv: 3, q: "Vado ___ ospedale a trovare la zia.", o: ["all'", "alla", "al"], x: "«ospedale» è maschile e inizia per vocale: allo → all'ospedale." },
+  { id: "apo33", s: "ort_apo", t: "cloze", lv: 2, q: "Questa è ___ isola più bella.", o: ["l'", "la", "lo"], x: "Davanti a vocale: l'isola." },
+  { id: "apo34", s: "ort_apo", t: "cloze", lv: 3, q: "Al museo ho conosciuto ___ artista famosa.", o: ["un'", "un"], x: "«artista famosa» è una donna: un'artista." },
+  { id: "apo35", s: "ort_apo", t: "mc", lv: 3, q: "Quale frase è tutta corretta?", o: ["Qual è l'unica amica di Sara che c'è?", "Qual'è l'unica amica di Sara che cè?", "Qual'è l'unica amica di Sara che c'è?"], x: "«qual è» senza apostrofo, «c'è» con l'apostrofo." },
+
+  // ======================= v1.8: ARTICOLI (ampliamento) =======================
+  { id: "art11", s: "gr_art", t: "cloze", lv: 2, q: "A colazione mangio ___ yogurt.", o: ["lo", "il", "l'"], x: "Davanti a y si usa «lo»: lo yogurt." },
+  { id: "art12", s: "gr_art", t: "cloze", lv: 3, q: "Il meccanico ha cambiato ___ pneumatici.", o: ["gli", "i"], x: "Davanti a pn si usa «lo/gli»: gli pneumatici." },
+  { id: "art13", s: "gr_art", t: "cloze", lv: 2, q: "Mia sorella suona ___ xilofono.", o: ["lo", "il"], x: "Davanti a x si usa «lo»: lo xilofono." },
+  { id: "art14", s: "gr_art", t: "cloze", lv: 3, q: "Nei miti greci ___ dei vivevano sull'Olimpo.", o: ["gli", "i"], x: "È un'eccezione: si dice «gli dei»." },
+  { id: "art15", s: "gr_art", t: "cloze", lv: 2, q: "In montagna ho noleggiato ___ sci.", o: ["gli", "i"], x: "Davanti a sc si usa «gli»: gli sci." },
+  { id: "art16", s: "gr_art", t: "cloze", lv: 1, q: "___ uomini lavoravano nel campo.", o: ["Gli", "I"], x: "Davanti a vocale il plurale maschile è «gli»: gli uomini." },
+  { id: "art17", s: "gr_art", t: "cloze", lv: 2, q: "Domenica andiamo in ___ zoo.", o: ["uno", "un"], x: "Davanti a z si usa «uno»: uno zoo." },
+  { id: "art18", s: "gr_art", t: "cloze", lv: 2, q: "Oggi c'è ___ sciopero dei treni.", o: ["lo", "il"], x: "Davanti a sc si usa «lo»: lo sciopero." },
+  { id: "art19", s: "gr_art", t: "cloze", lv: 1, q: "___ ape si posa sul fiore.", o: ["L'", "La", "Lo"], x: "Davanti a vocale «la» diventa l': l'ape." },
+  { id: "art20", s: "gr_art", t: "cloze", lv: 1, q: "Ho invitato ___ amica alla festa.", o: ["un'", "un", "uno"], x: "«amica» è femminile: un'amica, con l'apostrofo." },
+  { id: "art21", s: "gr_art", t: "cloze", lv: 1, q: "Ho visto ___ amico in piazza.", o: ["un", "un'", "uno"], x: "«amico» è maschile: un amico, senza apostrofo." },
+  { id: "art22", s: "gr_art", t: "cloze", lv: 2, q: "Al circo c'era ___ gnomo di legno.", o: ["uno", "un"], x: "Davanti a gn si usa «uno»: uno gnomo." },
+  { id: "art23", s: "gr_art", t: "cloze", lv: 2, q: "___ psicologo ha parlato alla classe.", o: ["Lo", "Il"], x: "Davanti a ps si usa «lo»: lo psicologo." },
+  { id: "art24", s: "gr_art", t: "cloze", lv: 1, q: "___ zaini sono nell'armadio.", o: ["Gli", "I"], x: "Davanti a z il plurale è «gli»: gli zaini." },
+  { id: "art25", s: "gr_art", t: "cloze", lv: 1, q: "___ studenti sono in gita.", o: ["Gli", "I"], x: "Davanti a s + consonante: gli studenti." },
+  { id: "art26", s: "gr_art", t: "pick", lv: 2, q: "Tocca la parola SBAGLIATA:", c: ["Domenica", "i", "zii", "sono venuti", "a pranzo."], a: 1, x: "Davanti a z: «gli zii», non «i zii»." },
+  { id: "art27", s: "gr_art", t: "pick", lv: 2, q: "Tocca la parola SBAGLIATA:", c: ["Ho comprato", "un", "spazzolino", "nuovo."], a: 1, x: "Davanti a s + consonante: «uno spazzolino»." },
+  { id: "art28", s: "gr_art", t: "mc", lv: 3, q: "In quale frase c'è un errore?", o: ["Il gnomo vive nel bosco.", "Lo gnomo vive nel bosco.", "Gli gnomi vivono nel bosco."], x: "Davanti a gn: lo gnomo, gli gnomi." },
+  { id: "art29", s: "gr_art", t: "mc", lv: 3, q: "In quale frase c'è un errore?", o: ["Ho letto un articolo su un'orso.", "Ho letto un articolo su un orso.", "Ho letto un'intervista a un'attrice."], x: "«orso» è maschile: un orso, senza apostrofo." },
+  { id: "art30", s: "gr_art", t: "mc", lv: 2, q: "Che tipo di articolo è «un» in «Ho un cane»?", o: ["indeterminativo", "determinativo", "partitivo"], x: "un, uno, una sono articoli indeterminativi: indicano una cosa qualsiasi." },
+  { id: "art31", s: "gr_art", t: "mc", lv: 3, q: "In «Ho mangiato del pane», che cos'è «del»?", o: ["articolo partitivo", "articolo determinativo", "preposizione semplice"], x: "«del pane» = un po' di pane: articolo partitivo." },
+  { id: "art32", s: "gr_art", t: "type", lv: 2, q: "Volgi al plurale: lo scoiattolo → ___ scoiattoli", hint: "articolo plurale", a: ["gli"], x: "lo → gli: gli scoiattoli." },
+  { id: "art33", s: "gr_art", t: "type", lv: 2, q: "Volgi al plurale: l'orologio → ___ orologi", hint: "articolo plurale", a: ["gli"], x: "l' (maschile) → gli: gli orologi." },
+  { id: "art34", s: "gr_art", t: "type", lv: 2, q: "Volgi al plurale: l'ombra → ___ ombre", hint: "articolo plurale femminile", a: ["le"], x: "l' (femminile) → le: le ombre." },
+  { id: "art35", s: "gr_art", t: "type", lv: 3, q: "Scrivi l'articolo determinativo: ___ whisky dello zio", hint: "davanti a w straniera, suono «u»", a: ["il"], x: "Davanti a w pronunciata «u» si usa «il»: il whisky (come il weekend)." },
+
+  // ======================= v1.8: IL NOME (ampliamento) =======================
+  { id: "nom11", s: "gr_nome", t: "type", lv: 2, q: "Plurale di «uomo»: gli ___", hint: "plurale irregolare", a: ["uomini"], x: "uomo → uomini (irregolare)." },
+  { id: "nom12", s: "gr_nome", t: "type", lv: 3, q: "Plurale di «dio»: gli ___", hint: "plurale irregolare", a: ["dei", "dèi"], x: "dio → dei (irregolare)." },
+  { id: "nom13", s: "gr_nome", t: "type", lv: 3, q: "Plurale di «bue»: i ___", hint: "plurale irregolare", a: ["buoi"], x: "bue → buoi (irregolare)." },
+  { id: "nom14", s: "gr_nome", t: "mc", lv: 2, q: "Qual è il plurale di «la città»?", o: ["le città", "le citte", "le cittè"], x: "I nomi accentati sull'ultima sillaba non cambiano: le città." },
+  { id: "nom15", s: "gr_nome", t: "mc", lv: 2, q: "Qual è il plurale di «l'auto»?", o: ["le auto", "le auti", "gli auto"], x: "«auto» è abbreviato (automobile): al plurale non cambia." },
+  { id: "nom16", s: "gr_nome", t: "mc", lv: 3, q: "Qual è il plurale di «il braccio» (del corpo)?", o: ["le braccia", "i bracci", "le braccie"], x: "Il braccio → le braccia (cambia anche il genere!). Come il dito → le dita." },
+  { id: "nom17", s: "gr_nome", t: "type", lv: 2, q: "Plurale di «lago»: i ___", hint: "attento alla h", a: ["laghi"], x: "lago → laghi: serve la h per mantenere il suono duro." },
+  { id: "nom18", s: "gr_nome", t: "type", lv: 3, q: "Plurale di «medico»: i ___", hint: "il suono cambia!", a: ["medici"], x: "medico → medici (non «medichi»)." },
+  { id: "nom19", s: "gr_nome", t: "type", lv: 2, q: "Plurale di «fuoco»: i ___", hint: "attento alla h", a: ["fuochi"], x: "fuoco → fuochi." },
+  { id: "nom20", s: "gr_nome", t: "type", lv: 2, q: "Femminile di «dottore»: la ___", hint: "finisce in -essa", a: ["dottoressa"], x: "dottore → dottoressa." },
+  { id: "nom21", s: "gr_nome", t: "type", lv: 2, q: "Femminile di «re»: la ___", hint: "parola diversa", a: ["regina"], x: "re → regina." },
+  { id: "nom22", s: "gr_nome", t: "type", lv: 3, q: "Femminile di «eroe»: l'___", hint: "finisce in -ina", a: ["eroina"], x: "eroe → eroina." },
+  { id: "nom23", s: "gr_nome", t: "type", lv: 2, q: "Femminile di «gallo»: la ___", hint: "finisce in -ina", a: ["gallina"], x: "gallo → gallina." },
+  { id: "nom24", s: "gr_nome", t: "type", lv: 2, q: "Maschile di «madre»: il ___", hint: "parola diversa", a: ["padre"], x: "madre → padre: parola completamente diversa." },
+  { id: "nom25", s: "gr_nome", t: "mc", lv: 2, q: "Quale di questi è un nome collettivo?", o: ["gregge", "pecora", "pastore"], x: "«gregge» indica tante pecore insieme, pur essendo singolare." },
+  { id: "nom26", s: "gr_nome", t: "mc", lv: 2, q: "Quale di questi è un nome collettivo?", o: ["squadra", "giocatore", "pallone"], x: "«squadra» è un gruppo di giocatori: nome collettivo." },
+  { id: "nom27", s: "gr_nome", t: "mc", lv: 2, q: "Quale di questi è un nome astratto?", o: ["coraggio", "spada", "cavaliere"], x: "Il coraggio non si tocca: nome astratto." },
+  { id: "nom28", s: "gr_nome", t: "mc", lv: 3, q: "Quale di questi è un nome astratto?", o: ["amicizia", "amico", "regalo"], x: "L'amicizia è un sentimento: nome astratto. «amico» è concreto." },
+  { id: "nom29", s: "gr_nome", t: "mc", lv: 3, q: "Di che genere è «cinema»?", o: ["maschile", "femminile"], x: "Si dice «il cinema»: maschile, anche se finisce in -a." },
+  { id: "nom30", s: "gr_nome", t: "mc", lv: 3, q: "Di che genere è «mano»?", o: ["femminile", "maschile"], x: "Si dice «la mano»: femminile, anche se finisce in -o." },
+  { id: "nom31", s: "gr_nome", t: "mc", lv: 3, q: "Di che genere è «problema»?", o: ["maschile", "femminile"], x: "«il problema», «i problemi»: maschile." },
+  { id: "nom32", s: "gr_nome", t: "pick", lv: 2, q: "Tocca il nome PROPRIO:", c: ["Il fiume", "Po", "attraversa", "la pianura."], a: 1, x: "«Po» è il nome di un fiume preciso: nome proprio, con la maiuscola." },
+  { id: "nom33", s: "gr_nome", t: "pick", lv: 3, q: "Tocca il nome ASTRATTO:", c: ["Il cavaliere", "affrontò", "il drago", "con grande", "coraggio."], a: 4, x: "«coraggio» non si tocca: nome astratto." },
+  { id: "nom34", s: "gr_nome", t: "mc", lv: 3, q: "Che cos'è «portafoglio»?", o: ["un nome composto", "un nome alterato", "un nome derivato"], x: "porta + foglio: nome composto." },
+  { id: "nom35", s: "gr_nome", t: "mc", lv: 3, q: "Che cos'è «gattino»?", o: ["un nome alterato (diminutivo)", "un nome composto", "un nome collettivo"], x: "gatto + -ino: nome alterato diminutivo." },
+  { id: "nom36", s: "gr_nome", t: "type", lv: 3, q: "Plurale di «amico»: gli ___", hint: "il suono cambia!", a: ["amici"], x: "amico → amici (ma amica → amiche!)." },
+
+  // ======================= v1.8: L'AGGETTIVO (ampliamento) =======================
+  { id: "agg11", s: "gr_agg", t: "cloze", lv: 1, q: "Le mie scarpe sono ___.", o: ["nuove", "nuovi", "nuovo"], x: "«scarpe» è femminile plurale: nuove." },
+  { id: "agg12", s: "gr_agg", t: "cloze", lv: 2, q: "Il cane e il gatto sono ___.", o: ["affamati", "affamate", "affamato"], x: "Due nomi maschili → aggettivo maschile plurale: affamati." },
+  { id: "agg13", s: "gr_agg", t: "cloze", lv: 3, q: "Marco e Giulia sono ___.", o: ["stanchi", "stanche", "stanca"], x: "Maschile + femminile → si usa il maschile plurale: stanchi." },
+  { id: "agg14", s: "gr_agg", t: "cloze", lv: 2, q: "Questi pantaloni sono troppo ___.", o: ["larghi", "largi", "larghe"], x: "largo → larghi (con la h)." },
+  { id: "agg15", s: "gr_agg", t: "cloze", lv: 2, q: "I miei compagni sono ___.", o: ["simpatici", "simpatichi", "simpatiche"], x: "simpatico → simpatici (maschile plurale)." },
+  { id: "agg16", s: "gr_agg", t: "cloze", lv: 2, q: "Le mie compagne sono ___.", o: ["simpatiche", "simpatice", "simpatici"], x: "simpatica → simpatiche (con la h)." },
+  { id: "agg17", s: "gr_agg", t: "mc", lv: 2, q: "«Ottimo» è il superlativo di…", o: ["buono", "bello", "grande"], x: "buono → migliore → ottimo." },
+  { id: "agg18", s: "gr_agg", t: "mc", lv: 2, q: "«Pessimo» è il superlativo di…", o: ["cattivo", "piccolo", "brutto"], x: "cattivo → peggiore → pessimo." },
+  { id: "agg19", s: "gr_agg", t: "mc", lv: 3, q: "«Maggiore» è il comparativo di…", o: ["grande", "alto", "buono"], x: "grande → maggiore → massimo." },
+  { id: "agg20", s: "gr_agg", t: "mc", lv: 3, q: "In quale frase c'è un errore?", o: ["Questo gelato è più migliore di quello.", "Questo gelato è migliore di quello.", "Questo gelato è più buono di quello."], x: "«migliore» vuol già dire «più buono»: «più migliore» è sbagliato." },
+  { id: "agg21", s: "gr_agg", t: "mc", lv: 2, q: "«Luca è più alto di Marco»: che grado ha «alto»?", o: ["comparativo di maggioranza", "superlativo assoluto", "comparativo di uguaglianza"], x: "più … di: comparativo di maggioranza." },
+  { id: "agg22", s: "gr_agg", t: "mc", lv: 2, q: "«Questa torta è buonissima»: che grado ha l'aggettivo?", o: ["superlativo assoluto", "superlativo relativo", "comparativo"], x: "-issimo: superlativo assoluto." },
+  { id: "agg23", s: "gr_agg", t: "mc", lv: 3, q: "«Sara è la più veloce della classe»: che grado ha «veloce»?", o: ["superlativo relativo", "superlativo assoluto", "comparativo di maggioranza"], x: "il più … di: superlativo relativo (rispetto a un gruppo)." },
+  { id: "agg24", s: "gr_agg", t: "mc", lv: 3, q: "«Anna è alta quanto Paolo»: che grado ha «alta»?", o: ["comparativo di uguaglianza", "comparativo di minoranza", "positivo"], x: "tanto/quanto, così/come: comparativo di uguaglianza." },
+  { id: "agg25", s: "gr_agg", t: "type", lv: 2, q: "Superlativo assoluto di «bello»: ___", hint: "con -issimo", a: ["bellissimo"], x: "bello → bellissimo." },
+  { id: "agg26", s: "gr_agg", t: "type", lv: 2, q: "Superlativo assoluto di «lungo»: ___", hint: "attento alla h", a: ["lunghissimo"], x: "lungo → lunghissimo (con la h)." },
+  { id: "agg27", s: "gr_agg", t: "type", lv: 3, q: "Superlativo assoluto di «facile»: ___", hint: "con -issimo", a: ["facilissimo"], x: "facile → facilissimo." },
+  { id: "agg28", s: "gr_agg", t: "pick", lv: 2, q: "Tocca l'AGGETTIVO:", c: ["Il drago", "verde", "dorme", "nella grotta."], a: 1, x: "«verde» descrive il drago: aggettivo qualificativo." },
+  { id: "agg29", s: "gr_agg", t: "pick", lv: 3, q: "Tocca l'AGGETTIVO:", c: ["Il rosso", "è", "il mio colore", "preferito."], a: 3, x: "«preferito» descrive il colore. Qui «il rosso» ha l'articolo: è usato come nome!" },
+  { id: "agg30", s: "gr_agg", t: "pick", lv: 3, q: "Tocca l'AGGETTIVO:", c: ["Ieri", "ho incontrato", "una signora", "anziana", "al parco."], a: 3, x: "«anziana» descrive la signora: aggettivo." },
+  { id: "agg31", s: "gr_agg", t: "mc", lv: 3, q: "In «Il rosso del tramonto era intenso», «rosso» è…", o: ["un nome", "un aggettivo", "un verbo"], x: "Ha l'articolo «il» davanti: qui «rosso» è usato come nome." },
+  { id: "agg32", s: "gr_agg", t: "mc", lv: 2, q: "In «Questa bici è mia», «mia» è un aggettivo…", o: ["possessivo", "qualificativo", "dimostrativo"], x: "mio, tuo, suo… indicano a chi appartiene: possessivi." },
+  { id: "agg33", s: "gr_agg", t: "mc", lv: 2, q: "In «Quel ragazzo è mio cugino», «quel» è un aggettivo…", o: ["dimostrativo", "possessivo", "qualificativo"], x: "questo, quello indicano la posizione: dimostrativi." },
+  { id: "agg34", s: "gr_agg", t: "cloze", lv: 3, q: "Nel parco ci sono ___ alberi.", o: ["begli", "bei", "belli"], x: "«bello» davanti al nome si comporta come l'articolo: gli alberi → begli alberi; i prati → bei prati." },
+  { id: "agg35", s: "gr_agg", t: "cloze", lv: 3, q: "Che ___ spettacolo!", o: ["bello", "bel"], x: "Davanti a s + consonante «bello» resta intero: un bello spettacolo (come «lo spettacolo»)." },
+
+  // ======================= v1.8: PRONOMI (ampliamento) =======================
+  { id: "pr11", s: "gr_pron", t: "cloze", lv: 2, q: "Ho cercato Giulia dappertutto e alla fine ___ trovata in biblioteca.", o: ["l'ho", "gli ho", "le ho"], x: "Ho trovato chi? lei → la → l'ho trovata." },
+  { id: "pr12", s: "gr_pron", t: "cloze", lv: 2, q: "I compiti di matematica? ___ ho fatti ieri sera.", o: ["Li", "Gli", "Le"], x: "Ho fatto che cosa? loro (maschile) → li." },
+  { id: "pr13", s: "gr_pron", t: "mc", lv: 3, q: "Quale frase è tutta corretta?", o: ["Ho visto la nonna e le ho portato i fiori che le piacciono.", "Ho visto la nonna e gli ho portato i fiori che gli piacciono.", "Ho visto la nonna e le ho portato i fiori che gli piacciono."], x: "A lei (la nonna) → «le», tutte e due le volte." },
+  { id: "pr14", s: "gr_pron", t: "cloze", lv: 2, q: "Il mio amico era triste, così ___ ho prestato il mio videogioco.", o: ["gli", "lo", "le"], x: "Ho prestato a chi? a lui → gli." },
+  { id: "pr15", s: "gr_pron", t: "cloze", lv: 3, q: "Se vuoi il mio libro, ___ presto volentieri.", o: ["te lo", "ti lo", "lo ti"], x: "ti + lo → te lo (il «ti» diventa «te» davanti a lo, la, li, le, ne)." },
+  { id: "pr16", s: "gr_pron", t: "cloze", lv: 3, q: "La bici? Mio padre ___ ha comprata per il compleanno.", o: ["me l'", "mi l'", "mi la"], x: "mi + la → me la → me l'ha comprata." },
+  { id: "pr17", s: "gr_pron", t: "cloze", lv: 2, q: "Vengo anch'io con ___!", o: ["te", "tu", "ti"], x: "Dopo una preposizione (con, per, a, di…) si usa «te»." },
+  { id: "pr18", s: "gr_pron", t: "cloze", lv: 2, q: "Sei ___ il capitano della squadra?", o: ["tu", "te", "ti"], x: "«tu» è il soggetto: sei tu." },
+  { id: "pr19", s: "gr_pron", t: "cloze", lv: 3, q: "Marco ed ___ siamo andati al cinema.", o: ["io", "me", "mi"], x: "Siamo andati chi? Marco e io: è soggetto, quindi «io»." },
+  { id: "pr20", s: "gr_pron", t: "cloze", lv: 3, q: "La maestra ha chiamato Marco e ___.", o: ["me", "io", "mi"], x: "Ha chiamato chi? Marco e me: è complemento, quindi «me»." },
+  { id: "pr21", s: "gr_pron", t: "cloze", lv: 2, q: "Ragazzi, ___ aspetto all'uscita.", o: ["vi", "ci", "li"], x: "Aspetto voi → vi." },
+  { id: "pr22", s: "gr_pron", t: "cloze", lv: 2, q: "Mamma ___ ha preparato una torta per tutti noi.", o: ["ci", "vi", "si"], x: "Ha preparato a noi → ci." },
+  { id: "pr23", s: "gr_pron", t: "mc", lv: 3, q: "In «Lo zaino è pesante», «lo» è…", o: ["un articolo", "un pronome", "un aggettivo"], x: "Qui «lo» sta davanti a un nome (zaino): è un articolo!" },
+  { id: "pr24", s: "gr_pron", t: "mc", lv: 3, q: "In «Lo vedo tutti i giorni», «lo» è…", o: ["un pronome", "un articolo", "una preposizione"], x: "Qui «lo» sta davanti a un verbo e sostituisce una persona: pronome." },
+  { id: "pr25", s: "gr_pron", t: "mc", lv: 3, q: "In «Chi ha suonato alla porta?», «chi» è un pronome…", o: ["interrogativo", "personale", "possessivo"], x: "Serve a fare una domanda: interrogativo." },
+  { id: "pr26", s: "gr_pron", t: "mc", lv: 3, q: "In «Il ragazzo che hai visto è mio cugino», «che» è un pronome…", o: ["relativo", "interrogativo", "personale"], x: "«che» = il quale, collega due frasi: pronome relativo." },
+  { id: "pr27", s: "gr_pron", t: "mc", lv: 3, q: "In «Questa è la mia, quella è la tua», «la tua» è…", o: ["un pronome possessivo", "un aggettivo possessivo", "un articolo"], x: "Non accompagna un nome, lo sostituisce (la tua bici): pronome possessivo." },
+  { id: "pr28", s: "gr_pron", t: "mc", lv: 2, q: "In quale frase c'è un errore?", o: ["A me mi piace la pizza.", "A me piace la pizza.", "Mi piace la pizza."], x: "«a me» e «mi» dicono la stessa cosa: «a me mi» è una ripetizione sbagliata." },
+  { id: "pr29", s: "gr_pron", t: "mc", lv: 3, q: "In quale frase c'è un errore?", o: ["Ho visto Sara e gli ho dato il libro.", "Ho visto Sara e le ho dato il libro.", "Ho visto Paolo e gli ho dato il libro."], x: "A Sara (a lei) → «le», non «gli»." },
+  { id: "pr30", s: "gr_pron", t: "pick", lv: 2, q: "Tocca il PRONOME:", c: ["Domani", "ti", "porto", "al", "luna park."], a: 1, x: "«ti» = te: pronome personale." },
+  { id: "pr31", s: "gr_pron", t: "pick", lv: 3, q: "Tocca il PRONOME:", c: ["Prima", "di uscire", "la mamma", "ci", "saluta."], a: 3, x: "«ci» = noi: pronome. «la mamma» ha un articolo." },
+  { id: "pr32", s: "gr_pron", t: "pick", lv: 3, q: "Tocca il PRONOME:", c: ["Il libro", "che", "mi hai", "regalato", "è bellissimo."], a: 1, x: "«che» = il quale (il libro): pronome relativo. Attento: anche «mi» è un pronome, ma qui è dentro «mi hai»." },
+  { id: "pr33", s: "gr_pron", t: "type", lv: 2, q: "Sostituisci con un pronome: Ho chiamato Luca → ___ ho chiamato.", hint: "lui, complemento oggetto", a: ["l'", "lo"], x: "Luca → lo → l'ho chiamato." },
+  { id: "pr34", s: "gr_pron", t: "type", lv: 2, q: "Sostituisci con un pronome: Ho scritto a Luca → ___ ho scritto.", hint: "a lui", a: ["gli"], x: "a Luca → gli." },
+  { id: "pr35", s: "gr_pron", t: "type", lv: 2, q: "Sostituisci con un pronome: Ho scritto a Laura → ___ ho scritto.", hint: "a lei", a: ["le"], x: "a Laura → le." },
+  { id: "pr36", s: "gr_pron", t: "type", lv: 3, q: "Sostituisci con un pronome: Ho incontrato le mie cugine → ___ ho incontrate.", hint: "loro, femminile", a: ["le"], x: "le mie cugine → le." },
+
+  // ======================= v1.8: SOGGETTO E PREDICATO (ampliamento) =======================
+  { id: "sg11", s: "log_sogg", t: "pick", lv: 3, q: "Tocca il SOGGETTO:", c: ["Mi", "piace", "molto", "la musica rock."], a: 3, x: "Che cosa piace? La musica rock: è il soggetto! «mi» = a me." },
+  { id: "sg12", s: "log_sogg", t: "pick", lv: 3, q: "Tocca il SOGGETTO:", c: ["A Luca", "manca", "tanto", "il suo cane."], a: 3, x: "Chi manca? Il suo cane. «A Luca» non è il soggetto: ha la preposizione." },
+  { id: "sg13", s: "log_sogg", t: "pick", lv: 3, q: "Tocca il SOGGETTO:", c: ["Fumare", "fa male", "alla salute."], a: 0, x: "Che cosa fa male? Fumare: anche un verbo all'infinito può essere soggetto." },
+  { id: "sg14", s: "log_sogg", t: "pick", lv: 2, q: "Tocca il SOGGETTO:", c: ["Nel bosco", "vivevano", "sette nani."], a: 2, x: "Chi viveva? Sette nani. Il soggetto può stare dopo il verbo." },
+  { id: "sg15", s: "log_sogg", t: "pick", lv: 2, q: "Tocca il SOGGETTO:", c: ["Sul tavolo", "ci sono", "tre biscotti."], a: 2, x: "Che cosa c'è? Tre biscotti." },
+  { id: "sg16", s: "log_sogg", t: "pick", lv: 3, q: "Tocca il SOGGETTO:", c: ["Alla fine", "della partita", "hanno esultato", "tutti i tifosi."], a: 3, x: "Chi ha esultato? Tutti i tifosi." },
+  { id: "sg17", s: "log_sogg", t: "pick", lv: 2, q: "Tocca il PREDICATO:", c: ["Il mio fratellino", "si è addormentato", "sul divano."], a: 1, x: "Il predicato è tutto il verbo: si è addormentato." },
+  { id: "sg18", s: "log_sogg", t: "pick", lv: 3, q: "Tocca il PREDICATO:", c: ["Quel film", "è", "davvero", "noioso."], a: 1, x: "Il verbo è «è» (essere): qui il predicato nominale è «è noioso», ma il verbo da toccare è «è»." },
+  { id: "sg19", s: "log_sogg", t: "mc", lv: 2, q: "In «Il cielo è nuvoloso» il predicato è:", o: ["nominale", "verbale"], x: "essere + aggettivo: predicato nominale." },
+  { id: "sg20", s: "log_sogg", t: "mc", lv: 3, q: "In «La mamma è in giardino» il predicato è:", o: ["verbale", "nominale"], x: "Qui «è» significa «si trova»: predicato verbale. È nominale solo con un nome o aggettivo (è brava, è una dottoressa)." },
+  { id: "sg21", s: "log_sogg", t: "mc", lv: 3, q: "In «Giulia è tornata tardi» il predicato è:", o: ["verbale", "nominale"], x: "«è tornata» è il passato prossimo di tornare: predicato verbale." },
+  { id: "sg22", s: "log_sogg", t: "mc", lv: 2, q: "In «Mio zio è un pilota» il predicato è:", o: ["nominale", "verbale"], x: "essere + nome: predicato nominale." },
+  { id: "sg23", s: "log_sogg", t: "mc", lv: 2, q: "In «Andate subito a letto!» il soggetto è:", o: ["voi (sottinteso)", "letto", "subito"], x: "«andate» → voi: soggetto sottinteso." },
+  { id: "sg24", s: "log_sogg", t: "mc", lv: 3, q: "In «Stanotte ha nevicato» qual è il soggetto?", o: ["Non c'è: il verbo è impersonale", "stanotte", "ha nevicato"], x: "Verbi del tempo atmosferico (piove, nevica) non hanno soggetto." },
+  { id: "sg25", s: "log_sogg", t: "mc", lv: 3, q: "In «La finestra è stata rotta dal pallone» il soggetto è:", o: ["la finestra", "il pallone", "è stata rotta"], x: "Nella frase passiva il soggetto subisce l'azione: la finestra." },
+  { id: "sg26", s: "log_sogg", t: "mc", lv: 2, q: "In «Ieri abbiamo visitato il museo» il soggetto è:", o: ["noi (sottinteso)", "il museo", "ieri"], x: "«abbiamo visitato» → noi." },
+  { id: "sg27", s: "log_sogg", t: "mc", lv: 3, q: "In «A Sara piacciono i gatti» il soggetto è:", o: ["i gatti", "Sara", "piacciono"], x: "Che cosa piace? I gatti. Infatti il verbo è plurale: piacciono." },
+  { id: "sg28", s: "log_sogg", t: "mc", lv: 3, q: "Quale frase ha il predicato NOMINALE?", o: ["Il compito era difficile.", "Il compito era sul banco.", "Il compito è finito presto."], x: "essere + aggettivo (era difficile): nominale. «era sul banco» = si trovava." },
+  { id: "sg29", s: "log_sogg", t: "mc", lv: 2, q: "Il predicato verbale indica…", o: ["un'azione o uno stato espresso da un verbo", "una qualità con il verbo essere", "il luogo dell'azione"], x: "Il predicato verbale dice che cosa fa (o in che stato è) il soggetto." },
+  { id: "sg30", s: "log_sogg", t: "pick", lv: 3, q: "Tocca il SOGGETTO:", c: ["Ci", "piacciono", "le vacanze", "al mare."], a: 2, x: "Che cosa ci piace? Le vacanze." },
+  { id: "sg31", s: "log_sogg", t: "pick", lv: 3, q: "Tocca il SOGGETTO:", c: ["Da quella finestra", "si vede", "il mare."], a: 2, x: "Che cosa si vede? Il mare." },
+
+  // ======================= v1.8: COMPLEMENTO OGGETTO (ampliamento) =======================
+  { id: "co10", s: "log_ogg", t: "pick", lv: 1, q: "Tocca il COMPLEMENTO OGGETTO:", c: ["Ho incontrato", "Anna", "al supermercato."], a: 1, x: "Ho incontrato chi? Anna. Anche un nome proprio può essere complemento oggetto." },
+  { id: "co11", s: "log_ogg", t: "pick", lv: 2, q: "Tocca il COMPLEMENTO OGGETTO:", c: ["La nonna", "ti", "aspetta", "alla stazione."], a: 1, x: "La nonna aspetta chi? Te → ti." },
+  { id: "co12", s: "log_ogg", t: "pick", lv: 2, q: "Tocca il COMPLEMENTO OGGETTO:", c: ["Il professore", "ci", "ha interrogati", "ieri."], a: 1, x: "Ha interrogato chi? Noi → ci." },
+  { id: "co13", s: "log_ogg", t: "pick", lv: 3, q: "Tocca il COMPLEMENTO OGGETTO:", c: ["Al forno", "ho comprato", "del pane", "fresco."], a: 2, x: "Ho comprato che cosa? Del pane (= un po' di pane): partitivo, ma è complemento oggetto." },
+  { id: "co14", s: "log_ogg", t: "pick", lv: 2, q: "Tocca il COMPLEMENTO OGGETTO:", c: ["Mio padre", "ha corso", "la maratona", "di Roma."], a: 2, x: "Ha corso che cosa? La maratona." },
+  { id: "co15", s: "log_ogg", t: "mc", lv: 3, q: "In «Mio padre corre al parco» c'è il complemento oggetto?", o: ["No", "Sì: al parco"], x: "«al parco» ha la preposizione e risponde a «dove?»: non è complemento oggetto." },
+  { id: "co16", s: "log_ogg", t: "mc", lv: 3, q: "In «Penso a te» c'è il complemento oggetto?", o: ["No: «a te» ha la preposizione", "Sì: te"], x: "«a te» risponde a «a chi?»: non è complemento oggetto." },
+  { id: "co17", s: "log_ogg", t: "mc", lv: 3, q: "In «Ti penso sempre», «ti» è…", o: ["complemento oggetto", "soggetto", "non è un complemento"], x: "Penso chi? Te → ti: complemento oggetto." },
+  { id: "co18", s: "log_ogg", t: "mc", lv: 3, q: "In «Il ladro è stato arrestato dalla polizia» il complemento oggetto è…", o: ["non c'è: la frase è passiva", "il ladro", "dalla polizia"], x: "Nelle frasi passive non c'è complemento oggetto: «il ladro» è il soggetto." },
+  { id: "co19", s: "log_ogg", t: "mc", lv: 2, q: "In «Chi hai invitato?», «chi» è…", o: ["complemento oggetto", "soggetto", "predicato"], x: "Hai invitato chi? → «chi» è ciò che hai invitato: complemento oggetto." },
+  { id: "co20", s: "log_ogg", t: "mc", lv: 3, q: "In «Chi ha vinto?», «chi» è…", o: ["soggetto", "complemento oggetto", "predicato"], x: "Chi ha vinto? → «chi» compie l'azione: soggetto." },
+  { id: "co21", s: "log_ogg", t: "pick", lv: 3, q: "Tocca il COMPLEMENTO OGGETTO:", c: ["Ho conosciuto", "una ragazza", "di Napoli", "simpaticissima."], a: 1, x: "Ho conosciuto chi? Una ragazza. «di Napoli» è un altro complemento." },
+  { id: "co22", s: "log_ogg", t: "mc", lv: 2, q: "Quale frase NON ha il complemento oggetto?", o: ["Il treno parte alle otto.", "Luca prende il treno.", "Ho perso il treno."], x: "«partire» non regge un complemento oggetto: alle otto risponde a «quando?»." },
+  { id: "co23", s: "log_ogg", t: "mc", lv: 3, q: "Quale frase NON ha il complemento oggetto?", o: ["Sara è arrivata in anticipo.", "Sara ha preso il bus.", "Sara li ha salutati."], x: "«arrivare» è intransitivo: non può avere complemento oggetto." },
+  { id: "co24", s: "log_ogg", t: "mc", lv: 2, q: "Quale frase ha il complemento oggetto?", o: ["Il gatto mangia i croccantini.", "Il gatto dorme sul letto.", "Il gatto salta sul tavolo."], x: "Mangia che cosa? I croccantini." },
+  { id: "co25", s: "log_ogg", t: "pick", lv: 3, q: "Tocca il COMPLEMENTO OGGETTO:", c: ["Quel libro", "l'ho già", "letto", "due volte."], a: 1, x: "«l'» (= lo) sostituisce «quel libro»: complemento oggetto. Il soggetto è «io» sottinteso." },
+  { id: "co26", s: "log_ogg", t: "pick", lv: 2, q: "Tocca il COMPLEMENTO OGGETTO:", c: ["Domenica", "i miei cugini", "mi", "hanno invitato", "a pranzo."], a: 2, x: "Hanno invitato chi? Me → mi." },
+  { id: "co27", s: "log_ogg", t: "pick", lv: 3, q: "Tocca il COMPLEMENTO OGGETTO:", c: ["Ogni mattina", "il cane", "sveglia", "tutta la famiglia."], a: 3, x: "Sveglia chi? Tutta la famiglia. Chi sveglia? Il cane (soggetto)." },
+  { id: "co28", s: "log_ogg", t: "mc", lv: 3, q: "In «Marco guarda la televisione» e «Marco guarda dalla finestra», il complemento oggetto c'è…", o: ["solo nella prima", "solo nella seconda", "in tutte e due"], x: "«la televisione» → che cosa? Sì. «dalla finestra» → da dove? No." },
+  { id: "co29", s: "log_ogg", t: "mc", lv: 2, q: "Il complemento oggetto ha mai la preposizione davanti?", o: ["No, mai", "Sì, sempre", "Solo con i nomi propri"], x: "Il complemento oggetto è «diretto»: non ha preposizioni." },
+  { id: "co30", s: "log_ogg", t: "pick", lv: 3, q: "Tocca il COMPLEMENTO OGGETTO:", c: ["Ai miei amici", "ho raccontato", "una storia", "di paura."], a: 2, x: "Ho raccontato che cosa? Una storia. «Ai miei amici» risponde a «a chi?»." },
 ];
 
 </script>
@@ -1616,6 +1854,21 @@ function suggestFocus() {
   const best = cands.slice().sort((a, b) => lastUse(a.area) - lastUse(b.area))[0];
   return best.id;
 }
+// ---------- livelli di difficoltà: 1 base · 2 medio · 3 sfida ----------
+const LV3 = new Set("h2 apo9 q9 dp6 dp14 dp15 dp29 dp32 cie7 cie10 cie17 cie19 cie22 cie23 z11 z12 z17 nom10 agg10 vb2 vb14 vb16 vb21 vb23 vb25 vb26 vb35 tp6 tp10 tp18 tp19 tp28 tp38 tp46 tp60 tp66 tp67 md20 md25 md30 md31 cg7 cg9 cg20 cg21 cg35 cg38 cg41 cg42 cg43 cg44 cg50 cg58 aus8 aus9 aus18 ind2 ind21 ind22 ind29 ind32 ind33 sg2 sg5 sg9 co2 co7 co8 pr8 pr9".split(" "));
+function lvl(i) {
+  if (i.lv) return i.lv;
+  if (LV3.has(i.id)) return 3;
+  if (i.t === "type") return 2;
+  if (i.t === "pick") return (i.c || []).length <= 4 ? 1 : 2;
+  return (i.o || []).length <= 2 ? 1 : 2;
+}
+const hardItems = id => ITEMS.filter(i => i.s === id && lvl(i) === 3);
+const hardNeed = id => Math.min(2, hardItems(id).length);
+const hardDone = id => hardItems(id).filter(i => S.items[i.id] && S.items[i.id].c > 0).length;
+const hardOk = id => hardDone(id) >= hardNeed(id);
+const hardMissing = id => Math.max(0, hardNeed(id) - hardDone(id));
+const SFIDA_XP = 5;   // una sfida giusta vale 15 XP invece di 10
 function itemState(id) { return S.items[id] || (S.items[id] = { b: 0, due: 0, n: 0, c: 0 }); }
 
 function record(item, ok, phase) {
@@ -1627,13 +1880,13 @@ function record(item, ok, phase) {
   let newlyMastered = false;
   if (phase !== "diag") {
     s.m += ALPHA * ((ok ? 1 : 0) - s.m);
-    if (!s.ever && s.m >= MASTER_M && s.n >= MASTER_N) { s.ever = true; newlyMastered = true; }
+    if (!s.ever && s.m >= MASTER_M && s.n >= MASTER_N && hardOk(item.s)) { s.ever = true; newlyMastered = true; }
   }
   const k = dayKey(); const d = S.days[k] || (S.days[k] = { xp: 0, ok: 0, tot: 0, sess: 0 });
   d.tot++; if (ok) d.ok++;
   // la prima sessione del giorno vale XP pieni, le successive metà: premia la costanza, non le abbuffate
   const factor = SESS && SESS.mode === "session" ? (SESS.factor || 1) : 1;
-  const gain = ok ? Math.round((phase === "diag" ? 5 : 10) * factor) : 0;   // nella raffica il bonus arriva dal combo
+  const gain = ok ? Math.round((phase === "diag" ? 5 : 10 + (lvl(item) === 3 ? SFIDA_XP : 0)) * factor) : 0;   // nella raffica il bonus arriva dal combo
   S.xp += gain; d.xp += gain;
   return { gain, newlyMastered };
 }
@@ -1705,6 +1958,17 @@ function buildSession() {
     const seen = pool.filter(i => S.items[i.id]).sort((a, b) => S.items[a.id].b - S.items[b.id].b || S.items[a.id].due - S.items[b.id].due);
     // prima si riconosce (scelta), poi si scrive: almeno 2-3 esercizi da scrivere quando ci sono
     const boost = needsBoost(focus);
+    // livello bersaglio: chi parte da zero vede prima gli esercizi base, chi è quasi pronto le sfide
+    const m = sk(focus).m, target = m < 0.4 ? 1 : m < 0.7 ? 2 : 3;
+    const byLv = arr => arr.map((i, k) => [i, k]).sort((a, b) => Math.abs(lvl(a[0]) - target) - Math.abs(lvl(b[0]) - target) || a[1] - b[1]).map(x => x[0]);
+    unseen.splice(0, unseen.length, ...byLv(unseen));
+    if (!isMastered(focus) && m >= 0.7 && !hardOk(focus)) {   // è pronta, ma mancano le sfide: le mette davanti
+      const ch = pool.filter(i => lvl(i) === 3 && !(S.items[i.id] && S.items[i.id].c > 0));
+      const chSet = new Set(ch.map(i => i.id));
+      const rest = unseen.filter(i => !chSet.has(i.id));
+      unseen.splice(0, unseen.length, ...ch, ...rest);
+      seen.splice(0, seen.length, ...seen.filter(i => !chSet.has(i.id)));
+    }
     const ordered = boost ? seen.filter(i => isErr(S.items[i.id])).concat(unseen, seen.filter(i => !isErr(S.items[i.id]))) : unseen.concat(seen);
     const typedAll = ordered.filter(i => i.t === "type"), restAll = ordered.filter(i => i.t !== "type");
     let typed = typedAll.slice(0, 3), rest = restAll.slice(0, 5 - typed.length);
@@ -1864,7 +2128,7 @@ function renderHome() {
     <button class="btn primary big" id="start">${doneToday ? "Un'altra lezione ▶" : "Inizia la missione di oggi ▶"}</button>
     <div class="row"><button class="btn" id="map">🗺️ Mappa</button><button class="btn ghost" id="par">👤 Area genitori</button></div>
   </section>
-  <p class="foot"><span id="sync"></span> · v1.7</p>`;
+  <p class="foot"><span id="sync"></span> · v1.8</p>`;
   $("#start").onclick = startSession; $("#shop").onclick = () => renderDen(); if ($("#hatch")) $("#hatch").onclick = renderHatch; $("#map").onclick = renderMap; $("#par").onclick = renderParentGate;
   updateSyncBadge();
 }
@@ -1878,7 +2142,7 @@ function renderMap() {
       const cls = ms ? "done" : av ? "open" : "locked";
       const news = hasNews(s.id), weak = needsBoost(s.id);
       const badge = s.id === focus ? "🎯" : weak ? "🔁" : news ? "✨" : ms ? "⭐" : av ? "▶" : "🔒";
-      const req = !av ? `<small>Prima: ${s.pre.map(p => SK[p].name).join(", ")}</small>` : weak ? `<small class="news">🔁 da rinforzare</small>` : news ? `<small class="news">✨ ${unseenCount(s.id)} esercizi nuovi</small>` : `<span class="bar thin"><i style="width:${pct}%"></i></span>`;
+      const req = !av ? `<small>Prima: ${s.pre.map(p => SK[p].name).join(", ")}</small>` : weak ? `<small class="news">🔁 da rinforzare</small>` : !ms && x.m >= 0.7 && hardMissing(s.id) ? `<span class="bar thin"><i style="width:${pct}%"></i></span><small class="news">🔥 mancano ${hardMissing(s.id)} ${hardMissing(s.id) === 1 ? "sfida" : "sfide"}</small>` : news ? `<small class="news">✨ ${unseenCount(s.id)} esercizi nuovi</small>` : `<span class="bar thin"><i style="width:${pct}%"></i></span>`;
       return `<button class="node ${cls} ${s.id === focus ? "focus" : ""}" data-id="${s.id}" ${av ? "" : "disabled"}>
         <span class="ni">${s.icon}</span><span class="nt"><b>${esc(s.name)}</b>${req}</span><span class="nb">${badge}</span></button>`;
     }).join("");
@@ -1886,7 +2150,7 @@ function renderMap() {
   }).join("");
   app().innerHTML = header() + `<section class="card">
     <h2>🗺️ La mappa delle abilità</h2>
-    <p class="muted">Tocca un'abilità aperta per sceglierla come prossima missione. ⭐ = conquistata · ✨ = conquistata, ma con esercizi nuovi · 🔁 = conquistata, ma da rinforzare · 🎯 = missione attuale · 🔒 = si apre dopo.</p>
+    <p class="muted">Tocca un'abilità aperta per sceglierla come prossima missione. ⭐ = conquistata · ✨ = conquistata, ma con esercizi nuovi · 🔁 = conquistata, ma da rinforzare · 🔥 = per conquistarla servono le sfide · 🎯 = missione attuale · 🔒 = si apre dopo.</p>
     <div class="map">${cols}</div>
     <button class="btn" id="back">← Torna alla base</button>
   </section><div id="toast"></div>`;
@@ -1975,7 +2239,7 @@ function showQuestion(item, ph) {
   const s = SK[item.s], a = AR[s.area];
   const frac = ph.items.length ? SESS.qi / ph.items.length : 0;
   app().innerHTML = sessHeader(ph, frac) + `<section class="card qcard" style="--c:${a.color};--s:${a.soft}">
-    <div class="qtag">${s.icon} ${esc(s.name)}</div>
+    <div class="qtag">${s.icon} ${esc(s.name)}</div>${lvl(item) === 3 ? `<span class="qtag sfida">🔥 Sfida</span>` : ""}
     ${renderItemBody(item)}
     ${mirrorOk(item, ph) ? `<button class="btn perk" id="mirror">🪞 Specchio di ghiaccio <small>(1 per lezione)</small></button>` : ""}
     <div id="fb"></div>
@@ -2179,7 +2443,7 @@ function renderParent() {
     const x = sk(s.id), acc = x.n ? Math.round(x.c / x.n * 100) : null;
     const items = ITEMS.filter(i => i.s === s.id), seen = items.filter(i => S.items[i.id]).length;
     const state = x.ever ? "⭐ conquistata" : isAvailable(s.id) ? (x.n ? "in corso" : "aperta") : "🔒 bloccata";
-    return `<tr><td>${s.icon} ${esc(s.name)}<br><small>${AR[s.area].name}</small></td><td><span class="bar thin"><i style="width:${Math.round(x.m * 100)}%"></i></span> ${Math.round(x.m * 100)}%</td><td>${acc === null ? "–" : acc + "%"} <small>(${x.n})</small></td><td>${seen}/${items.length}</td><td>${state}</td></tr>`;
+    return `<tr><td>${s.icon} ${esc(s.name)}<br><small>${AR[s.area].name}</small></td><td><span class="bar thin"><i style="width:${Math.round(x.m * 100)}%"></i></span> ${Math.round(x.m * 100)}%</td><td>${acc === null ? "–" : acc + "%"} <small>(${x.n})</small></td><td>${seen}/${items.length}</td><td>${hardDone(s.id)}/${hardItems(s.id).length}</td><td>${state}</td></tr>`;
   }).join("");
   app().innerHTML = `<section class="card">
     <h2>👤 Area genitori</h2>
@@ -2201,7 +2465,7 @@ function renderParent() {
     <h3>Da ripassare <small class="muted">(sbagliati di recente e non ancora recuperati)</small></h3>
     ${recentErrorsHTML()}
     <h3>Abilità</h3>
-    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Abilità</th><th>Padronanza</th><th>Accuratezza (tentativi)</th><th>Esercizi visti</th><th>Stato</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Abilità</th><th>Padronanza</th><th>Accuratezza (tentativi)</th><th>Esercizi visti</th><th>Sfide superate</th><th>Stato</th></tr></thead><tbody>${rows}</tbody></table></div>
     <p class="muted">La <b>padronanza</b> è una media mobile che dà più peso alle risposte recenti; un'abilità è «conquistata» quando supera l'85% dopo almeno 8 tentativi. Salvataggio: <span id="sync"></span>.</p>
     <h3>Nome nell'app</h3>
     <div class="row left"><input id="nick" class="inp" maxlength="20" value="${esc(S.name || "")}"><button class="btn" id="nicksave">Salva</button></div>

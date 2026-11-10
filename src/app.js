@@ -124,6 +124,21 @@ function suggestFocus() {
   const best = cands.slice().sort((a, b) => lastUse(a.area) - lastUse(b.area))[0];
   return best.id;
 }
+// ---------- livelli di difficoltà: 1 base · 2 medio · 3 sfida ----------
+const LV3 = new Set("h2 apo9 q9 dp6 dp14 dp15 dp29 dp32 cie7 cie10 cie17 cie19 cie22 cie23 z11 z12 z17 nom10 agg10 vb2 vb14 vb16 vb21 vb23 vb25 vb26 vb35 tp6 tp10 tp18 tp19 tp28 tp38 tp46 tp60 tp66 tp67 md20 md25 md30 md31 cg7 cg9 cg20 cg21 cg35 cg38 cg41 cg42 cg43 cg44 cg50 cg58 aus8 aus9 aus18 ind2 ind21 ind22 ind29 ind32 ind33 sg2 sg5 sg9 co2 co7 co8 pr8 pr9".split(" "));
+function lvl(i) {
+  if (i.lv) return i.lv;
+  if (LV3.has(i.id)) return 3;
+  if (i.t === "type") return 2;
+  if (i.t === "pick") return (i.c || []).length <= 4 ? 1 : 2;
+  return (i.o || []).length <= 2 ? 1 : 2;
+}
+const hardItems = id => ITEMS.filter(i => i.s === id && lvl(i) === 3);
+const hardNeed = id => Math.min(2, hardItems(id).length);
+const hardDone = id => hardItems(id).filter(i => S.items[i.id] && S.items[i.id].c > 0).length;
+const hardOk = id => hardDone(id) >= hardNeed(id);
+const hardMissing = id => Math.max(0, hardNeed(id) - hardDone(id));
+const SFIDA_XP = 5;   // una sfida giusta vale 15 XP invece di 10
 function itemState(id) { return S.items[id] || (S.items[id] = { b: 0, due: 0, n: 0, c: 0 }); }
 
 function record(item, ok, phase) {
@@ -135,13 +150,13 @@ function record(item, ok, phase) {
   let newlyMastered = false;
   if (phase !== "diag") {
     s.m += ALPHA * ((ok ? 1 : 0) - s.m);
-    if (!s.ever && s.m >= MASTER_M && s.n >= MASTER_N) { s.ever = true; newlyMastered = true; }
+    if (!s.ever && s.m >= MASTER_M && s.n >= MASTER_N && hardOk(item.s)) { s.ever = true; newlyMastered = true; }
   }
   const k = dayKey(); const d = S.days[k] || (S.days[k] = { xp: 0, ok: 0, tot: 0, sess: 0 });
   d.tot++; if (ok) d.ok++;
   // la prima sessione del giorno vale XP pieni, le successive metà: premia la costanza, non le abbuffate
   const factor = SESS && SESS.mode === "session" ? (SESS.factor || 1) : 1;
-  const gain = ok ? Math.round((phase === "diag" ? 5 : 10) * factor) : 0;   // nella raffica il bonus arriva dal combo
+  const gain = ok ? Math.round((phase === "diag" ? 5 : 10 + (lvl(item) === 3 ? SFIDA_XP : 0)) * factor) : 0;   // nella raffica il bonus arriva dal combo
   S.xp += gain; d.xp += gain;
   return { gain, newlyMastered };
 }
@@ -213,6 +228,17 @@ function buildSession() {
     const seen = pool.filter(i => S.items[i.id]).sort((a, b) => S.items[a.id].b - S.items[b.id].b || S.items[a.id].due - S.items[b.id].due);
     // prima si riconosce (scelta), poi si scrive: almeno 2-3 esercizi da scrivere quando ci sono
     const boost = needsBoost(focus);
+    // livello bersaglio: chi parte da zero vede prima gli esercizi base, chi è quasi pronto le sfide
+    const m = sk(focus).m, target = m < 0.4 ? 1 : m < 0.7 ? 2 : 3;
+    const byLv = arr => arr.map((i, k) => [i, k]).sort((a, b) => Math.abs(lvl(a[0]) - target) - Math.abs(lvl(b[0]) - target) || a[1] - b[1]).map(x => x[0]);
+    unseen.splice(0, unseen.length, ...byLv(unseen));
+    if (!isMastered(focus) && m >= 0.7 && !hardOk(focus)) {   // è pronta, ma mancano le sfide: le mette davanti
+      const ch = pool.filter(i => lvl(i) === 3 && !(S.items[i.id] && S.items[i.id].c > 0));
+      const chSet = new Set(ch.map(i => i.id));
+      const rest = unseen.filter(i => !chSet.has(i.id));
+      unseen.splice(0, unseen.length, ...ch, ...rest);
+      seen.splice(0, seen.length, ...seen.filter(i => !chSet.has(i.id)));
+    }
     const ordered = boost ? seen.filter(i => isErr(S.items[i.id])).concat(unseen, seen.filter(i => !isErr(S.items[i.id]))) : unseen.concat(seen);
     const typedAll = ordered.filter(i => i.t === "type"), restAll = ordered.filter(i => i.t !== "type");
     let typed = typedAll.slice(0, 3), rest = restAll.slice(0, 5 - typed.length);
@@ -372,7 +398,7 @@ function renderHome() {
     <button class="btn primary big" id="start">${doneToday ? "Un'altra lezione ▶" : "Inizia la missione di oggi ▶"}</button>
     <div class="row"><button class="btn" id="map">🗺️ Mappa</button><button class="btn ghost" id="par">👤 Area genitori</button></div>
   </section>
-  <p class="foot"><span id="sync"></span> · v1.7</p>`;
+  <p class="foot"><span id="sync"></span> · v1.8</p>`;
   $("#start").onclick = startSession; $("#shop").onclick = () => renderDen(); if ($("#hatch")) $("#hatch").onclick = renderHatch; $("#map").onclick = renderMap; $("#par").onclick = renderParentGate;
   updateSyncBadge();
 }
@@ -386,7 +412,7 @@ function renderMap() {
       const cls = ms ? "done" : av ? "open" : "locked";
       const news = hasNews(s.id), weak = needsBoost(s.id);
       const badge = s.id === focus ? "🎯" : weak ? "🔁" : news ? "✨" : ms ? "⭐" : av ? "▶" : "🔒";
-      const req = !av ? `<small>Prima: ${s.pre.map(p => SK[p].name).join(", ")}</small>` : weak ? `<small class="news">🔁 da rinforzare</small>` : news ? `<small class="news">✨ ${unseenCount(s.id)} esercizi nuovi</small>` : `<span class="bar thin"><i style="width:${pct}%"></i></span>`;
+      const req = !av ? `<small>Prima: ${s.pre.map(p => SK[p].name).join(", ")}</small>` : weak ? `<small class="news">🔁 da rinforzare</small>` : !ms && x.m >= 0.7 && hardMissing(s.id) ? `<span class="bar thin"><i style="width:${pct}%"></i></span><small class="news">🔥 mancano ${hardMissing(s.id)} ${hardMissing(s.id) === 1 ? "sfida" : "sfide"}</small>` : news ? `<small class="news">✨ ${unseenCount(s.id)} esercizi nuovi</small>` : `<span class="bar thin"><i style="width:${pct}%"></i></span>`;
       return `<button class="node ${cls} ${s.id === focus ? "focus" : ""}" data-id="${s.id}" ${av ? "" : "disabled"}>
         <span class="ni">${s.icon}</span><span class="nt"><b>${esc(s.name)}</b>${req}</span><span class="nb">${badge}</span></button>`;
     }).join("");
@@ -394,7 +420,7 @@ function renderMap() {
   }).join("");
   app().innerHTML = header() + `<section class="card">
     <h2>🗺️ La mappa delle abilità</h2>
-    <p class="muted">Tocca un'abilità aperta per sceglierla come prossima missione. ⭐ = conquistata · ✨ = conquistata, ma con esercizi nuovi · 🔁 = conquistata, ma da rinforzare · 🎯 = missione attuale · 🔒 = si apre dopo.</p>
+    <p class="muted">Tocca un'abilità aperta per sceglierla come prossima missione. ⭐ = conquistata · ✨ = conquistata, ma con esercizi nuovi · 🔁 = conquistata, ma da rinforzare · 🔥 = per conquistarla servono le sfide · 🎯 = missione attuale · 🔒 = si apre dopo.</p>
     <div class="map">${cols}</div>
     <button class="btn" id="back">← Torna alla base</button>
   </section><div id="toast"></div>`;
@@ -483,7 +509,7 @@ function showQuestion(item, ph) {
   const s = SK[item.s], a = AR[s.area];
   const frac = ph.items.length ? SESS.qi / ph.items.length : 0;
   app().innerHTML = sessHeader(ph, frac) + `<section class="card qcard" style="--c:${a.color};--s:${a.soft}">
-    <div class="qtag">${s.icon} ${esc(s.name)}</div>
+    <div class="qtag">${s.icon} ${esc(s.name)}</div>${lvl(item) === 3 ? `<span class="qtag sfida">🔥 Sfida</span>` : ""}
     ${renderItemBody(item)}
     ${mirrorOk(item, ph) ? `<button class="btn perk" id="mirror">🪞 Specchio di ghiaccio <small>(1 per lezione)</small></button>` : ""}
     <div id="fb"></div>
@@ -687,7 +713,7 @@ function renderParent() {
     const x = sk(s.id), acc = x.n ? Math.round(x.c / x.n * 100) : null;
     const items = ITEMS.filter(i => i.s === s.id), seen = items.filter(i => S.items[i.id]).length;
     const state = x.ever ? "⭐ conquistata" : isAvailable(s.id) ? (x.n ? "in corso" : "aperta") : "🔒 bloccata";
-    return `<tr><td>${s.icon} ${esc(s.name)}<br><small>${AR[s.area].name}</small></td><td><span class="bar thin"><i style="width:${Math.round(x.m * 100)}%"></i></span> ${Math.round(x.m * 100)}%</td><td>${acc === null ? "–" : acc + "%"} <small>(${x.n})</small></td><td>${seen}/${items.length}</td><td>${state}</td></tr>`;
+    return `<tr><td>${s.icon} ${esc(s.name)}<br><small>${AR[s.area].name}</small></td><td><span class="bar thin"><i style="width:${Math.round(x.m * 100)}%"></i></span> ${Math.round(x.m * 100)}%</td><td>${acc === null ? "–" : acc + "%"} <small>(${x.n})</small></td><td>${seen}/${items.length}</td><td>${hardDone(s.id)}/${hardItems(s.id).length}</td><td>${state}</td></tr>`;
   }).join("");
   app().innerHTML = `<section class="card">
     <h2>👤 Area genitori</h2>
@@ -709,7 +735,7 @@ function renderParent() {
     <h3>Da ripassare <small class="muted">(sbagliati di recente e non ancora recuperati)</small></h3>
     ${recentErrorsHTML()}
     <h3>Abilità</h3>
-    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Abilità</th><th>Padronanza</th><th>Accuratezza (tentativi)</th><th>Esercizi visti</th><th>Stato</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Abilità</th><th>Padronanza</th><th>Accuratezza (tentativi)</th><th>Esercizi visti</th><th>Sfide superate</th><th>Stato</th></tr></thead><tbody>${rows}</tbody></table></div>
     <p class="muted">La <b>padronanza</b> è una media mobile che dà più peso alle risposte recenti; un'abilità è «conquistata» quando supera l'85% dopo almeno 8 tentativi. Salvataggio: <span id="sync"></span>.</p>
     <h3>Nome nell'app</h3>
     <div class="row left"><input id="nick" class="inp" maxlength="20" value="${esc(S.name || "")}"><button class="btn" id="nicksave">Salva</button></div>
