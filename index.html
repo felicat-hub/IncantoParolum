@@ -1455,7 +1455,7 @@ function renderHome() {
     <button class="btn primary big" id="start">${doneToday ? "Un'altra lezione ▶" : "Inizia la missione di oggi ▶"}</button>
     <div class="row"><button class="btn" id="map">🗺️ Mappa</button><button class="btn ghost" id="par">👤 Area genitori</button></div>
   </section>
-  <p class="foot"><span id="sync"></span> · v1.1</p>`;
+  <p class="foot"><span id="sync"></span> · v1.1.1</p>`;
   $("#start").onclick = startSession; $("#shop").onclick = () => renderDen(); if ($("#hatch")) $("#hatch").onclick = renderHatch; $("#map").onclick = renderMap; $("#par").onclick = renderParentGate;
   updateSyncBadge();
 }
@@ -1816,8 +1816,8 @@ function renderParent() {
     $("#doimp").onclick = () => { try { const st = JSON.parse($("#ta").value); if (!st.skills) throw 0; S = normalize(st); Store.save(); renderParent(); } catch (e) { $("#pbox").insertAdjacentHTML("beforeend", "<p class='note bad'>Backup non valido.</p>"); } };
   };
   $("#reset").onclick = () => {
-    $("#pbox").innerHTML = `<p class="note bad">Sicuro? Si perdono tutti i progressi.</p><button class="btn warn" id="yes">Sì, azzera</button>`;
-    $("#yes").onclick = () => { S = freshState(); Store.save(); Sync.pushedAt = 0; boot(); };
+    $("#pbox").innerHTML = `<p class="note bad">Sicuro? Si perdono tutti i progressi su questo dispositivo${Sync.on() ? " e la sincronizzazione viene scollegata (i progressi in rete restano)" : ""}.</p><button class="btn warn" id="yes">Sì, azzera</button>`;
+    $("#yes").onclick = () => { Sync.saveCfg(null); S = freshState(); Store.save(); Sync.pushedAt = 0; boot(); };
   };
 }
 
@@ -1826,6 +1826,14 @@ function renderParent() {
 // I progressi viaggiano in un file JSON del repository dei dati. La chiave (fine-grained token,
 // solo "Contents" su quel repository) resta salvata su questo dispositivo, mai nel codice.
 const SYNC_KEY = "incanto-sync-v1";
+// Quale versione vince tra due dispositivi: quella con PIÙ PROGRESSI (gli XP non calano mai);
+// la data di modifica decide solo a parità. Così un profilo vuoto non sovrascrive mai uno vero.
+function progressScore(st) { return st && st.skills ? (st.xp || 0) * 10 + (st.sessions || 0) + (st.diagDone ? 1 : 0) : -1; }
+function remoteWins(r, l) {
+  if (!r || !r.skills) return false;
+  const a = progressScore(r), b = progressScore(l);
+  return a !== b ? a > b : (r.updatedAt || 0) > (l.updatedAt || 0);
+}
 const Sync = {
   cfg: null, status: "", lastOk: 0, busy: false, pushedAt: 0,
   load() { try { this.cfg = JSON.parse(localStorage.getItem(SYNC_KEY) || "null"); } catch (e) { this.cfg = null; } return this.cfg; },
@@ -1863,8 +1871,8 @@ const Sync = {
     try {
       const { data } = await this.get();
       this.ok();
-      if (data && data.skills && (data.updatedAt || 0) > (S.updatedAt || 0)) { S = normalize(data); Store.saveLocal(); this.pushedAt = S.updatedAt; return true; }
-      if (!data || (S.updatedAt || 0) > (data.updatedAt || 0)) { this.busy = false; await this.push("primo salvataggio"); }
+      if (remoteWins(data, S)) { S = normalize(data); Store.saveLocal(); this.pushedAt = S.updatedAt; return true; }
+      if (!data || progressScore(S) > progressScore(data)) { this.busy = false; await this.push("primo salvataggio"); }
       return false;
     } catch (e) { this.fail(e); return false; } finally { this.busy = false; }
   },
@@ -1875,7 +1883,7 @@ const Sync = {
     this.busy = true;
     try {
       const { data, sha } = await this.get();
-      if (data && (data.updatedAt || 0) > (S.updatedAt || 0)) {   // l'altro dispositivo è più avanti: prendo la sua versione
+      if (remoteWins(data, S)) {   // l'altro dispositivo è più avanti: prendo la sua versione
         S = normalize(data); Store.saveLocal(); this.pushedAt = S.updatedAt; this.ok(); if (!SESS) boot(); return;
       }
       await this.put(sha, why); this.pushedAt = S.updatedAt; this.ok();
@@ -2019,10 +2027,11 @@ function wireSyncPanel() {
     Sync.saveCfg(cfg); Sync.pushedAt = 0; st("Provo il collegamento…");
     try {
       const { data } = await Sync.get(); Sync.ok();
-      if (data && data.skills && (data.updatedAt || 0) > (S.updatedAt || 0)) {
+      if (remoteWins(data, S)) {
         st(`Collegato ✅ In rete ci sono progressi più recenti (${esc(data.name || "")}, ${data.xp || 0} XP): li ho caricati.`);
         S = normalize(data); Store.saveLocal(); Sync.pushedAt = S.updatedAt;
-      } else { S.updatedAt = Math.max(S.updatedAt || 0, Date.now()); Store.saveLocal(); await Sync.push("collegamento"); st(Sync.status === "ok" ? "Collegato ✅ Progressi salvati in rete." : "⚠️ " + Sync.err); }
+      } else if (data && data.skills && progressScore(data) === progressScore(S)) { Sync.pushedAt = S.updatedAt; st("Collegato ✅ I progressi in rete e su questo dispositivo sono già allineati."); }
+      else { S.updatedAt = Math.max(S.updatedAt || 0, Date.now()); Store.saveLocal(); await Sync.push("collegamento"); st(Sync.status === "ok" ? `Collegato ✅ Progressi di questo dispositivo (${S.xp} XP) salvati in rete.` : "⚠️ " + Sync.err); }
     } catch (e) { Sync.fail(e); st("⚠️ Non riesco a collegarmi: " + Sync.err + "."); }
   };
   if ($("#sy-now")) $("#sy-now").onclick = async () => { st("Sincronizzo…"); const changed = await Sync.pull(); if (!changed) { Sync.pushedAt = 0; await Sync.push("manuale"); } st(Sync.status === "ok" ? "✅ " + Sync.label() : "⚠️ " + Sync.err); };
