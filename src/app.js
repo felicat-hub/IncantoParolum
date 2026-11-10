@@ -372,7 +372,7 @@ function renderHome() {
     <button class="btn primary big" id="start">${doneToday ? "Un'altra lezione ▶" : "Inizia la missione di oggi ▶"}</button>
     <div class="row"><button class="btn" id="map">🗺️ Mappa</button><button class="btn ghost" id="par">👤 Area genitori</button></div>
   </section>
-  <p class="foot"><span id="sync"></span> · v1.6</p>`;
+  <p class="foot"><span id="sync"></span> · v1.7</p>`;
   $("#start").onclick = startSession; $("#shop").onclick = () => renderDen(); if ($("#hatch")) $("#hatch").onclick = renderHatch; $("#map").onclick = renderMap; $("#par").onclick = renderParentGate;
   updateSyncBadge();
 }
@@ -515,12 +515,13 @@ function showQuestion(item, ph) {
       ${cb.broke >= 3 ? `<p class="soft">🔥 Serie da ${cb.broke} interrotta: ripartiamo, ce la fai! 💪</p>` : ""}
       ${cb.saved ? `<p class="soft">💧 <b>Rigenerazione</b>: il tuo compagno ha salvato il combo!</p>` : ""}
       ${cb.halved ? `<p class="soft">❄️ <b>Inverno eterno</b>: il combo scende a ${cb.halved} invece di azzerarsi.</p>` : ""}
-      ${ok ? (SESS.mode === "diag" ? "" : `<p>${item.x}</p>`) : `${typed !== undefined ? `<p>Hai scritto: <s>${esc(typed)}</s></p>` : ""}<p>Risposta giusta: <b>${esc(correctText(item))}</b></p><p>${item.x}</p>`}
+      ${ok ? (SESS.mode === "diag" ? "" : `<p>${item.x}</p>`) : errorFeedback(item, typed, SESS.mode === "diag")}
       ${res.newlyMastered ? `<p class="mastered">✨ Incantesimo appreso: <b>${esc(s.name)}</b>! Nel Grimorio: ${powerOf(item.s).icon} <b>${esc(powerOf(item.s).name)}</b></p>` : ""}
       <button class="btn ${ok ? "primary" : "warn"}" id="cont">Continua ▶</button>`;
     const go = () => { SESS.qi++; next(); };
-    $("#cont").onclick = go; $("#cont").focus();
-    keyHandler = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } };
+    $("#cont").onclick = go;
+    if (!ok && SESS.mode !== "diag") armContinue(item, go);
+    else { $("#cont").focus(); keyHandler = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } }; }
   };
   wireAnswers(item, answer);
 }
@@ -625,7 +626,8 @@ function finishSession() {
   const sr = finishDay(); S.sessions++;
   const bc = SESS.bestCombo || 0, newRecord = bc >= 5 && bc > (S.bestCombo || 0);
   if (bc > (S.bestCombo || 0)) S.bestCombo = bc;
-  S.log = (S.log || []).concat([{ d: dayKey(), f: SESS.focus, ok: SESS.ok, tot: SESS.tot, r: SESS.rOk || 0, adj: SESS.adjust.join(","), c: bc, tOk: SESS.tOk || 0, tTot: SESS.tTot || 0, pk: (SESS.perkLog || []).join(",") }]).slice(-60);
+  S.log = (S.log || []).concat([{ d: dayKey(), f: SESS.focus, ok: SESS.ok, tot: SESS.tot, r: SESS.rOk || 0, adj: SESS.adjust.join(","), c: bc, tOk: SESS.tOk || 0, tTot: SESS.tTot || 0, pk: (SESS.perkLog || []).join(","),
+    rd: (SESS.dwell || []).length ? Math.round(SESS.dwell.reduce((a, b) => a + b, 0) / SESS.dwell.length / 100) / 10 : null }]).slice(-60);
   const iceBefore = iceBest();
   if (SESS.focus) { S.lastArea = SK[SESS.focus].area; S.areaHist = (S.areaHist || []).concat([S.lastArea]).slice(-6); if (S.focusChosen !== SESS.focus) S.focus = null; }
   Store.save();
@@ -700,7 +702,7 @@ function renderParent() {
     ${(S.log || []).length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Giorno</th><th>Missione</th><th>Giuste</th><th>Adattamenti</th></tr></thead><tbody>${(S.log || []).slice(-8).reverse().map(l => {
       const pc = l.tot ? Math.round(l.ok / l.tot * 100) : 0, col = pc < 70 ? "var(--bad)" : pc > 95 ? "var(--pri)" : "var(--ok)";
       const adj = (l.adj || "").split(",").filter(Boolean);
-      return `<tr><td>${l.d.split("-").reverse().slice(0, 2).join("/")}</td><td>${l.f && SK[l.f] ? SK[l.f].icon + " " + esc(SK[l.f].name) : "–"}</td><td><b style="color:${col}">${pc}%</b> <small>(${l.ok}/${l.tot})${l.tTot ? `<br>scritte: ${l.tOk}/${l.tTot}` : ""}${l.c ? ` · combo ${l.c}` : ""}</small></td><td><small>${adj.length ? adj.map(a => a === "giu" ? "↓ facilitato" : "↑ più difficile").join(", ") : "–"}${(l.pk || "").split(",").filter(x => x && x !== "breath").map(x => x === "mirror" ? " · 🪞 aiuto usato" : x === "regen" ? " · 💧 combo salvato" : " · ❄️ combo dimezzato").join("")}</small></td></tr>`; }).join("")}</tbody></table></div>`
+      return `<tr><td>${l.d.split("-").reverse().slice(0, 2).join("/")}</td><td>${l.f && SK[l.f] ? SK[l.f].icon + " " + esc(SK[l.f].name) : "–"}</td><td><b style="color:${col}">${pc}%</b> <small>(${l.ok}/${l.tot})${l.tTot ? `<br>scritte: ${l.tOk}/${l.tTot}` : ""}${l.c ? ` · combo ${l.c}` : ""}${l.rd != null ? `<br>⏱ ${l.rd}s sugli errori` : ""}</small></td><td><small>${adj.length ? adj.map(a => a === "giu" ? "↓ facilitato" : "↑ più difficile").join(", ") : "–"}${(l.pk || "").split(",").filter(x => x && x !== "breath").map(x => x === "mirror" ? " · 🪞 aiuto usato" : x === "regen" ? " · 💧 combo salvato" : " · ❄️ combo dimezzato").join("")}</small></td></tr>`; }).join("")}</tbody></table></div>`
       : `<p class="muted">Ancora nessuna sessione registrata con questa versione.</p>`}
     <h3>⚔️ Duelli</h3>
     ${duelsHTML()}
@@ -1072,7 +1074,7 @@ function duelCast(id) {
         ${chain ? "<p>⛓️ <b>Catena di incantesimi!</b> +10 di danno.</p>" : ""}${(D.used[id] === 3 && !D.resist.includes(id)) ? "<p>👀 Il mostro si sta abituando a questo incantesimo…</p>" : ""}`;
     } else {
       D.hearts--;
-      msg = `<div class="fb-t">Il mostro contrattacca! 💢</div>${typed !== undefined ? `<p>Hai scritto: <s>${esc(typed)}</s></p>` : ""}<p>Risposta giusta: <b>${esc(correctText(item))}</b></p><p>${item.x}</p>`;
+      msg = `<div class="fb-t">Il mostro contrattacca! 💢</div>${errorFeedback(item, typed, false)}`;
     }
     D.last.push(id); D.log.push([id, ok ? 1 : 0]);
     const fb = $("#fb"); fb.className = "fb " + (ok ? "good" : "bad");
@@ -1080,8 +1082,9 @@ function duelCast(id) {
     if (ok) { const m = document.querySelector(".mini-mon"); if (m) m.innerHTML = monsterSVG(D.monster, 80, true); }
     $(".hpbar i").style.width = Math.max(0, D.hp) / DUEL.HP * 100 + "%";
     const hpTxt = document.querySelector(".hpwrap small"); if (hpTxt) hpTxt.textContent = Math.max(0, Math.round(D.hp)) + " / " + DUEL.HP;
-    const go = () => duelTurn(); $("#cont").onclick = go; $("#cont").focus();
-    keyHandler = e => { if (e.key === "Enter") { e.preventDefault(); go(); } };
+    const go = () => duelTurn(); $("#cont").onclick = go;
+    if (!ok) armContinue(item, go);
+    else { $("#cont").focus(); keyHandler = e => { if (e.key === "Enter") { e.preventDefault(); go(); } }; }
   });
 }
 function duelEnd() {
@@ -1128,3 +1131,55 @@ function duelsHTML() {
     if (!SESS) boot();   // non interrompe una sessione in corso
   });
 })();
+
+// ---------------- dopo un errore: la spiegazione va letta ----------------
+// Evidenzia le lettere sbagliate, mostra la spiegazione in evidenza, tiene fermo il pulsante qualche
+// secondo e, negli esercizi da scrivere, chiede di ricopiare la forma giusta prima di andare avanti.
+const READ_MS = 3000;
+function diffMarks(a, b) {   // quali lettere di a e di b fanno parte della parte comune (LCS)
+  const A = a.toLowerCase(), B = b.toLowerCase(), n = A.length, m = B.length;
+  const dp = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) dp[i][j] = A[i] === B[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+  const ma = new Array(n).fill(false), mb = new Array(m).fill(false); let i = 0, j = 0;
+  while (i < n && j < m) { if (A[i] === B[j]) { ma[i] = mb[j] = true; i++; j++; } else if (dp[i + 1][j] >= dp[i][j + 1]) i++; else j++; }
+  return [ma, mb];
+}
+function diffHTML(typed, right) {
+  const [ma, mb] = diffMarks(typed, right);
+  const t = [...typed].map((c, i) => ma[i] ? esc(c) : `<span class="dx">${esc(c)}</span>`).join("");
+  const r = [...right].map((c, i) => mb[i] ? esc(c) : `<span class="di">${esc(c)}</span>`).join("");
+  return `<div class="diff"><div><small>Hai scritto</small><span class="dw">${t || "—"}</span></div><div class="arrow">→</div><div><small>Giusto</small><span class="dr">${r}</span></div></div>`;
+}
+function errorFeedback(item, typed, diag) {
+  const right = correctText(item);
+  const top = typed !== undefined && item.t === "type" ? diffHTML(typed.trim(), right) : `<p>Risposta giusta: <b class="right-ans">${esc(right)}</b></p>`;
+  if (diag) return top;
+  return top + `<div class="why">💡 ${item.x}</div>` +
+    (item.t === "type" ? `<div class="retype"><label for="fix">✍️ Riscrivila giusta per continuare:</label><input id="fix" class="inp" autocomplete="off" autocapitalize="off" spellcheck="false"><span id="fixok"></span></div>` : "");
+}
+function armContinue(item, go) {
+  const b = $("#cont"), fix = $("#fix"), t0 = Date.now();
+  let timeOk = false, fixOk = !fix;
+  b.disabled = true; keyHandler = null;
+  const label = () => { b.textContent = !timeOk ? `Leggi la spiegazione… ${Math.max(1, Math.ceil((READ_MS - (Date.now() - t0)) / 1000))}` : !fixOk ? "Riscrivi la parola qui sopra ✍️" : "Ho capito ▶"; };
+  const enable = () => {
+    label();
+    if (timeOk && fixOk) {
+      b.disabled = false; b.focus();
+      keyHandler = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); done(); } };
+    }
+  };
+  const done = () => { if (b.disabled) return; (SESS.dwell = SESS.dwell || []).push(Date.now() - t0); keyHandler = null; go(); };
+  b.onclick = done;
+  const tick = setInterval(() => { if (!document.body.contains(b)) return clearInterval(tick); timeOk = Date.now() - t0 >= READ_MS; enable(); if (timeOk) clearInterval(tick); }, 250);
+  label();
+  if (fix) {
+    setTimeout(() => fix.focus(), 50);
+    fix.oninput = () => {
+      fixOk = item.a.some(a => normAns(a) === normAns(fix.value));
+      fix.classList.toggle("right", fixOk); $("#fixok").textContent = fixOk ? "✅" : "";
+      enable();
+    };
+    fix.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); if (!b.disabled) done(); } };
+  }
+}
