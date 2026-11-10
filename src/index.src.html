@@ -126,6 +126,11 @@ button:disabled{cursor:default}
 .hatch-row{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}.hatch-row small{display:block;color:var(--muted);font-weight:800}.hatch-row .arrow{font-size:2rem;color:var(--muted)}
 .motto{margin:-4px 0 6px;font-style:italic;color:var(--muted);font-weight:700}
 .formula{display:block;font-size:.78rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--c);margin-bottom:4px}
+/* sincronizzazione */
+.btn.small{font-size:.85rem;padding:7px 12px;box-shadow:none}
+.syncbox{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.syncbox label{font-size:.82rem;font-weight:800;color:var(--muted)}.syncbox .inp{text-align:left;max-width:none;font-size:.95rem}
+.row.left{justify-content:flex-start}.row.left .inp{max-width:260px;margin:0;text-align:left}
+@media (max-width:640px){.syncbox{grid-template-columns:1fr}}
 /* telefono */
 @media (pointer:coarse){.accents{display:none}}
 @media (max-width:640px){.phase small{display:none}.phase{font-size:.92rem}.top.sess{flex-wrap:nowrap}.btn.perk small{display:none}}

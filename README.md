@@ -14,9 +14,14 @@ Su iPhone è importante installarla: Safari può cancellare i dati dei siti non 
 
 ## Dove stanno i dati
 
-I progressi restano **solo sul dispositivo**: nessun account, nessun server, nessun dato inviato altrove.
-Ogni dispositivo ha i suoi progressi. Per spostarli: *Area genitori → Scarica backup* su un dispositivo, poi *Carica backup da file* sull'altro.
-Conviene scaricare un backup ogni tanto.
+Di base i progressi restano **solo sul dispositivo**: nessun account, nessun server.
+
+**Sincronizzazione (facoltativa).** Nell'*Area genitori → ☁️ Sincronizzazione* si può collegare un repository GitHub **privato** dove l'app salva il file `progressi.json`: all'apertura scarica la versione più recente, a fine lezione la salva. Così PC e telefono restano allineati e GitHub conserva ogni versione.
+Serve una chiave *fine-grained* con accesso **solo** a quel repository e permesso **Contents: Read and write**. La chiave resta salvata sul dispositivo e non entra mai nel codice né nel file dei progressi.
+
+Su un dispositivo nuovo: nella schermata iniziale tocca *Ho già dei progressi su un altro dispositivo*, poi collega la sincronizzazione.
+
+Senza sincronizzazione, per spostare i progressi: *Area genitori → Scarica backup* su un dispositivo, poi *Carica backup da file* sull'altro.
 
 ## Per chi sviluppa
 

@@ -79,7 +79,7 @@ const Store = {
     if (this.pending) { this.pending = false; this.flush(); }
   },
 };
-function updateSyncBadge() { const b = $("#sync"); if (b) b.textContent = Store.status === "online" ? "☁️ salvato" : "💾 " + Store.status; }
+function updateSyncBadge() { const b = $("#sync"); if (!b) return; const l = typeof Sync !== "undefined" && Sync.on() ? Sync.label() : ""; b.textContent = l || (Store.status === "online" ? "☁️ salvato" : "💾 salvato su questo dispositivo"); }
 
 // ---------------- modello dello studente ----------------
 const sk = id => S.skills[id];
@@ -276,7 +276,9 @@ function renderOnboarding() {
     <input id="nm" class="inp" maxlength="20" placeholder="Il tuo nome" autocomplete="off">
     <p class="muted">Prima facciamo una <b>prova di partenza</b>: ${ITEMS.filter(i => i.d && !AR[SK[i.s].area].later).length} domande veloci per capire da dove iniziare. Non è un compito in classe: niente voti!</p>
     <button class="btn primary" id="go">Iniziamo! 🚀</button>
+    <p><button class="btn ghost small" id="restore">🔄 Ho già dei progressi su un altro dispositivo</button></p>
   </section>`;
+  $("#restore").onclick = renderParentGate;
   const go = () => { S.name = ($("#nm").value || "").trim() || "Esploratore"; Store.save(); startDiagnostic(); };
   $("#go").onclick = go; $("#nm").onkeydown = e => { if (e.key === "Enter") go(); };
   $("#nm").focus();
@@ -298,7 +300,7 @@ function finishDiagnostic() {
   });
   S.diagDone = true; S.sessions++;
   const d = S.days[dayKey()] || (S.days[dayKey()] = { xp: 0, ok: 0, tot: 0, sess: 0 }); d.sess++;
-  finishDay(); Store.save();
+  finishDay(); Store.save(); Sync.push("prova di partenza");
   const rows = AREAS.filter(a => !a.later).map(a => {
     const list = SKILLS.filter(s => s.area === a.id).map(s => {
       const r = SESS.diagRes[s.id] || { ok: 0, tot: 0 };
@@ -319,6 +321,7 @@ function finishDiagnostic() {
 }
 
 function renderHome() {
+  if (Sync.on()) Sync.push("modifiche");
   SESS = null;
   const si = curStage(), STG = curStages(), st = STG[si], nxt = STG[si + 1], cx = compXp();
   const doneToday = S.lastDay === dayKey();
@@ -348,7 +351,7 @@ function renderHome() {
     <button class="btn primary big" id="start">${doneToday ? "Un'altra lezione ▶" : "Inizia la missione di oggi ▶"}</button>
     <div class="row"><button class="btn" id="map">🗺️ Mappa</button><button class="btn ghost" id="par">👤 Area genitori</button></div>
   </section>
-  <p class="foot"><span id="sync"></span> · v1.0</p>`;
+  <p class="foot"><span id="sync"></span> · v1.1</p>`;
   $("#start").onclick = startSession; $("#shop").onclick = () => renderDen(); if ($("#hatch")) $("#hatch").onclick = renderHatch; $("#map").onclick = renderMap; $("#par").onclick = renderParentGate;
   updateSyncBadge();
 }
@@ -605,6 +608,7 @@ function finishSession() {
   Store.save();
   if (sr && sr.weekly) SESS.xp += 100;
   const stAfter = curStage(), evolved = stAfter > stBefore;
+  setTimeout(() => Sync.push("lezione"), 0);
   S.iceBest = iceBest(); const newPerks = PERKS.filter(p => p.stage > iceBefore && p.stage <= S.iceBest);
   const streakItems = []; AVATAR_CATALOG.forEach(c => c.items.forEach(i => { if (i.streak && i.streak > bestBefore && i.streak <= S.best) streakItems.push(i); }));
   const unlocked = SKILLS.filter(s => isAvailable(s.id) && !SESS.availBefore.includes(s.id));
@@ -644,7 +648,7 @@ function renderParentGate() {
   app().innerHTML = `<section class="card center"><h2>👤 Area genitori</h2><p>Per entrare: quanto fa <b>${a} × ${b}</b>?</p>
     <input id="pg" class="inp" inputmode="numeric" autocomplete="off"><div class="row"><button class="btn" id="back">← Indietro</button><button class="btn primary" id="ok">Entra</button></div></section>`;
   const go = () => { if (Number($("#pg").value) === a * b) renderParent(); else { $("#pg").value = ""; $("#pg").placeholder = "Riprova"; } };
-  $("#ok").onclick = go; $("#pg").onkeydown = e => { if (e.key === "Enter") go(); }; $("#back").onclick = renderHome; $("#pg").focus();
+  $("#ok").onclick = go; $("#pg").onkeydown = e => { if (e.key === "Enter") go(); }; $("#back").onclick = boot; $("#pg").focus();
 }
 
 function renderParent() {
@@ -677,13 +681,19 @@ function renderParent() {
     <h3>Abilità</h3>
     <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Abilità</th><th>Padronanza</th><th>Accuratezza (tentativi)</th><th>Esercizi visti</th><th>Stato</th></tr></thead><tbody>${rows}</tbody></table></div>
     <p class="muted">La <b>padronanza</b> è una media mobile che dà più peso alle risposte recenti; un'abilità è «conquistata» quando supera l'85% dopo almeno 8 tentativi. Salvataggio: <span id="sync"></span>.</p>
+    <h3>Nome nell'app</h3>
+    <div class="row left"><input id="nick" class="inp" maxlength="20" value="${esc(S.name || "")}"><button class="btn" id="nicksave">Salva</button></div>
+    <p class="muted">Se sincronizzi i progressi in rete, è meglio usare un soprannome invece del nome vero.</p>
+    ${IS_STANDALONE ? syncPanel() : ""}
     <h3>Backup</h3>
     <div class="row">${IS_STANDALONE ? `<button class="btn" id="dl">💾 Scarica backup</button><label class="btn" for="upl">📂 Carica backup da file</label><input type="file" id="upl" accept=".json,application/json" hidden>` : ""}<button class="btn" id="copy">📋 Copia backup</button><button class="btn" id="imp">📥 Ripristina da backup</button><button class="btn warn" id="reset">🗑️ Azzera tutto</button></div>
     <div id="pbox"></div>
     <button class="btn" id="back">← Torna alla base</button>
   </section>`;
   updateSyncBadge();
-  $("#back").onclick = renderHome;
+  $("#back").onclick = boot;
+  $("#nicksave").onclick = () => { S.name = $("#nick").value.trim() || S.name; Store.save(); $("#pbox").innerHTML = "<p class='note'>Nome aggiornato ✅</p>"; };
+  if (IS_STANDALONE) wireSyncPanel();
   $("#copy").onclick = async () => { try { await navigator.clipboard.writeText(JSON.stringify(S)); $("#pbox").innerHTML = "<p class='note'>Backup copiato negli appunti ✅</p>"; } catch (e) { $("#pbox").innerHTML = `<p class="muted">Copia manualmente:</p><textarea class="inp ta" readonly>${esc(JSON.stringify(S))}</textarea>`; } };
   if ($("#dl")) $("#dl").onclick = () => {
     const blob = new Blob([JSON.stringify(S, null, 1)], { type: "application/json" });
@@ -703,9 +713,79 @@ function renderParent() {
   };
   $("#reset").onclick = () => {
     $("#pbox").innerHTML = `<p class="note bad">Sicuro? Si perdono tutti i progressi.</p><button class="btn warn" id="yes">Sì, azzera</button>`;
-    $("#yes").onclick = () => { S = freshState(); Store.save(); boot(); };
+    $("#yes").onclick = () => { S = freshState(); Store.save(); Sync.pushedAt = 0; boot(); };
   };
 }
+
+
+// ---------------- sincronizzazione con un repository GitHub privato ----------------
+// I progressi viaggiano in un file JSON del repository dei dati. La chiave (fine-grained token,
+// solo "Contents" su quel repository) resta salvata su questo dispositivo, mai nel codice.
+const SYNC_KEY = "incanto-sync-v1";
+const Sync = {
+  cfg: null, status: "", lastOk: 0, busy: false, pushedAt: 0,
+  load() { try { this.cfg = JSON.parse(localStorage.getItem(SYNC_KEY) || "null"); } catch (e) { this.cfg = null; } return this.cfg; },
+  saveCfg(c) { this.cfg = c; try { c ? localStorage.setItem(SYNC_KEY, JSON.stringify(c)) : localStorage.removeItem(SYNC_KEY); } catch (e) {} },
+  on() { return IS_STANDALONE && !!(this.cfg && this.cfg.token && this.cfg.owner && this.cfg.repo); },
+  url() { const c = this.cfg; return `https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/contents/${c.path || "progressi.json"}`; },
+  headers() { return { "Authorization": "Bearer " + this.cfg.token, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" }; },
+  b64enc(str) { const b = new TextEncoder().encode(str); let s = ""; for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); return btoa(s); },
+  b64dec(b64) { const bin = atob(b64.replace(/\s/g, "")); const u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return new TextDecoder().decode(u); },
+  explain(code) {
+    return code === 401 ? "chiave non valida o scaduta" : code === 403 ? "la chiave non ha il permesso di scrivere (serve Contents: Read and write)"
+      : code === 404 ? "repository non trovato o non accessibile con questa chiave" : code === 0 ? "nessuna connessione a internet" : "errore " + code;
+  },
+  async get() {    // → { data, sha } oppure { data: null, sha: null } se il file non esiste ancora
+    let r; try { r = await fetch(this.url() + "?t=" + Date.now(), { headers: this.headers(), cache: "no-store" }); } catch (e) { throw { code: 0 }; }
+    if (r.status === 404) {
+      let rr; try { rr = await fetch(`https://api.github.com/repos/${encodeURIComponent(this.cfg.owner)}/${encodeURIComponent(this.cfg.repo)}`, { headers: this.headers() }); } catch (e) { throw { code: 0 }; }
+      if (!rr.ok) throw { code: rr.status };
+      return { data: null, sha: null };
+    }
+    if (!r.ok) throw { code: r.status };
+    const j = await r.json();
+    return { data: JSON.parse(this.b64dec(j.content)), sha: j.sha };
+  },
+  async put(sha, why) {
+    const body = { message: `Progressi aggiornati — ${dayKey()} ${new Date().toTimeString().slice(0, 5)} (${why})`, content: this.b64enc(JSON.stringify(S, null, 1)) };
+    if (sha) body.sha = sha;
+    let r; try { r = await fetch(this.url(), { method: "PUT", headers: Object.assign({ "Content-Type": "application/json" }, this.headers()), body: JSON.stringify(body) }); } catch (e) { throw { code: 0 }; }
+    if (!r.ok) throw { code: r.status };
+  },
+  // scarica: se in rete c'è una versione più recente, la usa
+  async pull() {
+    if (!this.on() || this.busy) return false;
+    this.busy = true;
+    try {
+      const { data } = await this.get();
+      this.ok();
+      if (data && data.skills && (data.updatedAt || 0) > (S.updatedAt || 0)) { S = normalize(data); Store.saveLocal(); this.pushedAt = S.updatedAt; return true; }
+      if (!data || (S.updatedAt || 0) > (data.updatedAt || 0)) { this.busy = false; await this.push("primo salvataggio"); }
+      return false;
+    } catch (e) { this.fail(e); return false; } finally { this.busy = false; }
+  },
+  // carica: salva i progressi, ma non sovrascrive mai una versione più recente arrivata da un altro dispositivo
+  async push(why = "lezione") {
+    if (!this.on() || this.busy) return;
+    if ((S.updatedAt || 0) <= this.pushedAt) return;
+    this.busy = true;
+    try {
+      const { data, sha } = await this.get();
+      if (data && (data.updatedAt || 0) > (S.updatedAt || 0)) {   // l'altro dispositivo è più avanti: prendo la sua versione
+        S = normalize(data); Store.saveLocal(); this.pushedAt = S.updatedAt; this.ok(); if (!SESS) boot(); return;
+      }
+      await this.put(sha, why); this.pushedAt = S.updatedAt; this.ok();
+    } catch (e) { this.fail(e); } finally { this.busy = false; updateSyncBadge(); }
+  },
+  ok() { this.status = "ok"; this.lastOk = Date.now(); this.err = ""; updateSyncBadge(); },
+  fail(e) { this.status = "err"; this.err = this.explain(e && e.code !== undefined ? e.code : -1); updateSyncBadge(); },
+  label() {
+    if (!this.on()) return "";
+    if (this.status === "ok") return "☁️ sincronizzato " + new Date(this.lastOk).toTimeString().slice(0, 5);
+    if (this.status === "err") return "⚠️ sincronizzazione: " + this.err;
+    return "☁️ sincronizzazione…";
+  },
+};
 
 // ---------------- avvio ----------------
 const IS_STANDALONE = !(window.claude && typeof window.claude.use === "function");
@@ -713,6 +793,9 @@ function boot() { keyHandler = null; if (!S.diagDone) renderOnboarding(); else r
 (function init() {
   const local = Store.loadLocal(); if (local) S = normalize(local);
   boot();
+  if (IS_STANDALONE && Sync.load()) Sync.pull().then(changed => { if (changed && !SESS) boot(); });
+  // quando l'app va in secondo piano o si chiude, salva in rete se c'è qualcosa di nuovo
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && !SESS) Sync.push("chiusura"); });
   Store.connect(remote => {
     S = normalize(remote); Store.saveLocal();
     if (!SESS) boot();   // non interrompe una sessione in corso
@@ -808,4 +891,36 @@ function perksHTML() {
 function mirrorOk(item, ph) {
   if (!SESS || SESS.mode !== "session" || ph.key !== "nuovo" || SESS.mirrorUsed || !hasPerk("mirror")) return false;
   return item.t === "type" || (item.o && item.o.length >= 3) || (item.c && item.c.length >= 3);
+}
+
+function syncPanel() {
+  const c = Sync.cfg || {};
+  const on = Sync.on();
+  return `<h3>☁️ Sincronizzazione</h3>
+    <p class="muted">Salva i progressi in un repository GitHub <b>privato</b>, così PC e telefono restano allineati e nulla va perso.</p>
+    <div class="syncbox">
+      <label>Proprietario <input id="sy-owner" class="inp" value="${esc(c.owner || "felicat-hub")}" autocomplete="off"></label>
+      <label>Repository dei dati <input id="sy-repo" class="inp" value="${esc(c.repo || "IncantoParolum-dati")}" autocomplete="off"></label>
+      <label>Chiave (fine-grained token) <input id="sy-token" class="inp" type="password" placeholder="${on ? "•••••• chiave salvata" : "github_pat_…"}" autocomplete="off"></label>
+    </div>
+    <div class="row left"><button class="btn primary" id="sy-save">${on ? "Aggiorna e prova" : "Collega e prova"}</button>${on ? `<button class="btn" id="sy-now">Sincronizza ora</button><button class="btn ghost" id="sy-off">Scollega</button>` : ""}</div>
+    <p class="muted" id="sy-status">${on ? esc(Sync.label() || "Collegato.") : "Non collegato: i progressi restano solo su questo dispositivo."}</p>`;
+}
+function wireSyncPanel() {
+  const st = m => { const e = $("#sy-status"); if (e) e.textContent = m; };
+  $("#sy-save").onclick = async () => {
+    const prev = Sync.cfg || {};
+    const cfg = { owner: $("#sy-owner").value.trim(), repo: $("#sy-repo").value.trim(), token: $("#sy-token").value.trim() || prev.token || "", path: "progressi.json" };
+    if (!cfg.owner || !cfg.repo || !cfg.token) { st("Compila proprietario, repository e chiave."); return; }
+    Sync.saveCfg(cfg); Sync.pushedAt = 0; st("Provo il collegamento…");
+    try {
+      const { data } = await Sync.get(); Sync.ok();
+      if (data && data.skills && (data.updatedAt || 0) > (S.updatedAt || 0)) {
+        st(`Collegato ✅ In rete ci sono progressi più recenti (${esc(data.name || "")}, ${data.xp || 0} XP): li ho caricati.`);
+        S = normalize(data); Store.saveLocal(); Sync.pushedAt = S.updatedAt;
+      } else { S.updatedAt = Math.max(S.updatedAt || 0, Date.now()); Store.saveLocal(); await Sync.push("collegamento"); st(Sync.status === "ok" ? "Collegato ✅ Progressi salvati in rete." : "⚠️ " + Sync.err); }
+    } catch (e) { Sync.fail(e); st("⚠️ Non riesco a collegarmi: " + Sync.err + "."); }
+  };
+  if ($("#sy-now")) $("#sy-now").onclick = async () => { st("Sincronizzo…"); const changed = await Sync.pull(); if (!changed) { Sync.pushedAt = 0; await Sync.push("manuale"); } st(Sync.status === "ok" ? "✅ " + Sync.label() : "⚠️ " + Sync.err); };
+  if ($("#sy-off")) $("#sy-off").onclick = () => { Sync.saveCfg(null); renderParent(); };
 }
