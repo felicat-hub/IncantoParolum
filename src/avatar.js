@@ -589,6 +589,8 @@ const POWERS = {
   gr_modi:  { icon: "🧭", name: "Bussola dei modi", d: "Sa sempre come muoversi." },
   gr_tempi: { icon: "⏳", name: "Viaggio nel tempo", d: "Va nel passato e nel futuro." },
   gr_cong:  { icon: "🌀", name: "Magia del se", d: "Immagina mondi possibili." },
+  gr_aus:   { icon: "🤝", name: "Doppia forza", d: "Unisce due parole in un solo colpo, come i tempi composti." },
+  gr_indef: { icon: "📣", name: "Voce di comando", d: "Dà ordini che tutti ascoltano." },
   gr_pron:  { icon: "🔁", name: "Eco magica", d: "Si sostituisce a chiunque." },
   log_sogg: { icon: "🎯", name: "Occhio del cacciatore", d: "Trova sempre chi compie l'azione." },
   log_ogg:  { icon: "🦾", name: "Presa possente", d: "Afferra direttamente il suo obiettivo." },
