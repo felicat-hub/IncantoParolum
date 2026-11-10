@@ -1,6 +1,6 @@
 // Incanto Parolum — service worker: l'app funziona anche senza internet.
 // Cambiare VERSION a ogni aggiornamento, così i dispositivi scaricano la nuova versione.
-const VERSION = "incanto-v1.2.0";
+const VERSION = "incanto-v1.3.0";
 const CORE = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png", "./icons/favicon-32.png"];
 
 self.addEventListener("install", e => {

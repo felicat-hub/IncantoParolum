@@ -98,14 +98,18 @@ function isAvailable(id) {
   const solid = p => sk(p).ever || (sk(p).m >= 0.8 && sk(p).n >= 5);   // prerequisito "abbastanza solido"
   return s.ever || SK[id].pre.every(solid) || (s.m >= 0.8 && s.n >= 2);
 }
+const unseenCount = id => ITEMS.filter(i => i.s === id && !S.items[i.id]).length;
+const hasNews = id => isMastered(id) && unseenCount(id) >= 5;   // abilità conquistata ma con esercizi nuovi da scoprire
 function suggestFocus() {
-  if (S.focus && isAvailable(S.focus) && !isMastered(S.focus)) return S.focus;
+  if (S.focus && isAvailable(S.focus) && (!isMastered(S.focus) || hasNews(S.focus))) return S.focus;
   if (S.focusChosen && isMastered(S.focusChosen)) S.focusChosen = null;
-  let cands = SKILLS.filter(s => isAvailable(s.id) && !isMastered(s.id));
+  let cands = SKILLS.filter(s => isAvailable(s.id) && (!isMastered(s.id) || hasNews(s.id)));
   const now = cands.filter(s => !AR[s.area].later);
   if (now.length) cands = now;
   if (!cands.length) return null;
-  cands.sort((a, b) => sk(a.id).m - sk(b.id).m || SKILLS.indexOf(a) - SKILLS.indexOf(b));
+  // un'abilità conquistata con novità conta come "a metà strada": arriva dopo le lacune vere, ma non viene dimenticata
+  const prio = id => hasNews(id) ? 0.6 : sk(id).m;
+  cands.sort((a, b) => prio(a.id) - prio(b.id) || SKILLS.indexOf(a) - SKILLS.indexOf(b));
   // rotazione tra le aree: sceglie l'area usata meno di recente, poi l'abilità più debole lì
   const hist = S.areaHist || (S.lastArea ? [S.lastArea] : []);
   const lastUse = a => hist.lastIndexOf(a);
@@ -184,9 +188,10 @@ function easyPool(used) {   // esercizi a scelta di abilità che padroneggia
 function buildSession() {
   const today = dayNum();
   const due = ITEMS.filter(i => S.items[i.id] && S.items[i.id].due <= today && isAvailable(i.s));
-  const review = interleave(shuffle(due)).slice(0, 6);
-  const used = new Set(review.map(i => i.id));
   const focus = suggestFocus();
+  const fresh = shuffle(ITEMS.filter(i => !S.items[i.id] && isMastered(i.s) && i.s !== focus && strongSkill(i.s))).slice(0, 2);
+  const review = interleave(shuffle(shuffle(due).slice(0, 6).concat(fresh)));
+  const used = new Set(review.map(i => i.id));
   const warm = interleave(easyPool(new Set([...used, ...ITEMS.filter(i => i.s === focus).map(i => i.id)]))).slice(0, 2);
   warm.forEach(i => used.add(i.id));
   const phases = [];
@@ -351,7 +356,7 @@ function renderHome() {
     <button class="btn primary big" id="start">${doneToday ? "Un'altra lezione ▶" : "Inizia la missione di oggi ▶"}</button>
     <div class="row"><button class="btn" id="map">🗺️ Mappa</button><button class="btn ghost" id="par">👤 Area genitori</button></div>
   </section>
-  <p class="foot"><span id="sync"></span> · v1.2</p>`;
+  <p class="foot"><span id="sync"></span> · v1.3</p>`;
   $("#start").onclick = startSession; $("#shop").onclick = () => renderDen(); if ($("#hatch")) $("#hatch").onclick = renderHatch; $("#map").onclick = renderMap; $("#par").onclick = renderParentGate;
   updateSyncBadge();
 }
@@ -363,8 +368,9 @@ function renderMap() {
       const x = sk(s.id), av = isAvailable(s.id), ms = isMastered(s.id);
       const pct = Math.round(Math.min(x.m, ms ? 1 : x.m) * 100);
       const cls = ms ? "done" : av ? "open" : "locked";
-      const badge = ms ? "⭐" : av ? (s.id === focus ? "🎯" : "▶") : "🔒";
-      const req = !av ? `<small>Prima: ${s.pre.map(p => SK[p].name).join(", ")}</small>` : `<span class="bar thin"><i style="width:${pct}%"></i></span>`;
+      const news = hasNews(s.id);
+      const badge = s.id === focus ? "🎯" : news ? "✨" : ms ? "⭐" : av ? "▶" : "🔒";
+      const req = !av ? `<small>Prima: ${s.pre.map(p => SK[p].name).join(", ")}</small>` : news ? `<small class="news">✨ ${unseenCount(s.id)} esercizi nuovi</small>` : `<span class="bar thin"><i style="width:${pct}%"></i></span>`;
       return `<button class="node ${cls} ${s.id === focus ? "focus" : ""}" data-id="${s.id}" ${av ? "" : "disabled"}>
         <span class="ni">${s.icon}</span><span class="nt"><b>${esc(s.name)}</b>${req}</span><span class="nb">${badge}</span></button>`;
     }).join("");
@@ -372,13 +378,13 @@ function renderMap() {
   }).join("");
   app().innerHTML = header() + `<section class="card">
     <h2>🗺️ La mappa delle abilità</h2>
-    <p class="muted">Tocca un'abilità aperta per sceglierla come prossima missione. ⭐ = conquistata · 🎯 = missione attuale · 🔒 = si apre dopo.</p>
+    <p class="muted">Tocca un'abilità aperta per sceglierla come prossima missione. ⭐ = conquistata · ✨ = conquistata, ma con esercizi nuovi · 🎯 = missione attuale · 🔒 = si apre dopo.</p>
     <div class="map">${cols}</div>
     <button class="btn" id="back">← Torna alla base</button>
   </section><div id="toast"></div>`;
   document.querySelectorAll(".node.open, .node.done").forEach(b => b.onclick = () => {
     const id = b.dataset.id;
-    if (isMastered(id)) { toast("Questa l'hai già conquistata! ⭐ La ripasserai ogni tanto."); return; }
+    if (isMastered(id) && !hasNews(id)) { toast("Questa l'hai già conquistata! ⭐ La ripasserai ogni tanto."); return; }
     S.focus = id; S.focusChosen = id; Store.save(); renderMap(); toast("Missione scelta: " + SK[id].name + " 🎯");
   });
   $("#back").onclick = renderHome;
@@ -604,7 +610,7 @@ function finishSession() {
   if (bc > (S.bestCombo || 0)) S.bestCombo = bc;
   S.log = (S.log || []).concat([{ d: dayKey(), f: SESS.focus, ok: SESS.ok, tot: SESS.tot, r: SESS.rOk || 0, adj: SESS.adjust.join(","), c: bc, tOk: SESS.tOk || 0, tTot: SESS.tTot || 0, pk: (SESS.perkLog || []).join(",") }]).slice(-60);
   const iceBefore = iceBest();
-  if (SESS.focus) { S.lastArea = SK[SESS.focus].area; S.areaHist = (S.areaHist || []).concat([S.lastArea]).slice(-6); if (!isMastered(SESS.focus) && S.focusChosen !== SESS.focus) S.focus = null; }
+  if (SESS.focus) { S.lastArea = SK[SESS.focus].area; S.areaHist = (S.areaHist || []).concat([S.lastArea]).slice(-6); if (S.focusChosen !== SESS.focus) S.focus = null; }
   Store.save();
   if (sr && sr.weekly) SESS.xp += 100;
   const stAfter = curStage(), evolved = stAfter > stBefore;

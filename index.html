@@ -134,6 +134,8 @@ button:disabled{cursor:default}
 .hatch-row{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}.hatch-row small{display:block;color:var(--muted);font-weight:800}.hatch-row .arrow{font-size:2rem;color:var(--muted)}
 .motto{margin:-4px 0 6px;font-style:italic;color:var(--muted);font-weight:700}
 .formula{display:block;font-size:.78rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--c);margin-bottom:4px}
+/* novità */
+.news{color:#B54708;font-weight:800}
 /* sincronizzazione */
 .btn.small{font-size:.85rem;padding:7px 12px;box-shadow:none}
 .syncbox{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.syncbox label{font-size:.82rem;font-weight:800;color:var(--muted)}.syncbox .inp{text-align:left;max-width:none;font-size:.95rem}
@@ -579,6 +581,40 @@ const ITEMS = [
   { id: "z16", s: "ort_z", t: "type", q: "Ho perso un ___ del puzzle.", hint: "una parte", say: "pezzo", a: ["pezzo"], x: "«pezzo» ha due z." },
   { id: "z17", s: "ort_z", t: "mc", q: "In quale parola c'è un errore?", o: ["stazzione", "stazione", "lezione", "attenzione"], x: "Si scrive «stazione»: davanti a -ione la z è una sola." },
   { id: "z18", s: "ort_z", t: "type", q: "La ___ dei nonni è in campagna, vicino al bosco.", hint: "dove si abita (sinonimo di casa, finisce in -zione)", say: "abitazione", a: ["abitazione"], x: "Davanti a -ione la z è una sola: abitazione." },
+
+  // ---------------- v1.3: TROVA IL VERBO (frasi insidiose) ----------------
+  // verbi composti: ausiliare + participio formano UN solo verbo
+  { id: "vb11", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Ieri", "Marco", "ha mangiato", "una pizza."], a: 2, x: "«ha mangiato» è un verbo composto: ausiliare (ha) + participio (mangiato) formano un solo verbo." },
+  { id: "vb12", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["I miei cugini", "sono partiti", "stamattina."], a: 1, x: "«sono partiti» è un verbo composto con l'ausiliare essere." },
+  { id: "vb13", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Noi", "siamo rimasti", "a casa", "tutto il giorno."], a: 1, x: "«siamo rimasti» viene da rimanere: verbo composto." },
+  { id: "vb14", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["I ragazzi", "avevano già finito", "i compiti."], a: 1, x: "Il verbo è «avevano finito» (trapassato prossimo): «già» si infila in mezzo, ma il verbo è uno solo." },
+  { id: "vb15", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Che", "bella", "sorpresa", "mi", "hai fatto!"], a: 4, x: "«hai fatto» (da fare) è il verbo, anche se arriva in fondo alla frase." },
+  { id: "vb16", s: "gr_verbo", t: "mc", q: "Quante parole formano il verbo in «I vincitori sono stati premiati»?", o: ["3", "1", "2"], x: "«sono stati premiati» è un solo verbo (passivo) formato da tre parole." },
+  // verbo in posizioni insolite
+  { id: "vb17", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Una storia", "alla sera", "racconta", "la nonna."], a: 2, x: "«racconta» è il verbo: chi racconta? la nonna, che sta in fondo." },
+  { id: "vb18", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["In fondo al corridoio,", "dietro la porta,", "dorme", "il gatto."], a: 2, x: "«dorme» è il verbo, prima del soggetto. Attenzione: qui «porta» è un nome!" },
+  { id: "vb19", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Ama", "la musica", "più di ogni cosa."], a: 0, x: "«Ama» è il verbo, all'inizio della frase. Il soggetto (lui o lei) è sottinteso." },
+  // parole che possono essere nome o verbo
+  { id: "vb20", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Luca", "porta", "lo zaino", "a scuola."], a: 1, x: "Qui «porta» è il verbo portare: Luca porta lo zaino." },
+  { id: "vb21", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Il mio", "gioco", "preferito", "è", "il calcio."], a: 3, x: "Qui «gioco» è un nome (il gioco); il verbo è «è»." },
+  { id: "vb22", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Io", "gioco", "a calcio", "ogni sabato."], a: 1, x: "Qui «gioco» è il verbo giocare: io gioco." },
+  { id: "vb23", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["La", "pesca", "è", "il mio frutto preferito."], a: 2, x: "Qui «pesca» è un frutto, quindi un nome; il verbo è «è»." },
+  { id: "vb24", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Mio zio", "pesca", "nel lago."], a: 1, x: "Qui «pesca» è il verbo pescare: mio zio pesca." },
+  { id: "vb25", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["L'amo", "da pesca", "si è rotto."], a: 2, x: "Qui «amo» è un nome (l'amo per pescare) e «pesca» pure; il verbo è «si è rotto»." },
+  { id: "vb26", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Il", "ritorno", "a casa", "fu", "lunghissimo."], a: 3, x: "«ritorno» qui è un nome (il ritorno); il verbo è «fu», passato remoto di essere." },
+  { id: "vb27", s: "gr_verbo", t: "mc", q: "In «Il canto degli uccelli è dolce», la parola «canto» è:", o: ["un nome", "un verbo"], x: "«il canto»: c'è l'articolo davanti, quindi è un nome. Il verbo è «è»." },
+  { id: "vb28", s: "gr_verbo", t: "mc", q: "In «Io canto una canzone», la parola «canto» è:", o: ["un verbo", "un nome"], x: "«io canto»: è il verbo cantare." },
+  // verbi irregolari da riconoscere
+  { id: "vb29", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Dante", "visse", "a Firenze."], a: 1, x: "«visse» è il passato remoto di vivere." },
+  { id: "vb30", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["Ieri", "colsi", "una mela", "dall'albero."], a: 1, x: "«colsi» è il passato remoto di cogliere." },
+  { id: "vb31", s: "gr_verbo", t: "pick", q: "Tocca il VERBO:", c: ["La neve", "cadde", "per tutta la notte."], a: 1, x: "«cadde» è il passato remoto di cadere." },
+  { id: "vb32", s: "gr_verbo", t: "mc", q: "L'infinito di «vissi» è:", o: ["vivere", "vissere", "visire"], x: "vissi → vivere." },
+  { id: "vb33", s: "gr_verbo", t: "mc", q: "L'infinito di «colsi» è:", o: ["cogliere", "colsere", "collere"], x: "colsi → cogliere." },
+  { id: "vb34", s: "gr_verbo", t: "mc", q: "L'infinito di «rimasto» è:", o: ["rimanere", "rimastare", "rimasere"], x: "rimasto → rimanere." },
+  { id: "vb35", s: "gr_verbo", t: "mc", q: "L'infinito di «posero» è:", o: ["porre", "posere", "posare"], x: "posero → porre (essi posero). Attenzione: «posare» è un altro verbo." },
+  { id: "vb36", s: "gr_verbo", t: "type", q: "«Ieri caddi dalla bici»: il verbo «caddi» viene da ___.", a: ["cadere"], x: "caddi → cadere (passato remoto)." },
+  { id: "vb37", s: "gr_verbo", t: "type", q: "«Il professore spiegò la lezione»: l'infinito del verbo è ___.", a: ["spiegare"], x: "spiegò → spiegare." },
+  { id: "vb38", s: "gr_verbo", t: "type", q: "«Nessuno seppe la risposta»: l'infinito del verbo è ___.", a: ["sapere"], x: "seppe → sapere (passato remoto)." },
 ];
 
 </script>
@@ -1290,14 +1326,18 @@ function isAvailable(id) {
   const solid = p => sk(p).ever || (sk(p).m >= 0.8 && sk(p).n >= 5);   // prerequisito "abbastanza solido"
   return s.ever || SK[id].pre.every(solid) || (s.m >= 0.8 && s.n >= 2);
 }
+const unseenCount = id => ITEMS.filter(i => i.s === id && !S.items[i.id]).length;
+const hasNews = id => isMastered(id) && unseenCount(id) >= 5;   // abilità conquistata ma con esercizi nuovi da scoprire
 function suggestFocus() {
-  if (S.focus && isAvailable(S.focus) && !isMastered(S.focus)) return S.focus;
+  if (S.focus && isAvailable(S.focus) && (!isMastered(S.focus) || hasNews(S.focus))) return S.focus;
   if (S.focusChosen && isMastered(S.focusChosen)) S.focusChosen = null;
-  let cands = SKILLS.filter(s => isAvailable(s.id) && !isMastered(s.id));
+  let cands = SKILLS.filter(s => isAvailable(s.id) && (!isMastered(s.id) || hasNews(s.id)));
   const now = cands.filter(s => !AR[s.area].later);
   if (now.length) cands = now;
   if (!cands.length) return null;
-  cands.sort((a, b) => sk(a.id).m - sk(b.id).m || SKILLS.indexOf(a) - SKILLS.indexOf(b));
+  // un'abilità conquistata con novità conta come "a metà strada": arriva dopo le lacune vere, ma non viene dimenticata
+  const prio = id => hasNews(id) ? 0.6 : sk(id).m;
+  cands.sort((a, b) => prio(a.id) - prio(b.id) || SKILLS.indexOf(a) - SKILLS.indexOf(b));
   // rotazione tra le aree: sceglie l'area usata meno di recente, poi l'abilità più debole lì
   const hist = S.areaHist || (S.lastArea ? [S.lastArea] : []);
   const lastUse = a => hist.lastIndexOf(a);
@@ -1376,9 +1416,10 @@ function easyPool(used) {   // esercizi a scelta di abilità che padroneggia
 function buildSession() {
   const today = dayNum();
   const due = ITEMS.filter(i => S.items[i.id] && S.items[i.id].due <= today && isAvailable(i.s));
-  const review = interleave(shuffle(due)).slice(0, 6);
-  const used = new Set(review.map(i => i.id));
   const focus = suggestFocus();
+  const fresh = shuffle(ITEMS.filter(i => !S.items[i.id] && isMastered(i.s) && i.s !== focus && strongSkill(i.s))).slice(0, 2);
+  const review = interleave(shuffle(shuffle(due).slice(0, 6).concat(fresh)));
+  const used = new Set(review.map(i => i.id));
   const warm = interleave(easyPool(new Set([...used, ...ITEMS.filter(i => i.s === focus).map(i => i.id)]))).slice(0, 2);
   warm.forEach(i => used.add(i.id));
   const phases = [];
@@ -1543,7 +1584,7 @@ function renderHome() {
     <button class="btn primary big" id="start">${doneToday ? "Un'altra lezione ▶" : "Inizia la missione di oggi ▶"}</button>
     <div class="row"><button class="btn" id="map">🗺️ Mappa</button><button class="btn ghost" id="par">👤 Area genitori</button></div>
   </section>
-  <p class="foot"><span id="sync"></span> · v1.2</p>`;
+  <p class="foot"><span id="sync"></span> · v1.3</p>`;
   $("#start").onclick = startSession; $("#shop").onclick = () => renderDen(); if ($("#hatch")) $("#hatch").onclick = renderHatch; $("#map").onclick = renderMap; $("#par").onclick = renderParentGate;
   updateSyncBadge();
 }
@@ -1555,8 +1596,9 @@ function renderMap() {
       const x = sk(s.id), av = isAvailable(s.id), ms = isMastered(s.id);
       const pct = Math.round(Math.min(x.m, ms ? 1 : x.m) * 100);
       const cls = ms ? "done" : av ? "open" : "locked";
-      const badge = ms ? "⭐" : av ? (s.id === focus ? "🎯" : "▶") : "🔒";
-      const req = !av ? `<small>Prima: ${s.pre.map(p => SK[p].name).join(", ")}</small>` : `<span class="bar thin"><i style="width:${pct}%"></i></span>`;
+      const news = hasNews(s.id);
+      const badge = s.id === focus ? "🎯" : news ? "✨" : ms ? "⭐" : av ? "▶" : "🔒";
+      const req = !av ? `<small>Prima: ${s.pre.map(p => SK[p].name).join(", ")}</small>` : news ? `<small class="news">✨ ${unseenCount(s.id)} esercizi nuovi</small>` : `<span class="bar thin"><i style="width:${pct}%"></i></span>`;
       return `<button class="node ${cls} ${s.id === focus ? "focus" : ""}" data-id="${s.id}" ${av ? "" : "disabled"}>
         <span class="ni">${s.icon}</span><span class="nt"><b>${esc(s.name)}</b>${req}</span><span class="nb">${badge}</span></button>`;
     }).join("");
@@ -1564,13 +1606,13 @@ function renderMap() {
   }).join("");
   app().innerHTML = header() + `<section class="card">
     <h2>🗺️ La mappa delle abilità</h2>
-    <p class="muted">Tocca un'abilità aperta per sceglierla come prossima missione. ⭐ = conquistata · 🎯 = missione attuale · 🔒 = si apre dopo.</p>
+    <p class="muted">Tocca un'abilità aperta per sceglierla come prossima missione. ⭐ = conquistata · ✨ = conquistata, ma con esercizi nuovi · 🎯 = missione attuale · 🔒 = si apre dopo.</p>
     <div class="map">${cols}</div>
     <button class="btn" id="back">← Torna alla base</button>
   </section><div id="toast"></div>`;
   document.querySelectorAll(".node.open, .node.done").forEach(b => b.onclick = () => {
     const id = b.dataset.id;
-    if (isMastered(id)) { toast("Questa l'hai già conquistata! ⭐ La ripasserai ogni tanto."); return; }
+    if (isMastered(id) && !hasNews(id)) { toast("Questa l'hai già conquistata! ⭐ La ripasserai ogni tanto."); return; }
     S.focus = id; S.focusChosen = id; Store.save(); renderMap(); toast("Missione scelta: " + SK[id].name + " 🎯");
   });
   $("#back").onclick = renderHome;
@@ -1796,7 +1838,7 @@ function finishSession() {
   if (bc > (S.bestCombo || 0)) S.bestCombo = bc;
   S.log = (S.log || []).concat([{ d: dayKey(), f: SESS.focus, ok: SESS.ok, tot: SESS.tot, r: SESS.rOk || 0, adj: SESS.adjust.join(","), c: bc, tOk: SESS.tOk || 0, tTot: SESS.tTot || 0, pk: (SESS.perkLog || []).join(",") }]).slice(-60);
   const iceBefore = iceBest();
-  if (SESS.focus) { S.lastArea = SK[SESS.focus].area; S.areaHist = (S.areaHist || []).concat([S.lastArea]).slice(-6); if (!isMastered(SESS.focus) && S.focusChosen !== SESS.focus) S.focus = null; }
+  if (SESS.focus) { S.lastArea = SK[SESS.focus].area; S.areaHist = (S.areaHist || []).concat([S.lastArea]).slice(-6); if (S.focusChosen !== SESS.focus) S.focus = null; }
   Store.save();
   if (sr && sr.weekly) SESS.xp += 100;
   const stAfter = curStage(), evolved = stAfter > stBefore;
