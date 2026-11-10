@@ -12,6 +12,7 @@ const DRAGON_COLORS = {
   oro:       { main: "#F2B830", dark: "#C98F0E", belly: "#FFF5CC" },
   argento:   { main: "#B8C2D6", dark: "#7E8AA3", belly: "#F2F5FA" },
   ghiaccio:  { main: "#8FD3FF", dark: "#3E9BD6", belly: "#EAF8FF" },
+  smeraldo:  { main: "#1FB57A", dark: "#0F7A52", belly: "#D9F7EA" },
 };
 
 // slot → elenco oggetti {id, name, lv}
@@ -20,7 +21,7 @@ const AVATAR_CATALOG = [
     { id: "verde", name: "Verde bosco", lv: 1 }, { id: "blu", name: "Blu oceano", lv: 2 },
     { id: "rosso", name: "Rosso fuoco", lv: 4 }, { id: "viola", name: "Viola magico", lv: 6 },
     { id: "ossidiana", name: "Ossidiana", lv: 8 }, { id: "oro", name: "Oro leggendario", lv: 11 },
-    { id: "argento", name: "Argento lunare", streak: 14 } ] },
+    { id: "argento", name: "Argento lunare", streak: 14 }, { id: "smeraldo", name: "Smeraldo del campione", trophy: 3 } ] },
   { slot: "wings", label: "Ali", dragon: true, items: [
     { id: "small", name: "Alette", lv: 1 }, { id: "big", name: "Ali da volo", lv: 4 }, { id: "fire", name: "Ali di fuoco", lv: 7 } ] },
   { slot: "horns", label: "Corna", dragon: true, items: [
@@ -39,7 +40,7 @@ const AVATAR_CATALOG = [
   { slot: "aura", label: "Aura", items: [
     { id: "none", name: "Niente", lv: 1 }, { id: "stars", name: "Stelline", lv: 4 },
     { id: "flames", name: "Fiamme", lv: 8 }, { id: "rainbow", name: "Arcobaleno", lv: 12 },
-    { id: "aurora", name: "Aurora boreale", streak: 7 }, { id: "galaxy", name: "Galassia", streak: 30 } ] },
+    { id: "aurora", name: "Aurora boreale", streak: 7 }, { id: "galaxy", name: "Galassia", streak: 30 }, { id: "lightning", name: "Fulmini del duellante", trophy: 1 } ] },
 ];
 const AVATAR_DEFAULT = { color: "verde", wings: "small", horns: "none", crest: "none", tail: "arrow", face: "none", neck: "none", head: "none", aura: "none", name: "", seenLevel: 1 };
 
@@ -419,6 +420,7 @@ function creatureSVG(av, stage, size = 200, uid = "d", line = "fuoco", scene = f
   let s = scene ? sceneSVG(line, stage) : "";
   if (stage === 0) return wrapSVG(s + (ice ? iceEggInner() : eggInner(C)), size, uid, L.names[0], scene);
   if (av.aura === "aurora") s += `<path d="M-6 50 Q40 10 100 40 T206 30 L206 70 Q150 50 100 76 T-6 80 Z" fill="#7BE0B0" opacity=".35"/><path d="M-6 66 Q50 34 100 60 T206 50 L206 84 Q150 70 100 92 T-6 96 Z" fill="#B18CFF" opacity=".3"/>`;
+  if (av.aura === "lightning") s += [[22, 30, 1], [178, 40, -1], [30, 120, 1], [176, 126, -1]].map(([x, y, d]) => `<path d="M${x} ${y} l${8 * d} 14 l${-6 * d} 2 l${10 * d} 18 l${-14 * d} -16 l${6 * d} -2 Z" fill="#FFD54A" stroke="#F2A900" stroke-width="1.5" stroke-linejoin="round"/>`).join("");
   if (av.aura === "galaxy") s += `<circle cx="100" cy="100" r="96" fill="url(#gal-${uid})"/>` + [[30, 40, 3], [160, 30, 2.5], [180, 120, 3], [20, 130, 2], [120, 16, 2], [60, 170, 2.5], [150, 170, 2]].map(([x, y, r]) => star(x, y, r * 2, "#fff")).join("");
   // aura (dietro a tutto)
   if (stage >= 6) s += `<circle cx="100" cy="104" r="94" fill="none" stroke="#FFD54A" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round" opacity=".9"/>`;
@@ -602,3 +604,26 @@ const PERKS = [
   { id: "mirror", stage: 5, icon: "🪞", name: "Specchio di ghiaccio", d: "Una volta per lezione: un aiuto su una domanda difficile." },
   { id: "winter", stage: 6, icon: "❄️", name: "Inverno eterno",       d: "Dopo un errore il combo si dimezza invece di azzerarsi." },
 ];
+
+// ================= IL MOSTRO DEI REFUSI =================
+const MONSTERS = [
+  { n: "Refuso Gommoso",         c: "#9A6CF0", d: "#6E44C9", spikes: false, armor: false },
+  { n: "Refuso Spinoso",         c: "#EF5B5B", d: "#C23A3A", spikes: true,  armor: false },
+  { n: "Refuso Fangoso",         c: "#A27B52", d: "#74532F", spikes: false, armor: false },
+  { n: "Gran Refuso Corazzato",  c: "#5B5A72", d: "#33324A", spikes: true,  armor: true  },
+];
+function monsterSVG(m, size = 180, hurt = false) {
+  const words = ["tacquino", "lezzione", "perchè", "qual'è", "squola"];
+  let s = `<ellipse cx="100" cy="182" rx="56" ry="7" fill="#000" opacity=".08"/>`;
+  if (m.spikes) s += [40, 62, 84, 106, 128, 150].map((x, i) => `<path d="M${x} ${70 - (i % 2) * 4} l10 -26 l10 26 Z" fill="${m.d}"/>`).join("");
+  s += `<path d="M38 150 Q20 90 60 64 Q100 40 140 64 Q182 90 164 150 Q160 178 132 176 L120 168 L110 178 L100 168 L90 178 L80 168 L68 176 Q42 178 38 150 Z" fill="${m.c}" stroke="${m.d}" stroke-width="3"/>`;
+  s += `<circle cx="60" cy="140" r="9" fill="${m.d}" opacity=".35"/><circle cx="146" cy="128" r="6" fill="${m.d}" opacity=".35"/><circle cx="128" cy="154" r="4" fill="${m.d}" opacity=".35"/>`;   // macchie d'inchiostro
+  if (m.armor) s += `<path d="M58 122 Q100 108 142 122 L138 150 Q100 162 62 150 Z" fill="#9CA3B8" stroke="#33324A" stroke-width="2.5"/><path d="M80 118 L80 156 M100 114 L100 160 M120 118 L120 156" stroke="#33324A" stroke-width="1.5" opacity=".6"/>`;
+  s += hurt ? `<path d="M64 90 l16 12 M80 90 l-16 12 M122 90 l16 12 M138 90 l-16 12" stroke="#fff" stroke-width="5" stroke-linecap="round"/>`
+            : `<ellipse cx="74" cy="96" rx="14" ry="16" fill="#fff"/><ellipse cx="128" cy="96" rx="14" ry="16" fill="#fff"/><circle cx="78" cy="100" r="7" fill="#2B2340"/><circle cx="124" cy="100" r="7" fill="#2B2340"/>` +
+              `<path d="M58 74 L88 84 M144 74 L114 84" stroke="${m.d}" stroke-width="5" stroke-linecap="round"/>`;
+  s += `<path d="M70 124 Q100 ${hurt ? 116 : 140} 132 124" stroke="#2B2340" stroke-width="4" fill="${hurt ? "none" : "#2B2340"}" stroke-linejoin="round"/>`;
+  if (!hurt) s += `<path d="M80 128 l5 8 l5 -6 M112 130 l5 6 l5 -8" fill="#fff"/>`;
+  s += words.map((w, i) => `<text x="${[12, 150, 4, 160, 70][i]}" y="${[30, 24, 66, 60, 16][i]}" font-family="Georgia,serif" font-size="13" font-style="italic" fill="${m.d}" opacity=".55" transform="rotate(${[-12, 10, -6, 8, -3][i]} ${[12, 150, 4, 160, 70][i]} ${[30, 24, 66, 60, 16][i]})">${w}</text>`).join("");
+  return `<svg class="monster${hurt ? " hit" : ""}" viewBox="0 0 200 200" width="${size}" height="${size}" role="img" aria-label="${m.n}">${s}</svg>`;
+}
