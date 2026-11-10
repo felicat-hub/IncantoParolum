@@ -225,7 +225,8 @@ function buildSession() {
     pick.forEach(i => used.add(i.id));
     phases.push({ key: "nuovo", label: (boost ? "🔁 Rinforzo: " : "🧭 Missione: ") + SK[focus].name, skill: focus, items: pick, lessonShown: false });
   }
-  phases.push({ key: "raffica", label: "⚡ Raffica finale" });
+  const duelNow = duelReady() && todaySessions() === 0;
+  phases.push(duelNow ? { key: "duello", label: "⚔️ Duello" } : { key: "raffica", label: "⚡ Raffica finale" });
   return { mode: "session", phases, pi: 0, qi: 0, retried: new Set(), ok: 0, tot: 0, xp: 0, mastered: [], start: Date.now(), focus,
            factor: todaySessions() > 0 ? 0.5 : 1,
            used, boosts: 0, lastAdjust: -10, adjust: [],
@@ -360,6 +361,7 @@ function renderHome() {
     <div class="powers">${powers.length ? powers.map(s => `<span class="pw" title="${esc(powerOf(s.id).name)}: ${esc(powerOf(s.id).d)}">${powerOf(s.id).icon}</span>`).join("") : ""}<span class="pw-n">${powers.length}/${SKILLS.length} poteri</span></div>
     <button class="btn" id="shop">🛠️ Tana del drago${newItems ? ` <span class="badge">${newItems} nuovi!</span>` : ""}</button>
   </section>
+  ${duelReady() ? `<section class="card duel-banner"><div>${monsterSVG(weekMonster(), 64)}</div><div><b>⚔️ ${esc(weekMonster().n)} ti sfida!</b><br><small>${todaySessions() === 0 ? "Lo affronterai alla fine della lezione di oggi, al posto della raffica." : "Lo affronterai alla fine della prima lezione di domani."}</small></div></section>` : ""}
   <section class="card">
     <p class="hi">Ciao <b>${esc(S.name)}</b>! ${doneToday ? "Missione di oggi completata ✅ Se vuoi, puoi fare un'altra lezione di ripasso." : S.streak > 0 ? `La tua serie è a <b>${S.streak}</b> ${S.streak === 1 ? "giorno" : "giorni"}: non spezzarla! 🔥` : "Pronto per la missione di oggi?"}</p>
     <div class="mission">
@@ -370,7 +372,7 @@ function renderHome() {
     <button class="btn primary big" id="start">${doneToday ? "Un'altra lezione ▶" : "Inizia la missione di oggi ▶"}</button>
     <div class="row"><button class="btn" id="map">🗺️ Mappa</button><button class="btn ghost" id="par">👤 Area genitori</button></div>
   </section>
-  <p class="foot"><span id="sync"></span> · v1.4</p>`;
+  <p class="foot"><span id="sync"></span> · v1.5</p>`;
   $("#start").onclick = startSession; $("#shop").onclick = () => renderDen(); if ($("#hatch")) $("#hatch").onclick = renderHatch; $("#map").onclick = renderMap; $("#par").onclick = renderParentGate;
   updateSyncBadge();
 }
@@ -412,6 +414,7 @@ function next() {
   const ph = SESS.phases[SESS.pi];
   if (!ph) return SESS.mode === "diag" ? finishDiagnostic() : finishSession();
   if (ph.key === "raffica") return rafficaIntro();
+  if (ph.key === "duello") return duelIntro();
   if (ph.key === "nuovo" && !ph.lessonShown) return showLesson(ph);
   if (SESS.qi >= ph.items.length) { SESS.pi++; SESS.qi = 0; return next(); }
   balance(ph);
@@ -648,6 +651,7 @@ function finishSession() {
       <div><b>🔥 ${bc}</b><small>${newRecord ? "🏅 nuovo record combo!" : "miglior combo"}</small></div>
       <div><b>🔥 ${S.streak}</b><small>${already ? "serie (già fatta oggi)" : "giorni di fila"}</small></div>
     </div>
+    ${SESS.duelResult ? `<p class="note">${SESS.duelResult === "win" ? "🏆 Duello vinto! Il trofeo è nella tua Collezione." : "💨 Il mostro è scappato: lo ritroverai la settimana prossima."}</p>` : ""}
     ${sr && sr.weekly ? `<div class="levelup"><b>🎁 ${S.streak} giorni di fila!</b><p>Premio della settimana: <b>+100 XP</b> e un ghiacciolo 🧊</p></div>` : ""}
     ${streakItems.length ? `<div class="levelup pw-up"><b>🔥 Premio della costanza!</b><p>Sbloccato: ${streakItems.map(i => `<b>${esc(i.name)}</b>`).join(", ")} — si ottiene solo con la serie di giorni!</p></div>` : ""}
     ${SESS.factor < 1 ? `<p class="note">🔋 ${petName()[0].toUpperCase() + petName().slice(1)} è un po' stanco: le missioni extra di oggi valgono metà XP. Domani la prima missione torna a carica piena ⚡</p>` : ""}
@@ -698,6 +702,8 @@ function renderParent() {
       const adj = (l.adj || "").split(",").filter(Boolean);
       return `<tr><td>${l.d.split("-").reverse().slice(0, 2).join("/")}</td><td>${l.f && SK[l.f] ? SK[l.f].icon + " " + esc(SK[l.f].name) : "–"}</td><td><b style="color:${col}">${pc}%</b> <small>(${l.ok}/${l.tot})${l.tTot ? `<br>scritte: ${l.tOk}/${l.tTot}` : ""}${l.c ? ` · combo ${l.c}` : ""}</small></td><td><small>${adj.length ? adj.map(a => a === "giu" ? "↓ facilitato" : "↑ più difficile").join(", ") : "–"}${(l.pk || "").split(",").filter(x => x && x !== "breath").map(x => x === "mirror" ? " · 🪞 aiuto usato" : x === "regen" ? " · 💧 combo salvato" : " · ❄️ combo dimezzato").join("")}</small></td></tr>`; }).join("")}</tbody></table></div>`
       : `<p class="muted">Ancora nessuna sessione registrata con questa versione.</p>`}
+    <h3>⚔️ Duelli</h3>
+    ${duelsHTML()}
     <h3>Da ripassare <small class="muted">(sbagliati di recente e non ancora recuperati)</small></h3>
     ${recentErrorsHTML()}
     <h3>Abilità</h3>
@@ -820,17 +826,7 @@ const Sync = {
 // ---------------- avvio ----------------
 const IS_STANDALONE = !(window.claude && typeof window.claude.use === "function");
 function boot() { keyHandler = null; if (!S.diagDone) renderOnboarding(); else renderHome(); }
-(function init() {
-  const local = Store.loadLocal(); if (local) S = normalize(local);
-  boot();
-  if (IS_STANDALONE && Sync.load()) Sync.pull().then(changed => { if (changed && !SESS) boot(); });
-  // quando l'app va in secondo piano o si chiude, salva in rete se c'è qualcosa di nuovo
-  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && !SESS) Sync.push("chiusura"); });
-  Store.connect(remote => {
-    S = normalize(remote); Store.saveLocal();
-    if (!SESS) boot();   // non interrompe una sessione in corso
-  });
-})();
+// (l'avvio è in fondo al file, dopo che tutto è stato definito)
 
 // ---------------- tana del drago: personalizzazione e poteri ----------------
 function renderDen(tab) {
@@ -840,9 +836,9 @@ function renderDen(tab) {
   const nx = nextUnlock(lv);
   const slots = AVATAR_CATALOG.map(c => {
     const chips = c.items.map(i => {
-      const locked = i.streak ? (S.best || 0) < i.streak : i.lv > lv, on = S.avatar[c.slot] === i.id, isNew = fresh.has(c.slot + ":" + i.id);
+      const locked = i.trophy ? (S.trophies || []).length < i.trophy : i.streak ? (S.best || 0) < i.streak : i.lv > lv, on = S.avatar[c.slot] === i.id, isNew = fresh.has(c.slot + ":" + i.id);
       return `<button class="chip ${on ? "on" : ""} ${locked ? "lock" : ""}" data-slot="${c.slot}" data-id="${i.id}" ${locked ? "disabled" : ""}>
-        ${locked ? "🔒 " : i.streak ? "🔥 " : ""}${esc(i.name)}${locked ? ` <small>${i.streak ? i.streak + " giorni di fila" : "Liv. " + i.lv}</small>` : ""}${isNew ? ' <span class="badge">nuovo</span>' : ""}</button>`;
+        ${locked ? "🔒 " : i.trophy ? "🏆 " : i.streak ? "🔥 " : ""}${esc(i.name)}${locked ? ` <small>${i.trophy ? i.trophy + (i.trophy === 1 ? " trofeo" : " trofei") : i.streak ? i.streak + " giorni di fila" : "Liv. " + i.lv}</small>` : ""}${isNew ? ' <span class="badge">nuovo</span>' : ""}</button>`;
     }).join("");
     const note = c.slot === "wings" && S.line === "ghiaccio" ? `<small class="muted"> · i compagni della Linea del Ghiaccio volano senza ali</small>` : c.dragon && !isDragon ? `<small class="muted"> · si vedrà quando diventa ${esc(STG[DRAGON_FROM].n)}</small>` : c.slot === "color" && LINES[S.line].palette ? `<small class="muted"> · il compagno di ${esc(LINES[S.line].name)} ha il suo colore</small>` : "";
     return `<div class="slot"><h4>${c.label}${note}</h4><div class="chips">${chips}</div></div>`;
@@ -869,7 +865,8 @@ function renderDen(tab) {
         <div class="tabs"><button class="tab ${tab === "look" ? "on" : ""}" data-t="look">🎨 Aspetto</button><button class="tab ${tab === "pow" ? "on" : ""}" data-t="pow">✨ Poteri</button><button class="tab ${tab === "evo" ? "on" : ""}" data-t="evo">🧬 Evoluzione</button><button class="tab ${tab === "coll" ? "on" : ""}" data-t="coll">🏆 Collezione</button></div>
         ${tab === "look" ? slots : tab === "pow" ? `${perksHTML()}<h4 class="sub">📖 Il Grimorio</h4><p class="muted">Ogni incantesimo che apprendi (⭐ sulla mappa) scrive una pagina del Grimorio e dà un potere al tuo compagno.</p><div class="powers-grid">${powers}</div>`
           : tab === "evo" ? `<p class="muted">${LINES[S.line].icon} ${esc(LINES[S.line].name)}. Ogni risposta giusta lo fa crescere. Chi sarà il prossimo?</p><div class="evo-line">${evo}</div>`
-          : `<p class="muted">Quando il tuo compagno raggiunge la forma finale, entra nella collezione e trovi un nuovo uovo di un'altra specie.</p><div class="coll">${coll}</div>`}
+          : `<p class="muted">Quando il tuo compagno raggiunge la forma finale, entra nella collezione e trovi un nuovo uovo di un'altra specie.</p><div class="coll">${coll}</div>
+            <h4 class="sub">🏆 Trofei dei duelli</h4>${(S.trophies || []).length ? `<div class="coll">${S.trophies.map(t => `<div class="coll-item">${monsterSVG(MONSTERS.find(m => m.n === t.n) || MONSTERS[0], 90, true)}<b>${esc(t.n)}</b><small>sconfitto il ${t.d.split("-").reverse().join("/")}</small></div>`).join("")}</div>` : `<p class="muted">Ancora nessun trofeo: sconfiggi il mostro della settimana!</p>`}`}
       </div>
     </div>
     <button class="btn" id="back">← Torna alla base</button>
@@ -966,3 +963,168 @@ function recentErrorsHTML() {
   return `<div class="errs">${Object.entries(bySkill).map(([sid, its]) => `<div><b>${SK[sid].icon} ${esc(SK[sid].name)}</b>${needsBoost(sid) ? ' <span class="tag mid">da rinforzare</span>' : ""}<br>${its.map(i => `<span class="errw" title="${esc(i.q)}">${esc(correctText(i))}</span>`).join(" ")}</div>`).join("")}</div>
     <p class="muted">Tornano per primi nei prossimi ripassi; quando li risponde giusti, escono dall'elenco.</p>`;
 }
+
+// ======================= IL DUELLO DELLA SETTIMANA =======================
+// Ripasso misto delle abilità conquistate, travestito da combattimento.
+// Per far variare gli incantesimi: mano di 3 pescata a favore dei più deboli, ricarica di 2 turni,
+// punti deboli (×2) sulle abilità da allenare, corazza (½) su quelle più usate, catena di 3 diversi.
+const DUEL = { HP: 150, HEARTS: 5, BASE: 15, COOLDOWN: 2, CHAIN: 10, MIN_SPELLS: 3 };
+function weekKey(d = new Date()) { const x = new Date(d); const day = (x.getDay() + 6) % 7; x.setDate(x.getDate() - day); return dayKey(x); }   // lunedì della settimana
+const spells = () => SKILLS.filter(s => isMastered(s.id));
+const duelReady = () => spells().length >= DUEL.MIN_SPELLS && (S.duel || {}).week !== weekKey();
+function weekMonster() { const n = Math.floor(keyToNum(weekKey()) / 7); return MONSTERS[((n % MONSTERS.length) + MONSTERS.length) % MONSTERS.length]; }
+
+function setupDuel() {
+  const sp = spells().map(s => s.id);
+  const use = S.duelUse || {};
+  // corazza: l'incantesimo più usato nei duelli passati (al primo duello: quello più padroneggiato)
+  const byUse = sp.slice().sort((a, b) => (use[b] || 0) - (use[a] || 0) || sk(b).m - sk(a).m);
+  const resist = [byUse[0]];
+  // punti deboli: le abilità conquistate dove serve più allenamento
+  const weak = sp.filter(id => !resist.includes(id))
+    .sort((a, b) => (needsBoost(b) - needsBoost(a)) || (errItems(b).length - errItems(a).length) || (sk(a).m - sk(b).m)).slice(0, 2);
+  return { monster: weekMonster(), hp: DUEL.HP, hearts: DUEL.HEARTS, turn: 0, last: [], cool: {}, used: {}, offered: {}, okBy: {}, weak, resist, seen: new Set(), log: [] };
+}
+function spellPower(id, D) {
+  let m = D.weak.includes(id) ? 2 : D.resist.includes(id) || (D.used[id] || 0) >= 3 ? 0.5 : 1;
+  const instab = Math.min(1.3, 1 + (1 - sk(id).m) * 0.5);   // meno è solida, più è potente (ma rischiosa)
+  return { mult: m, instab };
+}
+function drawHand(D) {
+  let pool = spells().map(s => s.id).filter(id => !(D.cool[id] > 0));
+  if (pool.length === 0) pool = spells().map(s => s.id);
+  const w = id => 1 + 3 * (1 - sk(id).m) + (errItems(id).length ? 2 : 0) + (D.weak.includes(id) ? 3 : 0) - (D.resist.includes(id) ? 0.5 : 0);
+  const hand = [];
+  while (hand.length < 3 && pool.length) {
+    const tot = pool.reduce((a, id) => a + w(id), 0); let r = Math.random() * tot, k = 0;
+    for (; k < pool.length - 1; k++) { r -= w(pool[k]); if (r <= 0) break; }
+    hand.push(pool.splice(k, 1)[0]);
+  }
+  hand.forEach(id => D.offered[id] = (D.offered[id] || 0) + 1);
+  return hand;
+}
+function duelItem(id, D) {
+  const its = ITEMS.filter(i => i.s === id && !D.seen.has(i.id));
+  const err = its.filter(i => isErr(S.items[i.id])), seen = its.filter(i => S.items[i.id] && !isErr(S.items[i.id])).sort((a, b) => S.items[a.id].b - S.items[b.id].b), unseen = its.filter(i => !S.items[i.id]);
+  const pick = shuffle(err)[0] || seen[0] || shuffle(unseen)[0] || shuffle(ITEMS.filter(i => i.s === id))[0];
+  D.seen.add(pick.id); return pick;
+}
+const spellTag = (id, D) => { const p = spellPower(id, D); return p.mult === 2 ? `<span class="stag weak">💥 punto debole ×2</span>` : p.mult === 0.5 ? `<span class="stag res">🛡️ corazza ½</span>` : p.instab >= 1.12 ? `<span class="stag ins">⚡ instabile</span>` : `<span class="stag">affidabile</span>`; };
+
+function duelIntro() {
+  keyHandler = null;
+  const D = SESS.duel = setupDuel(), M = D.monster;
+  app().innerHTML = `<header class="top sess"><div class="phase">⚔️ Duello della settimana</div></header>
+  <section class="card center duel">
+    <div class="duel-row"><div>${pet(140, "dp", false)}</div><div class="vs">VS</div><div>${monsterSVG(M, 150)}</div></div>
+    <h2>${esc(M.n)} ti sfida!</h2>
+    <p>Ha rubato le parole del regno e le ha riempite di errori. Usa gli incantesimi del tuo Grimorio per sconfiggerlo!</p>
+    <div class="duel-rules">
+      <p>💥 <b>Teme:</b> ${D.weak.map(id => `${powerOf(id).icon} ${esc(powerOf(id).name)}`).join(", ") || "–"}</p>
+      <p>🛡️ <b>Corazzato contro:</b> ${D.resist.map(id => `${powerOf(id).icon} ${esc(powerOf(id).name)}`).join(", ")}</p>
+      <p class="muted">A ogni turno scegli 1 incantesimo tra 3. Dopo averlo usato si ricarica per 2 turni. Tre incantesimi diversi di fila = <b>Catena!</b> Nessuna fretta: pensa bene.</p>
+    </div>
+    <button class="btn primary big" id="fight">Al duello! ⚔️</button>
+  </section>`;
+  $("#fight").onclick = duelTurn;
+}
+function duelHeader(D, hurt) {
+  const pct = Math.max(0, D.hp) / DUEL.HP * 100;
+  return `<header class="top sess"><div class="phase">⚔️ ${esc(D.monster.n)}</div><div class="pill">${"❤️".repeat(D.hearts)}${"🤍".repeat(DUEL.HEARTS - D.hearts)}</div></header>
+    <div class="duel-hud"><div class="mini-pet">${pet(70, "dh" + D.turn, false)}</div>
+      <div class="hpwrap"><div class="hpbar"><i style="width:${pct}%"></i></div><small>${Math.max(0, Math.round(D.hp))} / ${DUEL.HP}</small></div>
+      <div class="mini-mon">${monsterSVG(D.monster, 80, hurt)}</div></div>`;
+}
+function duelTurn() {
+  const D = SESS.duel; if (!D) return;
+  if (D.hp <= 0 || D.hearts <= 0) return duelEnd();
+  Object.keys(D.cool).forEach(k => D.cool[k] = Math.max(0, D.cool[k] - 1));
+  const hand = drawHand(D);
+  const chainReady = D.last.length >= 2 && D.last[D.last.length - 1] !== D.last[D.last.length - 2];
+  app().innerHTML = duelHeader(D) + `<section class="card">
+    <h3 class="center">Scegli l'incantesimo da lanciare</h3>
+    <div class="hand">${hand.map(id => { const P = powerOf(id), d = spellPower(id, D), next = chainReady && !D.last.slice(-2).includes(id);
+      return `<button class="spell" data-id="${id}"><span class="si">${P.icon}</span><b>${esc(P.name)}</b><small>${esc(SK[id].name)}</small>${spellTag(id, D)}${next ? `<span class="stag chain">⛓️ Catena!</span>` : ""}</button>`; }).join("")}</div>
+  </section>`;
+  document.querySelectorAll(".spell").forEach(b => b.onclick = () => duelCast(b.dataset.id));
+}
+function duelCast(id) {
+  const D = SESS.duel, item = duelItem(id, D), P = powerOf(id), s = SK[id], a = AR[s.area];
+  D.turn++;
+  app().innerHTML = duelHeader(D) + `<section class="card qcard" style="--c:${a.color};--s:${a.soft}">
+    <div class="qtag">${P.icon} ${esc(P.name)} · ${esc(s.name)}</div>${renderItemBody(item)}<div id="fb"></div></section>`;
+  let done = false;
+  wireAnswers(item, (ok, el, typed) => {
+    if (done) return; done = true;
+    const res = record(item, ok, "duello"); SESS.xp += res.gain; SESS.tot++; if (ok) SESS.ok++;
+    if (res.newlyMastered) SESS.mastered.push(item.s);
+    markAnswer(item, ok, el); Store.save();
+    D.used[id] = (D.used[id] || 0) + 1; D.cool[id] = DUEL.COOLDOWN + 1;
+    const ob = D.okBy[id] || (D.okBy[id] = [0, 0]); ob[1]++; if (ok) ob[0]++;
+    let msg;
+    if (ok) {
+      const p = spellPower(id, D);
+      const chain = D.last.length >= 2 && new Set([D.last[D.last.length - 2], D.last[D.last.length - 1], id]).size === 3;
+      const dmg = Math.round(DUEL.BASE * p.mult * p.instab) + (chain ? DUEL.CHAIN : 0);
+      D.hp -= dmg;
+      msg = `<div class="fb-t">${P.icon} Colpito! <span class="dmg">−${dmg}</span></div>
+        ${p.mult === 2 ? "<p>💥 Punto debole! Danno doppio.</p>" : p.mult === 0.5 ? "<p>🛡️ Il mostro si è difeso con la corazza: danno dimezzato. Prova un altro incantesimo!</p>" : ""}
+        ${chain ? "<p>⛓️ <b>Catena di incantesimi!</b> +10 di danno.</p>" : ""}${(D.used[id] === 3 && !D.resist.includes(id)) ? "<p>👀 Il mostro si sta abituando a questo incantesimo…</p>" : ""}`;
+    } else {
+      D.hearts--;
+      msg = `<div class="fb-t">Il mostro contrattacca! 💢</div>${typed !== undefined ? `<p>Hai scritto: <s>${esc(typed)}</s></p>` : ""}<p>Risposta giusta: <b>${esc(correctText(item))}</b></p><p>${item.x}</p>`;
+    }
+    D.last.push(id); D.log.push([id, ok ? 1 : 0]);
+    const fb = $("#fb"); fb.className = "fb " + (ok ? "good" : "bad");
+    fb.innerHTML = msg + `<button class="btn ${ok ? "primary" : "warn"}" id="cont">${D.hp <= 0 ? "Finisci il mostro! ✨" : D.hearts <= 0 ? "Continua" : "Prossimo turno ▶"}</button>`;
+    if (ok) { const m = document.querySelector(".mini-mon"); if (m) m.innerHTML = monsterSVG(D.monster, 80, true); }
+    $(".hpbar i").style.width = Math.max(0, D.hp) / DUEL.HP * 100 + "%";
+    const hpTxt = document.querySelector(".hpwrap small"); if (hpTxt) hpTxt.textContent = Math.max(0, Math.round(D.hp)) + " / " + DUEL.HP;
+    const go = () => duelTurn(); $("#cont").onclick = go; $("#cont").focus();
+    keyHandler = e => { if (e.key === "Enter") { e.preventDefault(); go(); } };
+  });
+}
+function duelEnd() {
+  keyHandler = null;
+  const D = SESS.duel, win = D.hp <= 0, M = D.monster;
+  S.duel = { week: weekKey(), result: win ? "win" : "flee" };
+  S.duelUse = S.duelUse || {}; Object.entries(D.used).forEach(([k, v]) => S.duelUse[k] = (S.duelUse[k] || 0) + v);
+  const trophiesBefore = (S.trophies || []).length;
+  if (win) { S.trophies = (S.trophies || []).concat([{ n: M.n, c: M.c, d: dayKey() }]); S.xp += 50; SESS.xp += 50; }
+  S.duelLog = (S.duelLog || []).concat([{ d: dayKey(), m: M.n, win, turns: D.turn, hearts: D.hearts, used: D.used, offered: D.offered, ok: D.okBy, weak: D.weak, resist: D.resist }]).slice(-20);
+  Store.save();
+  const newItems = []; AVATAR_CATALOG.forEach(c => c.items.forEach(i => { if (i.trophy && i.trophy > trophiesBefore && i.trophy <= (S.trophies || []).length) newItems.push(i); }));
+  SESS.duelResult = win ? "win" : "flee";
+  app().innerHTML = `<header class="top sess"><div class="phase">⚔️ Duello della settimana</div></header><section class="card center duel">
+    ${win ? `<div class="duel-row"><div class="float">${pet(150, "dw", true)}</div><div>${monsterSVG(M, 110, true)}</div></div>
+      <h2>Hai sconfitto il ${esc(M.n)}! 🏆</h2><p>Le parole del regno sono salve. Hai vinto un <b>trofeo</b> e <b>+50 XP</b>.</p>`
+          : `<div class="duel-row"><div>${pet(140, "dl", false)}</div><div class="wob">${monsterSVG(M, 130)}</div></div>
+      <h2>Il ${esc(M.n)} è scappato!</h2><p>Non hai perso niente: tornerà la settimana prossima, e tu sarai più forte.</p>`}
+    ${newItems.length ? `<div class="levelup"><b>🎁 Premio del duellante!</b><p>Sbloccato: ${newItems.map(i => `<b>${esc(i.name)}</b>`).join(", ")}</p></div>` : ""}
+    <p class="muted">Incantesimi lanciati: ${Object.entries(D.used).map(([k, v]) => `${powerOf(k).icon}×${v}`).join(" ")}</p>
+    <button class="btn primary big" id="cont">Continua ▶</button></section>`;
+  $("#cont").onclick = () => { SESS.pi++; SESS.qi = 0; next(); };
+}
+
+function duelsHTML() {
+  const L = (S.duelLog || []).slice(-6).reverse();
+  if (!L.length) return `<p class="muted">${spells().length >= DUEL.MIN_SPELLS ? "Il primo duello arriverà alla fine di una delle prossime lezioni." : `I duelli iniziano quando ha conquistato almeno ${DUEL.MIN_SPELLS} abilità.`}</p>`;
+  return `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Giorno</th><th>Esito</th><th>Incantesimi scelti (giuste/lanci)</th><th>Offerti ma mai scelti</th></tr></thead><tbody>${L.map(l => {
+    const usedTxt = Object.entries(l.ok || {}).map(([k, [c, n]]) => `${powerOf(k).icon} ${esc(SK[k] ? SK[k].name : k)} <b>${c}/${n}</b>${(l.weak || []).includes(k) ? " 💥" : (l.resist || []).includes(k) ? " 🛡️" : ""}`).join("<br>");
+    const avoided = Object.keys(l.offered || {}).filter(k => !(l.used || {})[k]).map(k => `${powerOf(k).icon} ${esc(SK[k] ? SK[k].name : k)}`).join("<br>") || "–";
+    return `<tr><td>${l.d.split("-").reverse().slice(0, 2).join("/")}</td><td>${l.win ? "🏆 vinto" : "💨 scappato"}<br><small>${l.turns} turni</small></td><td><small>${usedTxt}</small></td><td><small>${avoided}</small></td></tr>`; }).join("")}</tbody></table></div>
+    <p class="muted">💥 = punto debole del mostro (abilità da allenare) · 🛡️ = corazza (incantesimo più usato). Se un incantesimo compare spesso tra gli "offerti ma mai scelti", Nicola lo sta evitando.</p>`;
+}
+
+// ---------------- avvio (in fondo, così ogni parte dell'app è già definita) ----------------
+(function init() {
+  const local = Store.loadLocal(); if (local) S = normalize(local);
+  boot();
+  if (IS_STANDALONE && Sync.load()) Sync.pull().then(changed => { if (changed && !SESS) boot(); });
+  // quando l'app va in secondo piano o si chiude, salva in rete se c'è qualcosa di nuovo
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && !SESS) Sync.push("chiusura"); });
+  Store.connect(remote => {
+    S = normalize(remote); Store.saveLocal();
+    if (!SESS) boot();   // non interrompe una sessione in corso
+  });
+})();
