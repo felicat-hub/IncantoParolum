@@ -579,6 +579,7 @@ const POWERS = {
   ort_q:    { icon: "💧", name: "Respiro d'acqua", d: "Nuota nei fiumi e negli acquari." },
   ort_dop:  { icon: "👯", name: "Doppio colpo", d: "Colpisce due volte, come le doppie." },
   ort_cie:  { icon: "🔍", name: "Lente magica", d: "Scova ogni i nascosta." },
+  ort_z:    { icon: "🦓", name: "Zampata a zeta", d: "Graffia una zeta sola, proprio dove serve." },
   gr_art:   { icon: "🛡️", name: "Scudo degli articoli", d: "Ogni parola ha la sua protezione." },
   gr_nome:  { icon: "📜", name: "Memoria dei nomi", d: "Non dimentica mai un nome." },
   gr_agg:   { icon: "🎨", name: "Scaglie cangianti", d: "Cambia aspetto come un aggettivo." },
