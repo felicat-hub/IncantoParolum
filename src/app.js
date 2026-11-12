@@ -293,12 +293,37 @@ function interleave(arr) {   // evita due esercizi consecutivi della stessa abil
   }
   return out;
 }
+// Raffica: mazzo pesato. Più spazio a errori recenti, esercizi medi/sfida e novità;
+// poco spazio a quelli ormai saputi; niente ripetizioni dall'ultima raffica; ~1 su 5 facile, per il ritmo.
+const RAFFICA_DECK = 40;
+function rafficaWeight(i) {
+  const it = S.items[i.id], L = lvl(i);
+  let w = L === 3 ? 1.1 : L === 2 ? 1.3 : 1;
+  if (!it) return w * (isMastered(i.s) ? 1.5 : 1);   // mai visto
+  if (isErr(it)) return w * 4;                       // sbagliato e non ancora recuperato
+  if (it.b >= 4) return w * 0.25;                    // indovinato più volte di fila: lo sa
+  if (it.b === 3) return w * 0.6;
+  return w * 1.5;
+}
+function weightedPick(arr, n) {
+  const a = arr.map(i => ({ i, k: Math.pow(Math.random(), 1 / Math.max(0.01, rafficaWeight(i))) }));   // estrazione pesata senza reinserimento
+  return a.sort((x, y) => y.k - x.k).slice(0, n).map(x => x.i);
+}
 function rafficaPool(sess) {
   const quick = i => i.t !== "type";
-  let pool = ITEMS.filter(i => quick(i) && S.items[i.id] && isAvailable(i.s));
-  if (sess.focus) pool = pool.concat(ITEMS.filter(i => quick(i) && i.s === sess.focus && !S.items[i.id]));
-  if (pool.length < 4) pool = ITEMS.filter(i => quick(i) && isAvailable(i.s));
-  return pool;
+  let cand = ITEMS.filter(i => quick(i) && isAvailable(i.s));
+  if (cand.length < 4) cand = ITEMS.filter(quick);
+  const recent = new Set(S.lastRaffica || []);
+  const fresh = cand.filter(i => !recent.has(i.id));
+  if (fresh.length >= 30) cand = fresh;
+  const errs = shuffle(cand.filter(i => isErr(S.items[i.id]))).slice(0, 6);   // gli errori da recuperare entrano sempre
+  const errSet = new Set(errs.map(i => i.id)); cand = cand.filter(i => !errSet.has(i.id));
+  const easy = cand.filter(i => lvl(i) === 1), hard = cand.filter(i => lvl(i) > 1);
+  const nEasy = Math.min(easy.length, Math.round(RAFFICA_DECK / 5));
+  const E = weightedPick(easy, nEasy), H = shuffle(errs.concat(weightedPick(hard, RAFFICA_DECK - nEasy - errs.length))).slice(0, RAFFICA_DECK - E.length);
+  const deck = [];   // un facile ogni 5, il resto pesato
+  while (E.length || H.length) { for (let k = 0; k < 4 && H.length; k++) deck.push(H.shift()); if (E.length) deck.push(E.shift()); }
+  return interleave(deck);
 }
 
 // ---------------- schermate ----------------
@@ -398,7 +423,7 @@ function renderHome() {
     <button class="btn primary big" id="start">${doneToday ? "Un'altra lezione ▶" : "Inizia la missione di oggi ▶"}</button>
     <div class="row"><button class="btn" id="map">🗺️ Mappa</button><button class="btn ghost" id="par">👤 Area genitori</button></div>
   </section>
-  <p class="foot"><span id="sync"></span> · v1.8</p>`;
+  <p class="foot"><span id="sync"></span> · v1.8.1</p>`;
   $("#start").onclick = startSession; $("#shop").onclick = () => renderDen(); if ($("#hatch")) $("#hatch").onclick = renderHatch; $("#map").onclick = renderMap; $("#par").onclick = renderParentGate;
   updateSyncBadge();
 }
@@ -604,9 +629,10 @@ function rafficaIntro() {
 function startRaffica() {
   const ph = SESS.phases[SESS.pi];
   const pool = rafficaPool(SESS);
-  let deck = shuffle(pool), last = null, ended = false, busy = false;
+  let deck = pool.slice(), last = null, ended = false, busy = false;
   const t0 = Date.now(), DUR = rafficaDur(); SESS.rOk = 0; SESS.rTot = 0; if (hasPerk("breath")) (SESS.perkLog = SESS.perkLog || []).push("breath");
-  const draw = () => { if (!deck.length) deck = shuffle(pool); let it = deck.shift(); if (it === last && deck.length) { deck.push(it); it = deck.shift(); } last = it; return it; };
+  SESS.rSeen = [];
+  const draw = () => { if (!deck.length) deck = rafficaPool(SESS); let it = deck.shift(); if (it === last && deck.length) { deck.push(it); it = deck.shift(); } last = it; SESS.rSeen.push(it.id); return it; };
   const mySess = SESS;
   const tick = setInterval(() => {
     if (SESS !== mySess) { clearInterval(tick); return; }
@@ -639,7 +665,7 @@ function startRaffica() {
   show();
 }
 const rafficaDur = () => RAFFICA_SEC + (hasPerk("breath") ? 10 : 0);
-function endRaffica() { if (!SESS || SESS._rEnded) return; SESS._rEnded = true; keyHandler = null; SESS.pi++; SESS.qi = 0; next(); }
+function endRaffica() { if (!SESS || SESS._rEnded) return; SESS._rEnded = true; S.lastRaffica = [...new Set(SESS.rSeen || [])].slice(-60); Store.save(); keyHandler = null; SESS.pi++; SESS.qi = 0; next(); }
 
 // ---------------- fine sessione ----------------
 function finishSession() {
