@@ -61,7 +61,7 @@ const STAGE_XP = [0, 100, 300, 650, 1200, 2000, 3200];
 const LINES = {
   fuoco: { name: "Linea del Fuoco", icon: "🔥", mult: 1,
     names: ["Uovo misterioso", "Lucertola", "Iguana", "Coccodrillo", "Draghetto", "Drago", "Drago delle Parole"] },
-  ghiaccio: { name: "Linea del Ghiaccio", icon: "❄️", mult: 2, palette: "ghiaccio",
+  ghiaccio: { name: "Linea del Ghiaccio", icon: "❄️", mult: 4, palette: "ghiaccio",
     names: ["Uovo di ghiaccio", "Axolotl delle nevi", "Tritone di ghiaccio", "Serpente marino", "Cucciolo di drago d'acqua", "Leviatano dei ghiacci", "Drago dell'Inverno"] },
 };
 const LINE_ORDER = ["fuoco", "ghiaccio"];

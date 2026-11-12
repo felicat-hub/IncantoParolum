@@ -27,7 +27,7 @@ function levelBounds(L) { return [L === 1 ? 0 : 50 * (L - 1) * L, 50 * L * (L + 
 function freshState() {
   const skills = {};
   SKILLS.forEach(s => skills[s.id] = { m: 0, n: 0, c: 0, ever: false });
-  return { v: 3, name: "", created: Date.now(), updatedAt: 0, diagDone: false, xp: 0, streak: 0, best: 0,
+  return { v: 4, name: "", created: Date.now(), updatedAt: 0, diagDone: false, xp: 0, streak: 0, best: 0,
            freezes: 1, lastDay: null, sessions: 0, focus: null, skills, items: {}, days: {}, avatar: Object.assign({}, AVATAR_DEFAULT), line: "fuoco", hatchXp: 0, collection: [] };
 }
 let S = freshState();
@@ -44,6 +44,10 @@ function normalize(st) {   // aggiunge abilità nuove se la banca cresce
     const today = dayNum();
     Object.values(st.items || {}).forEach(it => { if (it.b <= 1 && it.c < it.n && it.lw === undefined) it.lw = today; });
     st.v = 3;
+  }
+  if (st.v < 4) {   // v1.9: linea del ghiaccio più lunga; si riscala la posizione per non perdere stadi né percentuale
+    if (st.line === "ghiaccio" && typeof st.hatchXp === "number") { const cx = Math.max(0, st.xp - st.hatchXp); st.hatchXp = st.xp - cx * (LINES.ghiaccio.mult / 2); }
+    st.v = 4;
   }
   SKILLS.forEach(s => { if (!st.skills[s.id]) st.skills[s.id] = { m: 0, n: 0, c: 0, ever: false }; });
   return st;
@@ -108,6 +112,8 @@ const hasNews = id => isMastered(id) && unseenCount(id) >= 5;   // abilità conq
 const isErr = it => it && it.lw !== undefined && it.b <= 1;     // sbagliato e non ancora recuperato
 const errItems = id => ITEMS.filter(i => i.s === id && isErr(S.items[i.id]));
 const needsBoost = id => isMastered(id) && sk(id).m < 0.6 && errItems(id).length >= 2;   // conquistata, ma ora vacilla
+// Lacuna principale dichiarata all'inizio: modi e tempi verbali. Hanno la precedenza (2 missioni su 3).
+const CORE_SKILLS = ["gr_tempi", "gr_modi", "gr_aus", "gr_indef", "gr_cong"];
 function suggestFocus() {
   if (S.focus && isAvailable(S.focus) && (!isMastered(S.focus) || hasNews(S.focus) || needsBoost(S.focus))) return S.focus;
   if (S.focusChosen && isMastered(S.focusChosen)) S.focusChosen = null;
@@ -115,6 +121,11 @@ function suggestFocus() {
   const now = cands.filter(s => !AR[s.area].later);
   if (now.length) cands = now;
   if (!cands.length) return null;
+  const core = cands.filter(s => CORE_SKILLS.includes(s.id));
+  if (core.length && (S.log || []).slice(-3).filter(l => CORE_SKILLS.includes(l.f)).length < 2) {
+    const p = id => needsBoost(id) ? sk(id).m - 1 : sk(id).m;
+    return core.sort((a, b) => p(a.id) - p(b.id) || CORE_SKILLS.indexOf(a.id) - CORE_SKILLS.indexOf(b.id))[0].id;
+  }
   // un'abilità conquistata con novità conta come "a metà strada": arriva dopo le lacune vere, ma non viene dimenticata
   const prio = id => needsBoost(id) ? sk(id).m - 1 : hasNews(id) ? 0.6 : sk(id).m;   // una base che vacilla passa davanti
   cands.sort((a, b) => prio(a.id) - prio(b.id) || SKILLS.indexOf(a) - SKILLS.indexOf(b));
@@ -138,6 +149,10 @@ const hardNeed = id => Math.min(2, hardItems(id).length);
 const hardDone = id => hardItems(id).filter(i => S.items[i.id] && S.items[i.id].c > 0).length;
 const hardOk = id => hardDone(id) >= hardNeed(id);
 const hardMissing = id => Math.max(0, hardNeed(id) - hardDone(id));
+const MIN_DISTINCT = 8;   // per conquistare un'abilità: almeno 8 esercizi diversi indovinati
+const distinctDone = id => ITEMS.filter(i => i.s === id && S.items[i.id] && S.items[i.id].c > 0).length;
+const distinctNeed = id => Math.min(MIN_DISTINCT, ITEMS.filter(i => i.s === id).length);
+const distinctMissing = id => Math.max(0, distinctNeed(id) - distinctDone(id));
 const SFIDA_XP = 5;   // una sfida giusta vale 15 XP invece di 10
 function itemState(id) { return S.items[id] || (S.items[id] = { b: 0, due: 0, n: 0, c: 0 }); }
 
@@ -150,7 +165,7 @@ function record(item, ok, phase) {
   let newlyMastered = false;
   if (phase !== "diag") {
     s.m += ALPHA * ((ok ? 1 : 0) - s.m);
-    if (!s.ever && s.m >= MASTER_M && s.n >= MASTER_N && hardOk(item.s)) { s.ever = true; newlyMastered = true; }
+    if (!s.ever && s.m >= MASTER_M && s.n >= MASTER_N && hardOk(item.s) && !distinctMissing(item.s)) { s.ever = true; newlyMastered = true; }
   }
   const k = dayKey(); const d = S.days[k] || (S.days[k] = { xp: 0, ok: 0, tot: 0, sess: 0 });
   d.tot++; if (ok) d.ok++;
@@ -163,7 +178,7 @@ function record(item, ok, phase) {
 
 // ---------- combo: risposte giuste di fila ----------
 // +1 per ogni risposta giusta, +2 se l'esercizio è da scrivere; un errore azzera (senza togliere XP).
-function comboMult(c, phase) { return c >= 10 && phase === "raffica" ? 2.5 : c >= 6 ? 2 : c >= 3 ? 1.5 : 1; }
+function comboMult(c, phase) { return c >= 10 ? 2 : c >= 5 ? 1.5 : 1; }   // v1.9: combo meno generoso
 function applyCombo(item, ok, phase, res) {
   if (!SESS || SESS.mode !== "session") return { mult: 1, bonus: 0, broke: 0 };
   const before = SESS.combo || 0;
@@ -254,7 +269,7 @@ function buildSession() {
   const duelNow = duelReady() && todaySessions() === 0;
   phases.push(duelNow ? { key: "duello", label: "⚔️ Duello" } : { key: "raffica", label: "⚡ Raffica finale" });
   return { mode: "session", phases, pi: 0, qi: 0, retried: new Set(), ok: 0, tot: 0, xp: 0, mastered: [], start: Date.now(), focus,
-           factor: todaySessions() > 0 ? 0.5 : 1,
+           factor: todaySessions() === 0 ? 1 : todaySessions() === 1 ? 0.5 : 0.25,
            used, boosts: 0, lastAdjust: -10, adjust: [],
            xpBefore: S.xp, availBefore: SKILLS.filter(s => isAvailable(s.id)).map(s => s.id) };
 }
@@ -399,10 +414,10 @@ function renderHome() {
   const focus = suggestFocus();
   const dueN = ITEMS.filter(i => S.items[i.id] && S.items[i.id].due <= dayNum() && isAvailable(i.s)).length;
   const mastered = SKILLS.filter(s => isMastered(s.id)).length;
-  const prog = nxt ? Math.round((cx - st.xp) / (nxt.xp - st.xp) * 100) : 100;
+  const prog = nxt ? Math.max(0, Math.min(100, Math.round((cx - st.xp) / (nxt.xp - st.xp) * 100))) : 100;
   const newItems = newSince(S.avatar.seenLevel || 1, levelOf(S.xp)).length;
   const powers = SKILLS.filter(s => isMastered(s.id));
-  const energy = todaySessions() === 0 ? `<div class="pill energy full" title="La prima missione del giorno vale XP pieni">⚡ Carica piena</div>` : `<div class="pill energy" title="Le missioni extra di oggi valgono metà XP">🔋 Mezza carica</div>`;
+  const energy = todaySessions() === 0 ? `<div class="pill energy full" title="La prima missione del giorno vale XP pieni">⚡ Carica piena</div>` : `<div class="pill energy" title="La seconda missione di oggi vale metà XP, le successive un quarto">${todaySessions() === 1 ? "🔋 Mezza carica" : "🪫 Carica bassa"}</div>`;
   app().innerHTML = header(`<div class="pill">🧊 ${S.freezes}</div>${energy}`) + `
   <section class="card center pet">
     <div class="float petbox">${pet(190)}</div>
@@ -423,7 +438,7 @@ function renderHome() {
     <button class="btn primary big" id="start">${doneToday ? "Un'altra lezione ▶" : "Inizia la missione di oggi ▶"}</button>
     <div class="row"><button class="btn" id="map">🗺️ Mappa</button><button class="btn ghost" id="par">👤 Area genitori</button></div>
   </section>
-  <p class="foot"><span id="sync"></span> · v1.8.1</p>`;
+  <p class="foot"><span id="sync"></span> · v1.9</p>`;
   $("#start").onclick = startSession; $("#shop").onclick = () => renderDen(); if ($("#hatch")) $("#hatch").onclick = renderHatch; $("#map").onclick = renderMap; $("#par").onclick = renderParentGate;
   updateSyncBadge();
 }
@@ -437,7 +452,7 @@ function renderMap() {
       const cls = ms ? "done" : av ? "open" : "locked";
       const news = hasNews(s.id), weak = needsBoost(s.id);
       const badge = s.id === focus ? "🎯" : weak ? "🔁" : news ? "✨" : ms ? "⭐" : av ? "▶" : "🔒";
-      const req = !av ? `<small>Prima: ${s.pre.map(p => SK[p].name).join(", ")}</small>` : weak ? `<small class="news">🔁 da rinforzare</small>` : !ms && x.m >= 0.7 && hardMissing(s.id) ? `<span class="bar thin"><i style="width:${pct}%"></i></span><small class="news">🔥 mancano ${hardMissing(s.id)} ${hardMissing(s.id) === 1 ? "sfida" : "sfide"}</small>` : news ? `<small class="news">✨ ${unseenCount(s.id)} esercizi nuovi</small>` : `<span class="bar thin"><i style="width:${pct}%"></i></span>`;
+      const req = !av ? `<small>Prima: ${s.pre.map(p => SK[p].name).join(", ")}</small>` : weak ? `<small class="news">🔁 da rinforzare</small>` : !ms && x.m >= 0.7 && (hardMissing(s.id) || distinctMissing(s.id)) ? `<span class="bar thin"><i style="width:${pct}%"></i></span><small class="news">${[hardMissing(s.id) ? `🔥 mancano ${hardMissing(s.id)} ${hardMissing(s.id) === 1 ? "sfida" : "sfide"}` : "", distinctMissing(s.id) ? `🧩 ${distinctMissing(s.id)} esercizi nuovi da superare` : ""].filter(Boolean).join(" · ")}</small>` : news ? `<small class="news">✨ ${unseenCount(s.id)} esercizi nuovi</small>` : `<span class="bar thin"><i style="width:${pct}%"></i></span>`;
       return `<button class="node ${cls} ${s.id === focus ? "focus" : ""}" data-id="${s.id}" ${av ? "" : "disabled"}>
         <span class="ni">${s.icon}</span><span class="nt"><b>${esc(s.name)}</b>${req}</span><span class="nb">${badge}</span></button>`;
     }).join("");
@@ -488,6 +503,7 @@ function showLesson(ph) {
     <div class="lesson-h"><span class="ni">${s.icon}</span><div><small>${a.name}</small><h2>${esc(s.name)}</h2></div></div>
     <div class="rule"><span class="formula">📜 Formula</span>${s.rule}</div>
     <ul class="ex">${s.ex.map(e => `<li>${e}</li>`).join("")}</ul>
+    ${Object.entries(TRAPS).filter(([k, t]) => t.s.includes(s.id)).map(([k, t]) => `<div class="trap">⚠️ <b>Trappola: ${t.t}</b><br>${t.d}</div>`).join("")}
     <button class="btn primary big" id="ok">Ho capito, mettimi alla prova! ▶</button>
   </section>`;
   bindQuit();
@@ -621,7 +637,7 @@ function rafficaIntro() {
   const ph = SESS.phases[SESS.pi];
   app().innerHTML = sessHeader(ph, 0) + `<section class="card center">
     <div class="big-emoji">⚡</div><h2>Raffica finale!</h2>
-    <p>Hai <b>${rafficaDur()} secondi</b>${hasPerk("breath") ? " (🌬️ +10 dal Respiro gelido)" : ""}. Ogni risposta giusta vale <b>10 XP</b>, e con il <b>combo</b> fino a ×2,5. Non sbagliare per non spezzare la serie!</p>
+    <p>Hai <b>${rafficaDur()} secondi</b>${hasPerk("breath") ? " (🌬️ +10 dal Respiro gelido)" : ""}. Ogni risposta giusta vale <b>10 XP</b>, e con il <b>combo</b> fino a ×2. Non sbagliare per non spezzare la serie!</p>
     <button class="btn primary big" id="go">Via! ⏱️</button></section>`;
   bindQuit();
   $("#go").onclick = startRaffica; keyHandler = e => { if (e.key === "Enter") startRaffica(); };
@@ -679,6 +695,7 @@ function finishSession() {
   const bc = SESS.bestCombo || 0, newRecord = bc >= 5 && bc > (S.bestCombo || 0);
   if (bc > (S.bestCombo || 0)) S.bestCombo = bc;
   S.log = (S.log || []).concat([{ d: dayKey(), f: SESS.focus, ok: SESS.ok, tot: SESS.tot, r: SESS.rOk || 0, adj: SESS.adjust.join(","), c: bc, tOk: SESS.tOk || 0, tTot: SESS.tTot || 0, pk: (SESS.perkLog || []).join(","),
+    min: Math.min(90, Math.round((Date.now() - SESS.start) / 6000) / 10),
     rd: (SESS.dwell || []).length ? Math.round(SESS.dwell.reduce((a, b) => a + b, 0) / SESS.dwell.length / 100) / 10 : null }]).slice(-60);
   const iceBefore = iceBest();
   if (SESS.focus) { S.lastArea = SK[SESS.focus].area; S.areaHist = (S.areaHist || []).concat([S.lastArea]).slice(-6); if (S.focusChosen !== SESS.focus) S.focus = null; }
@@ -708,7 +725,7 @@ function finishSession() {
     ${SESS.duelResult ? `<p class="note">${SESS.duelResult === "win" ? "🏆 Duello vinto! Il trofeo è nella tua Collezione." : "💨 Il mostro è scappato: lo ritroverai la settimana prossima."}</p>` : ""}
     ${sr && sr.weekly ? `<div class="levelup"><b>🎁 ${S.streak} giorni di fila!</b><p>Premio della settimana: <b>+100 XP</b> e un ghiacciolo 🧊</p></div>` : ""}
     ${streakItems.length ? `<div class="levelup pw-up"><b>🔥 Premio della costanza!</b><p>Sbloccato: ${streakItems.map(i => `<b>${esc(i.name)}</b>`).join(", ")} — si ottiene solo con la serie di giorni!</p></div>` : ""}
-    ${SESS.factor < 1 ? `<p class="note">🔋 ${petName()[0].toUpperCase() + petName().slice(1)} è un po' stanco: le missioni extra di oggi valgono metà XP. Domani la prima missione torna a carica piena ⚡</p>` : ""}
+    ${SESS.factor < 1 ? `<p class="note">🔋 ${petName()[0].toUpperCase() + petName().slice(1)} è un po' stanco: ${SESS.factor < 0.5 ? "questa missione extra valeva un quarto degli XP" : "la seconda missione di oggi vale metà XP"}. Domani la prima missione torna a carica piena ⚡</p>` : ""}
     ${stAfter >= FINAL_STAGE && canHatch() ? `<button class="btn primary big" id="hatch2">🥚 Hai trovato un uovo misterioso!</button>` : ""}
     ${sr && sr.usedFreeze ? `<p class="note">🧊 Hai usato ${sr.usedFreeze} ${sr.usedFreeze === 1 ? "ghiacciolo" : "ghiaccioli"} per salvare la serie!</p>` : ""}
     ${newPowers.length ? `<p class="mastered">✨ Incantesimi appresi: ${newPowers.map(id => esc(SK[id].name)).join(", ")}</p>` : ""}
@@ -754,7 +771,7 @@ function renderParent() {
     ${(S.log || []).length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Giorno</th><th>Missione</th><th>Giuste</th><th>Adattamenti</th></tr></thead><tbody>${(S.log || []).slice(-8).reverse().map(l => {
       const pc = l.tot ? Math.round(l.ok / l.tot * 100) : 0, col = pc < 70 ? "var(--bad)" : pc > 95 ? "var(--pri)" : "var(--ok)";
       const adj = (l.adj || "").split(",").filter(Boolean);
-      return `<tr><td>${l.d.split("-").reverse().slice(0, 2).join("/")}</td><td>${l.f && SK[l.f] ? SK[l.f].icon + " " + esc(SK[l.f].name) : "–"}</td><td><b style="color:${col}">${pc}%</b> <small>(${l.ok}/${l.tot})${l.tTot ? `<br>scritte: ${l.tOk}/${l.tTot}` : ""}${l.c ? ` · combo ${l.c}` : ""}${l.rd != null ? `<br>⏱ ${l.rd}s sugli errori` : ""}</small></td><td><small>${adj.length ? adj.map(a => a === "giu" ? "↓ facilitato" : "↑ più difficile").join(", ") : "–"}${(l.pk || "").split(",").filter(x => x && x !== "breath").map(x => x === "mirror" ? " · 🪞 aiuto usato" : x === "regen" ? " · 💧 combo salvato" : " · ❄️ combo dimezzato").join("")}</small></td></tr>`; }).join("")}</tbody></table></div>`
+      return `<tr><td>${l.d.split("-").reverse().slice(0, 2).join("/")}</td><td>${l.f && SK[l.f] ? SK[l.f].icon + " " + esc(SK[l.f].name) : "–"}</td><td><b style="color:${col}">${pc}%</b> <small>(${l.ok}/${l.tot})${l.tTot ? `<br>scritte: ${l.tOk}/${l.tTot}` : ""}${l.c ? ` · combo ${l.c}` : ""}${l.min != null ? `<br>🕒 ${String(l.min).replace(".", ",")} min` : ""}${l.rd != null ? `<br>⏱ ${l.rd}s sugli errori` : ""}</small></td><td><small>${adj.length ? adj.map(a => a === "giu" ? "↓ facilitato" : "↑ più difficile").join(", ") : "–"}${(l.pk || "").split(",").filter(x => x && x !== "breath").map(x => x === "mirror" ? " · 🪞 aiuto usato" : x === "regen" ? " · 💧 combo salvato" : " · ❄️ combo dimezzato").join("")}</small></td></tr>`; }).join("")}</tbody></table></div>`
       : `<p class="muted">Ancora nessuna sessione registrata con questa versione.</p>`}
     <h3>⚔️ Duelli</h3>
     ${duelsHTML()}
@@ -1206,7 +1223,8 @@ function errorFeedback(item, typed, diag) {
   const right = correctText(item);
   const top = typed !== undefined && item.t === "type" ? diffHTML(typed.trim(), right) : `<p>Risposta giusta: <b class="right-ans">${esc(right)}</b></p>`;
   if (diag) return top;
-  return top + `<div class="why">💡 ${item.x}</div>` +
+  const tr = TRAP_OF[item.id] && TRAPS[TRAP_OF[item.id]];
+  return top + `<div class="why">💡 ${item.x}</div>` + (tr ? `<div class="trap">🧪 <b>${tr.t}</b><br>${tr.d}</div>` : "") +
     (item.t === "type" ? `<div class="retype"><label for="fix">✍️ Riscrivila giusta per continuare:</label><input id="fix" class="inp" autocomplete="off" autocapitalize="off" spellcheck="false"><span id="fixok"></span></div>` : "");
 }
 function armContinue(item, go) {

@@ -875,3 +875,20 @@ const ITEMS = [
   { id: "co29", s: "log_ogg", t: "mc", lv: 2, q: "Il complemento oggetto ha mai la preposizione davanti?", o: ["No, mai", "Sì, sempre", "Solo con i nomi propri"], x: "Il complemento oggetto è «diretto»: non ha preposizioni." },
   { id: "co30", s: "log_ogg", t: "pick", lv: 3, q: "Tocca il COMPLEMENTO OGGETTO:", c: ["Ai miei amici", "ho raccontato", "una storia", "di paura."], a: 2, x: "Ho raccontato che cosa? Una storia. «Ai miei amici» risponde a «a chi?»." },
 ];
+
+// ---------- v1.9: TRAPPOLE — formule mirate per i casi in cui si inciampa ----------
+const TRAPS = {
+  sogg_dopo: { s: ["log_sogg"], t: "il soggetto non sta sempre all'inizio",
+    d: "Chiediti «chi?» o «che cosa?» davanti al verbo: «Nel bosco vivevano sette nani» → chi viveva? <b>sette nani</b>. Il soggetto può stare anche in fondo alla frase, e può essere perfino un verbo: «<b>Fumare</b> fa male»." },
+  piacere: { s: ["log_sogg", "gr_pron"], t: "piacere, mancare, servire",
+    d: "In «Mi piace <b>la musica</b>» chi piace? la musica: è lei il soggetto. «Mi», «a me», «a Luca» vogliono dire «a qualcuno»: non sono mai il soggetto. Prova: metti la cosa al plurale e il verbo cambia → mi piacci<b>ono</b> i film." },
+  co_prep: { s: ["log_ogg"], t: "con la preposizione non è complemento oggetto",
+    d: "Il complemento oggetto risponde a «chi?» o «che cosa?» <b>senza preposizione davanti</b>. «Va <b>a</b> scuola», «penso <b>a</b> te», «corre <b>al</b> parco»: c'è una preposizione → non è complemento oggetto. «<b>Ti</b> penso» invece sì: penso chi? te." },
+  pron_lgl: { s: ["gr_pron"], t: "lo, gli o le?",
+    d: "Cerca la «a». Senza «a» → <b>lo, la, li, le</b>: ho visto Marco → <b>l'</b>ho visto. Con «a» → <b>gli</b> per un maschio o per loro, <b>le</b> per una femmina: ho parlato a Marco → <b>gli</b> ho parlato; a Sara → <b>le</b> ho parlato." },
+};
+const TRAP_OF = {};
+[["sogg_dopo", "sg2 sg8 sg13 sg14 sg15 sg16 sg31"], ["piacere", "sg11 sg12 sg27 sg30 pr6 pr28"],
+ ["co_prep", "co2 co15 co16 co22 co23 co24 co28 co30"],
+ ["pron_lgl", "pr1 pr2 pr4 pr7 pr9 pr11 pr12 pr13 pr14 pr29 pr33 pr34 pr35 pr36"]]
+  .forEach(([k, ids]) => ids.split(" ").forEach(id => TRAP_OF[id] = k));
