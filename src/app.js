@@ -438,11 +438,17 @@ function renderHome() {
     <button class="btn primary big" id="start">${doneToday ? "Un'altra lezione ▶" : "Inizia la missione di oggi ▶"}</button>
     <div class="row"><button class="btn" id="map">🗺️ Mappa</button><button class="btn ghost" id="par">👤 Area genitori</button></div>
   </section>
-  <p class="foot"><span id="sync"></span> · v1.9</p>`;
+  <p class="foot"><span id="sync"></span> · v1.9.1</p>`;
   $("#start").onclick = startSession; $("#shop").onclick = () => renderDen(); if ($("#hatch")) $("#hatch").onclick = renderHatch; $("#map").onclick = renderMap; $("#par").onclick = renderParentGate;
   updateSyncBadge();
 }
 
+// v1.9.1: «Torna alla base» anche in alto (resta visibile scorrendo): Nicola non deve scendere fino in fondo
+const backTop = () => `<div class="back-top-wrap"><button class="btn back-top" type="button">← Torna alla base</button></div>`;
+document.addEventListener("click", e => {
+  if (!e.target.closest || !e.target.closest(".back-top")) return;
+  const b = document.querySelector("#back") || document.querySelector("#home"); if (b) b.click();
+});
 function renderMap() {
   const focus = suggestFocus();
   const cols = AREAS.map(a => {
@@ -458,7 +464,7 @@ function renderMap() {
     }).join("");
     return `<div class="col" style="--c:${a.color};--s:${a.soft}"><h3>${a.name}</h3>${a.later ? `<p class="later">👀 Anteprima: la farai in classe più avanti. Puoi provarla quando vuoi!</p>` : ""}${nodes}</div>`;
   }).join("");
-  app().innerHTML = header() + `<section class="card">
+  app().innerHTML = header() + `<section class="card">${backTop()}
     <h2>🗺️ La mappa delle abilità</h2>
     <p class="muted">Tocca un'abilità aperta per sceglierla come prossima missione. ⭐ = conquistata · ✨ = conquistata, ma con esercizi nuovi · 🔁 = conquistata, ma da rinforzare · 🔥 = per conquistarla servono le sfide · 🎯 = missione attuale · 🔒 = si apre dopo.</p>
     <div class="map">${cols}</div>
@@ -710,7 +716,7 @@ function finishSession() {
   const st = curStages()[stAfter], lvAfter = levelOf(S.xp);
   const newItems = []; for (let l = lvBefore + 1; l <= lvAfter; l++) newItems.push(...unlockedAt(l));
   const newPowers = [...new Set(SESS.mastered)];
-  app().innerHTML = header() + `<section class="card center">
+  app().innerHTML = header() + `<section class="card center">${backTop()}
     ${evolved ? `<div class="evo"><span class="fade-out">${creatureSVG(S.avatar, stBefore, 170, "o", S.line, true)}</span><span class="pop">${creatureSVG(S.avatar, stAfter, 170, "n", S.line, true)}</span></div><h2>${petName()[0].toUpperCase() + petName().slice(1)} si è evoluto!</h2><p>Ora è: <b>${esc(st.n)}</b> 🎉</p>`
               : `<div class="float petbox">${pet(170)}</div><h2>Missione completata!</h2>`}
     ${lvAfter > lvBefore ? `<div class="levelup"><b>🆙 Livello ${lvAfter}!</b>${newItems.length ? `<p>Hai sbloccato: ${newItems.map(i => `<b>${esc(i.name)}</b> <small>(${esc(i.label)})</small>`).join(", ")}</p>` : ""}</div>` : ""}
@@ -758,7 +764,7 @@ function renderParent() {
     const state = x.ever ? "⭐ conquistata" : isAvailable(s.id) ? (x.n ? "in corso" : "aperta") : "🔒 bloccata";
     return `<tr><td>${s.icon} ${esc(s.name)}<br><small>${AR[s.area].name}</small></td><td><span class="bar thin"><i style="width:${Math.round(x.m * 100)}%"></i></span> ${Math.round(x.m * 100)}%</td><td>${acc === null ? "–" : acc + "%"} <small>(${x.n})</small></td><td>${seen}/${items.length}</td><td>${hardDone(s.id)}/${hardItems(s.id).length}</td><td>${state}</td></tr>`;
   }).join("");
-  app().innerHTML = `<section class="card">
+  app().innerHTML = `<section class="card">${backTop()}
     <h2>👤 Area genitori</h2>
     <div class="stats left">
       <div><b>${activeDays}</b><small>giorni attivi</small></div>
@@ -925,7 +931,7 @@ function renderDen(tab) {
     + `<div class="coll-item cur">${pet(110, "ccur", false)}<b>${esc(S.avatar.name || STG[si].n)}</b><small>${LINES[S.line].icon} in crescita: ${esc(STG[si].n)}</small></div>`
     + LINE_ORDER.slice(LINE_ORDER.indexOf(S.line) + 1).map(() => `<div class="coll-item"><div class="q-mark big">?</div><b>???</b><small>Uovo ancora da trovare</small></div>`).join("");
 
-  app().innerHTML = header() + `<section class="card">
+  app().innerHTML = header() + `<section class="card">${backTop()}
     <div class="den">
       <div class="den-pet"><div class="float">${pet(220, "den")}</div>
         <label class="lbl">Nome del tuo compagno</label>
