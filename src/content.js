@@ -38,6 +38,9 @@ const SKILLS = [
   { id: "ort_z", area: "ort", icon: "🦓", name: "La Z: -zia, -zio, -zione", pre: [],
     rule: "Davanti a <b>-ia, -ie, -io, -ione</b> la <b>z</b> è sempre <b>una sola</b>: polizia, grazie, silenzio, stazione. <br>Eccezioni da ricordare: <b>pazzia</b>, <b>razzia</b>, e le parole che vengono da una parola con zz (carrozza → <b>carrozziere</b>). <br>Negli altri casi la z può essere doppia: pizza, piazza, pezzo.",
     ex: ["poli<b>z</b>ia · gra<b>z</b>ie · silen<b>z</b>io · le<b>z</b>ione", "ma: pi<b>zz</b>a · pia<b>zz</b>a · pe<b>zz</b>o", "eccezioni: pa<b>zz</b>ia (da pazzo) · carro<b>zz</b>iere (da carrozza)"] },
+  { id: "ort_comp", area: "ort", icon: "🧩", name: "Parole unite o staccate?", pre: [],
+    rule: "Le <b>parole composte</b> nascono da due parole che si uniscono e diventano <b>una sola parola</b>, con un significato nuovo: palla + volo → <b>pallavolo</b> (uno sport). Si scrivono <b>attaccate</b>. <br>Trucco: se puoi metterci davanti un articolo e indica <b>una cosa sola</b> (il pomodoro, il grattacielo), è una parola sola. Se invece le due parole fanno cose diverse nella frase (<i>la palla vola</i>), restano staccate. <br>Attenzione al contrario: alcune espressioni si scrivono sempre <b>staccate</b>: <b>a posto, di più, per favore, ogni tanto, d'accordo</b>. <br>Qui trovi solo parole che hanno <b>un solo modo giusto</b> di scriverle.",
+    ex: ["<b>pallavolo</b> · <b>pomodoro</b> · <b>arcobaleno</b> · <b>grattacielo</b>", "il <b>portacenere</b> ↔ Luca <b>porta la cenere</b> fuori", "sempre staccate: <b>a posto</b> · <b>di più</b> · <b>per favore</b> · <b>ogni tanto</b>"] },
   { id: "gr_art", area: "gr", icon: "🅰️", name: "Gli articoli", pre: [],
     rule: "Determinativi: <b>il, lo, la, i, gli, le</b> (e <b>l'</b>). Indeterminativi: <b>un, uno, una</b> (<b>un'</b>). <br>Si usano <b>lo, gli, uno</b> davanti a parole che iniziano per <b>s + consonante, z, gn, ps, x, y</b>.",
     ex: ["<b>lo</b> zaino · <b>gli</b> zaini", "<b>lo</b> studente · <b>uno</b> scoiattolo", "<b>lo</b> gnomo · <b>lo</b> psicologo"] },
@@ -874,6 +877,44 @@ const ITEMS = [
   { id: "co28", s: "log_ogg", t: "mc", lv: 3, q: "In «Marco guarda la televisione» e «Marco guarda dalla finestra», il complemento oggetto c'è…", o: ["solo nella prima", "solo nella seconda", "in tutte e due"], x: "«la televisione» → che cosa? Sì. «dalla finestra» → da dove? No." },
   { id: "co29", s: "log_ogg", t: "mc", lv: 2, q: "Il complemento oggetto ha mai la preposizione davanti?", o: ["No, mai", "Sì, sempre", "Solo con i nomi propri"], x: "Il complemento oggetto è «diretto»: non ha preposizioni." },
   { id: "co30", s: "log_ogg", t: "pick", lv: 3, q: "Tocca il COMPLEMENTO OGGETTO:", c: ["Ai miei amici", "ho raccontato", "una storia", "di paura."], a: 2, x: "Ho raccontato che cosa? Una storia. «Ai miei amici» risponde a «a chi?»." },
+
+  // ======================= v2.1: PAROLE UNITE O STACCATE =======================
+  { id: "cp1", s: "ort_comp", t: "mc", lv: 1, q: "Come si scrive lo sport con la rete e la palla?", o: ["pallavolo", "palla volo", "palla-volo"], x: "È una parola composta: palla + volo → pallavolo, tutto attaccato.", d: 1 },
+  { id: "cp2", s: "ort_comp", t: "cloze", lv: 2, q: "Per favore, metti ___ la tua camera!", o: ["a posto", "apposto"], x: "«a posto» si scrive sempre staccato: a + posto.", d: 1 },
+  { id: "cp3", s: "ort_comp", t: "mc", lv: 1, q: "Come si scrive?", o: ["arcobaleno", "arco baleno", "arco-baleno"], x: "arco + baleno → arcobaleno: una parola sola." },
+  { id: "cp4", s: "ort_comp", t: "mc", lv: 1, q: "Come si scrive?", o: ["pomodoro", "pomo d'oro", "pomo doro"], x: "pomodoro si scrive attaccato." },
+  { id: "cp5", s: "ort_comp", t: "mc", lv: 1, q: "Come si scrive?", o: ["grattacielo", "gratta cielo", "grattaccielo"], x: "gratta + cielo → grattacielo: attaccato, con una sola c." },
+  { id: "cp6", s: "ort_comp", t: "mc", lv: 1, q: "Come si scrive?", o: ["francobollo", "franco bollo", "francobbollo"], x: "franco + bollo → francobollo." },
+  { id: "cp7", s: "ort_comp", t: "mc", lv: 1, q: "Come si scrive?", o: ["capotreno", "capo treno", "capo-treno"], x: "Il capotreno è una persona sola, una parola sola." },
+  { id: "cp8", s: "ort_comp", t: "mc", lv: 2, q: "Come si scrive?", o: ["ferrovia", "ferro via", "ferrovvia"], x: "ferro + via → ferrovia." },
+  { id: "cp9", s: "ort_comp", t: "type", lv: 2, q: "Asciugati con l'___ dopo la doccia.", hint: "si usa dopo esserti lavato", say: "asciugamano", a: ["asciugamano"], x: "asciuga + mano → asciugamano: tutto attaccato." },
+  { id: "cp10", s: "ort_comp", t: "type", lv: 2, q: "Per spedire la lettera serve un ___.", hint: "si incolla sulla busta", say: "francobollo", a: ["francobollo"], x: "francobollo: una parola sola." },
+  { id: "cp11", s: "ort_comp", t: "type", lv: 2, q: "Nel campo c'era un ___ altissimo e giallo che guardava il sole.", hint: "un fiore", say: "girasole", a: ["girasole"], x: "gira + sole → girasole." },
+  { id: "cp12", s: "ort_comp", t: "type", lv: 2, q: "Dopo la pioggia è comparso l'___.", hint: "sette colori in cielo", say: "arcobaleno", a: ["arcobaleno"], x: "arcobaleno: una parola sola." },
+  { id: "cp13", s: "ort_comp", t: "type", lv: 2, q: "Papà tiene i soldi nel ___.", hint: "si mette in tasca", say: "portafoglio", a: ["portafoglio"], x: "porta + foglio → portafoglio." },
+  { id: "cp14", s: "ort_comp", t: "type", lv: 2, q: "A New York ci sono tanti ___.", hint: "palazzi altissimi, al plurale", say: "grattacieli", a: ["grattacieli"], x: "grattacielo → grattacieli: attaccato anche al plurale." },
+  { id: "cp15", s: "ort_comp", t: "cloze", lv: 1, q: "Ho messo l'ombrello bagnato nel ___.", o: ["portaombrelli", "porta ombrelli"], x: "Il portaombrelli è un oggetto solo: una parola sola." },
+  { id: "cp16", s: "ort_comp", t: "cloze", lv: 3, q: "Mio fratello ___ sempre l'ombrello a scuola.", o: ["porta", "portaombrelli"], x: "Qui «porta» è un verbo (che cosa fa? porta l'ombrello): le parole restano staccate." },
+  { id: "cp17", s: "ort_comp", t: "cloze", lv: 3, q: "Guarda come ___ alta quella palla!", o: ["vola", "pallavolo"], x: "Qui la palla vola: sono parole diverse (nome + verbo). Unite solo se è lo sport: la pallavolo." },
+  { id: "cp18", s: "ort_comp", t: "mc", lv: 3, q: "In quale frase c'è un errore?", o: ["Il sabato gioco a palla volo.", "Il sabato gioco a pallavolo.", "La palla vola sopra la rete."], x: "Lo sport è uno solo: pallavolo, attaccato." },
+  { id: "cp19", s: "ort_comp", t: "mc", lv: 3, q: "In quale frase c'è un errore?", o: ["Ho comprato un porta penne nuovo.", "Ho comprato un portapenne nuovo.", "Marco porta le penne a scuola."], x: "L'oggetto è uno solo: portapenne. Staccato solo se «porta» è il verbo." },
+  { id: "cp20", s: "ort_comp", t: "mc", lv: 3, q: "Quale frase è tutta corretta?", o: ["Il capotreno controlla i biglietti sul treno.", "Il capo treno controlla i biglietti sul treno.", "Il capotreno controlla i biglietti sul capotreno."], x: "capotreno: una parola sola (la persona); treno: il mezzo." },
+  { id: "cp21", s: "ort_comp", t: "cloze", lv: 3, q: "La nonna ha chiuso i gioielli nella ___.", o: ["cassaforte", "cassa forte"], x: "La cassaforte (per i valori) è una parola sola." },
+  { id: "cp22", s: "ort_comp", t: "cloze", lv: 3, q: "Per il trasloco ci serve una ___ che non si rompa.", o: ["cassa forte", "cassaforte"], x: "Qui è una cassa robusta: nome + aggettivo, staccati. La cassaforte invece è quella per i valori." },
+  { id: "cp23", s: "ort_comp", t: "cloze", lv: 2, q: "Mi passi il sale, ___?", o: ["per favore", "perfavore"], x: "«per favore» si scrive sempre staccato." },
+  { id: "cp24", s: "ort_comp", t: "cloze", lv: 2, q: "Vorrei un po' ___ di torta.", o: ["di più", "dipiù"], x: "«di più» si scrive sempre staccato." },
+  { id: "cp25", s: "ort_comp", t: "cloze", lv: 2, q: "___ vado a trovare i nonni.", o: ["Ogni tanto", "Ognitanto"], x: "«ogni tanto» si scrive sempre staccato." },
+  { id: "cp26", s: "ort_comp", t: "cloze", lv: 2, q: "Va bene, siamo ___!", o: ["d'accordo", "daccordo", "d'acordo"], x: "«d'accordo» = di + accordo: apostrofo e due parole." },
+  { id: "cp27", s: "ort_comp", t: "cloze", lv: 1, q: "Non vengo ___ piove.", o: ["perché", "per ché", "per che"], x: "«perché» è una parola sola, con l'accento." },
+  { id: "cp28", s: "ort_comp", t: "cloze", lv: 2, q: "Ho cercato le chiavi ___.", o: ["dappertutto", "da per tutto", "dapertutto"], x: "«dappertutto» si scrive attaccato, con due p." },
+  { id: "cp29", s: "ort_comp", t: "cloze", lv: 2, q: "Mi piace il calcio, ma ___ la pallavolo.", o: ["soprattutto", "sopratutto", "sopra tutto"], x: "«soprattutto»: attaccato e con due t." },
+  { id: "cp30", s: "ort_comp", t: "cloze", lv: 1, q: "___ ci vediamo al parco.", o: ["Stasera", "Sta sera", "Stà sera"], x: "«stasera» (questa sera) è una parola sola, come stamattina e stanotte." },
+  { id: "cp31", s: "ort_comp", t: "pick", lv: 2, q: "Tocca la parola SBAGLIATA:", c: ["Ieri", "ho mangiato", "un panino", "al pomo doro."], a: 3, x: "Si scrive «pomodoro», attaccato." },
+  { id: "cp32", s: "ort_comp", t: "pick", lv: 3, q: "Tocca la parola SBAGLIATA:", c: ["Il senza tetto", "dormiva", "sotto", "il porticato."], a: 0, x: "La persona senza casa è «il senzatetto», una parola sola. Staccato solo in «una casa senza tetto»." },
+  { id: "cp33", s: "ort_comp", t: "pick", lv: 2, q: "Tocca la parola SBAGLIATA:", c: ["Ho messo", "tutto apposto", "prima di", "uscire."], a: 1, x: "Si scrive «a posto», staccato." },
+  { id: "cp34", s: "ort_comp", t: "mc", lv: 3, q: "In quale frase la parola è giusta STACCATA?", o: ["Hanno costruito una casa senza tetto.", "Il senza tetto chiedeva aiuto.", "Ho comprato un porta ombrelli."], x: "Una casa senza tetto = una casa a cui manca il tetto: due parole. Il senzatetto e il portaombrelli sono una parola sola." },
+  { id: "cp35", s: "ort_comp", t: "mc", lv: 3, q: "In quale frase c'è un errore?", o: ["Luca ha più figurine, ma io ne ho dipiù.", "Luca ha più figurine, ma io ne ho di più.", "Vorrei più tempo per giocare."], x: "«di più» è sempre staccato." },
+  { id: "cp36", s: "ort_comp", t: "type", lv: 3, q: "Il bagnino ha lanciato il ___ al bambino in acqua.", hint: "ciambella che fa galleggiare", say: "salvagente", a: ["salvagente"], x: "salva + gente → salvagente: una parola sola." },
 ];
 
 // ---------- v1.9: TRAPPOLE — formule mirate per i casi in cui si inciampa ----------
@@ -887,8 +928,10 @@ const TRAPS = {
   pron_lgl: { s: ["gr_pron"], t: "lo, gli o le?",
     d: "Cerca la «a». Senza «a» → <b>lo, la, li, le</b>: ho visto Marco → <b>l'</b>ho visto. Con «a» → <b>gli</b> per un maschio o per loro, <b>le</b> per una femmina: ho parlato a Marco → <b>gli</b> ho parlato; a Sara → <b>le</b> ho parlato." },
 };
+TRAPS.comp = { s: ["ort_comp"], t: "una cosa sola o due parole?",
+  d: "Chiediti: indica <b>un oggetto o una persona sola</b>, con un significato nuovo? Allora è una parola: il <b>portaombrelli</b>, la <b>cassaforte</b>, il <b>senzatetto</b>. Se invece una parola fa l'azione o descrive l'altra, restano staccate: Luca <b>porta l'ombrello</b>, una <b>cassa forte</b> (robusta), una casa <b>senza tetto</b>." };
 const TRAP_OF = {};
-[["sogg_dopo", "sg2 sg8 sg13 sg14 sg15 sg16 sg31"], ["piacere", "sg11 sg12 sg27 sg30 pr6 pr28"],
+[["comp", "cp15 cp16 cp17 cp18 cp19 cp21 cp22 cp32 cp34"], ["sogg_dopo", "sg2 sg8 sg13 sg14 sg15 sg16 sg31"], ["piacere", "sg11 sg12 sg27 sg30 pr6 pr28"],
  ["co_prep", "co2 co15 co16 co22 co23 co24 co28 co30"],
  ["pron_lgl", "pr1 pr2 pr4 pr7 pr9 pr11 pr12 pr13 pr14 pr29 pr33 pr34 pr35 pr36"]]
   .forEach(([k, ids]) => ids.split(" ").forEach(id => TRAP_OF[id] = k));
