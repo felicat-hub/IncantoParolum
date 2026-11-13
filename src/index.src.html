@@ -55,6 +55,20 @@ h1{font-size:2rem;margin:.2em 0;font-weight:900}h2{font-size:1.45rem;margin:.2em
 .qcard{border-color:var(--s)}
 .back-top-wrap{position:sticky;top:8px;z-index:20;display:flex;justify-content:flex-start;margin:-4px 0 12px;pointer-events:none}
 .back-top{pointer-events:auto;padding:8px 14px;font-size:.95rem;background:#fff;box-shadow:0 4px 0 var(--line),0 6px 16px rgba(40,30,60,.12)}
+.who-grid{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin:18px 0}
+.who-card{font:inherit;display:flex;flex-direction:column;align-items:center;gap:4px;width:150px;padding:12px 10px;border:2px solid var(--line);border-radius:20px;background:#fff;cursor:pointer;box-shadow:0 4px 0 var(--line)}
+.who-card.on{border-color:var(--pri)}
+.who-card b{font-size:1.1rem}.who-card small{color:var(--muted,#776f8a)}
+.who-pet svg{display:block}
+.pill.who{font:inherit;cursor:pointer;border:2px solid var(--line)}
+.pics{display:grid;grid-template-columns:repeat(3,72px);gap:10px;justify-content:center;margin:14px 0}
+.pics.small{grid-template-columns:repeat(9,40px);gap:6px;justify-content:flex-start}
+.pic{font-size:2rem;height:72px;border:2px solid var(--line);border-radius:16px;background:#fff;cursor:pointer;box-shadow:0 4px 0 var(--line)}
+.pics.small .pic{font-size:1.3rem;height:40px;border-radius:10px;box-shadow:0 2px 0 var(--line)}
+.pic:active{transform:translateY(3px)}
+.secret-dots{display:flex;gap:10px;justify-content:center}.secret-dots span{width:16px;height:16px;border-radius:50%;border:2px solid var(--line)}.secret-dots span.on{background:var(--pri);border-color:var(--pri)}
+.shake{animation:shk .4s}@keyframes shk{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+details.sub{margin:10px 0;padding:8px 12px;border:2px solid var(--line);border-radius:14px}details.sub summary{cursor:pointer;font-weight:800}
 .trap{margin-top:10px;color:#2a2340;font-weight:500;background:#f3ecff;border-left:4px solid #7c3aed;border-radius:10px;padding:10px 12px;font-size:.95rem;line-height:1.4}
 .qtag.sfida{background:#fff1e0;color:#c2410c;margin-left:6px}
 .qtag{display:inline-block;background:var(--s);color:var(--c);font-weight:800;font-size:.85rem;border-radius:99px;padding:3px 12px}

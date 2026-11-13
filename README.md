@@ -12,6 +12,12 @@ Apri l'indirizzo dell'app nel browser e **installala**: così ha l'icona come un
 
 Su iPhone è importante installarla: Safari può cancellare i dati dei siti non installati dopo alcune settimane senza uso.
 
+## Più giocatori
+
+Dall'Area genitori → **Profili** si aggiunge un giocatore con nome e classe (scuola media oppure quarta elementare: per la quarta il catalogo esclude modi, congiuntivo/condizionale, imperativo/participi/gerundi e i termini che si studiano più avanti). Ogni profilo può avere un **disegno segreto** di 3 figure, da toccare in ordine per entrare: evita di giocare per sbaglio sul profilo dell'altro.
+
+Con la sincronizzazione attiva ogni profilo ha il suo file nel repository dei dati (`progressi.json` per il primo, `progressi-<id>.json` per gli altri); collegando un nuovo dispositivo, i profili presenti in rete vengono trovati da soli.
+
 ## Dove stanno i dati
 
 Di base i progressi restano **solo sul dispositivo**: nessun account, nessun server.
