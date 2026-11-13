@@ -63,6 +63,20 @@ h1{font-size:2rem;margin:.2em 0;font-weight:900}h2{font-size:1.45rem;margin:.2em
 .qcard{border-color:var(--s)}
 .back-top-wrap{position:sticky;top:8px;z-index:20;display:flex;justify-content:flex-start;margin:-4px 0 12px;pointer-events:none}
 .back-top{pointer-events:auto;padding:8px 14px;font-size:.95rem;background:#fff;box-shadow:0 4px 0 var(--line),0 6px 16px rgba(40,30,60,.12)}
+.who-grid{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin:18px 0}
+.who-card{font:inherit;display:flex;flex-direction:column;align-items:center;gap:4px;width:150px;padding:12px 10px;border:2px solid var(--line);border-radius:20px;background:#fff;cursor:pointer;box-shadow:0 4px 0 var(--line)}
+.who-card.on{border-color:var(--pri)}
+.who-card b{font-size:1.1rem}.who-card small{color:var(--muted,#776f8a)}
+.who-pet svg{display:block}
+.pill.who{font:inherit;cursor:pointer;border:2px solid var(--line)}
+.pics{display:grid;grid-template-columns:repeat(3,72px);gap:10px;justify-content:center;margin:14px 0}
+.pics.small{grid-template-columns:repeat(9,40px);gap:6px;justify-content:flex-start}
+.pic{font-size:2rem;height:72px;border:2px solid var(--line);border-radius:16px;background:#fff;cursor:pointer;box-shadow:0 4px 0 var(--line)}
+.pics.small .pic{font-size:1.3rem;height:40px;border-radius:10px;box-shadow:0 2px 0 var(--line)}
+.pic:active{transform:translateY(3px)}
+.secret-dots{display:flex;gap:10px;justify-content:center}.secret-dots span{width:16px;height:16px;border-radius:50%;border:2px solid var(--line)}.secret-dots span.on{background:var(--pri);border-color:var(--pri)}
+.shake{animation:shk .4s}@keyframes shk{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+details.sub{margin:10px 0;padding:8px 12px;border:2px solid var(--line);border-radius:14px}details.sub summary{cursor:pointer;font-weight:800}
 .trap{margin-top:10px;color:#2a2340;font-weight:500;background:#f3ecff;border-left:4px solid #7c3aed;border-radius:10px;padding:10px 12px;font-size:.95rem;line-height:1.4}
 .qtag.sfida{background:#fff1e0;color:#c2410c;margin-left:6px}
 .qtag{display:inline-block;background:var(--s);color:var(--c);font-weight:800;font-size:.85rem;border-radius:99px;padding:3px 12px}
@@ -1753,6 +1767,7 @@ function monsterSVG(m, size = 180, hurt = false) {
 // ============================================================
 "use strict";
 
+const ALL_SKILLS = SKILLS.slice(), ALL_ITEMS = ITEMS.slice();
 const SK = Object.fromEntries(SKILLS.map(s => [s.id, s]));
 const AR = Object.fromEntries(AREAS.map(a => [a.id, a]));
 const IT = Object.fromEntries(ITEMS.map(i => [i.id, i]));
@@ -1776,11 +1791,59 @@ function levelBounds(L) { return [L === 1 ? 0 : 50 * (L - 1) * L, 50 * L * (L + 
 // ---------------- stato ----------------
 function freshState() {
   const skills = {};
-  SKILLS.forEach(s => skills[s.id] = { m: 0, n: 0, c: 0, ever: false });
-  return { v: 4, name: "", created: Date.now(), updatedAt: 0, diagDone: false, xp: 0, streak: 0, best: 0,
+  ALL_SKILLS.forEach(s => skills[s.id] = { m: 0, n: 0, c: 0, ever: false });
+  return { v: 4, grade: "media", name: "", created: Date.now(), updatedAt: 0, diagDone: false, xp: 0, streak: 0, best: 0,
            freezes: 1, lastDay: null, sessions: 0, focus: null, skills, items: {}, days: {}, avatar: Object.assign({}, AVATAR_DEFAULT), line: "fuoco", hatchXp: 0, collection: [] };
 }
 let S = freshState();
+
+// ---------------- classe: il catalogo si adatta a chi gioca ----------------
+// Quarta elementare: niente modi, congiuntivo/condizionale, imperativo/participi/gerundi,
+// né esercizi con termini che si fanno più avanti (relativi, partitivi, forma passiva…).
+const GRADES = { media: "Scuola media", elem4: "Quarta elementare" };
+const ELEM4_SKIP = new Set(["gr_modi", "gr_indef", "gr_cong"]);
+const ELEM4_RX = /congiuntiv|condizional|gerundi|participi|relativ|partitiv|passiv|forma attiva|infinito passato|trapassato remoto|futuro anteriore/i;
+function itemForGrade(i, g) {
+  if (g !== "elem4") return true;
+  return !ELEM4_SKIP.has(i.s) && !ELEM4_RX.test(i.q + " " + (i.o || []).join(" ") + " " + (i.c || []).join(" ") + " " + (i.hint || ""));
+}
+function applyGrade(g = S.grade || "media") {
+  ITEMS.length = 0; ALL_ITEMS.forEach(i => { if (itemForGrade(i, g)) ITEMS.push(i); });
+  SKILLS.length = 0; ALL_SKILLS.forEach(k => { if (g !== "elem4" || !ELEM4_SKIP.has(k.id)) SKILLS.push(k); });
+}
+
+// ---------------- profili: più bambini sullo stesso dispositivo ----------------
+// Il primo profilo ("main") usa le chiavi di sempre, così i progressi esistenti non si spostano.
+const PROF_KEY = "incanto-profili-v1";
+const PICS = ["🍎", "🚀", "⭐", "🐱", "⚽", "🌈", "🎸", "🍕", "🌙"];
+const Profiles = {
+  reg: null,
+  load() {
+    try { this.reg = JSON.parse(localStorage.getItem(PROF_KEY) || "null"); } catch (e) { this.reg = null; }
+    if (!this.reg || !Array.isArray(this.reg.list) || !this.reg.list.length) this.reg = { list: [{ id: "main", name: "" }], active: "main" };
+    if (!this.reg.list.some(p => p.id === this.reg.active)) this.reg.active = this.reg.list[0].id;
+    return this.reg;
+  },
+  save() { try { localStorage.setItem(PROF_KEY, JSON.stringify(this.reg)); } catch (e) {} },
+  get active() { return this.reg ? this.reg.active : "main"; },
+  many() { return !!this.reg && this.reg.list.length > 1; },
+  entry(id = this.active) { return this.reg.list.find(p => p.id === id); },
+  lsKey(id = this.active) { return id === "main" ? LS_KEY : LS_KEY + ":" + id; },
+  docPath(id = this.active) { return id === "main" ? DOC_PATH : "progress/" + id; },
+  file(id = this.active) { return id === "main" ? "progressi.json" : "progressi-" + id + ".json"; },
+  readLocal(id) { try { const r = localStorage.getItem(this.lsKey(id)); return r ? JSON.parse(r) : null; } catch (e) { return null; } },
+  // ricorda come appare il profilo (per la schermata «Chi gioca?»)
+  touch() {
+    if (!this.reg) return; const e = this.entry(); if (!e) return;
+    const st = curStage();
+    const meta = { name: S.name || e.name || "", grade: S.grade || "media", av: S.avatar, line: S.line, stage: st, lock: !!(S.secret && S.secret.length) };
+    if (JSON.stringify(meta) !== JSON.stringify({ name: e.name, grade: e.grade, av: e.av, line: e.line, stage: e.stage, lock: e.lock })) { Object.assign(e, meta); this.save(); }
+  },
+  newId(name) {
+    const base = (name || "profilo").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "").slice(0, 12) || "profilo";
+    return base + "-" + Math.random().toString(36).slice(2, 5);
+  },
+};
 function normalize(st) {   // aggiunge abilità nuove se la banca cresce
   const f = freshState();
   st = Object.assign(f, st);
@@ -1799,7 +1862,8 @@ function normalize(st) {   // aggiunge abilità nuove se la banca cresce
     if (st.line === "ghiaccio" && typeof st.hatchXp === "number") { const cx = Math.max(0, st.xp - st.hatchXp); st.hatchXp = st.xp - cx * (LINES.ghiaccio.mult / 2); }
     st.v = 4;
   }
-  SKILLS.forEach(s => { if (!st.skills[s.id]) st.skills[s.id] = { m: 0, n: 0, c: 0, ever: false }; });
+  ALL_SKILLS.forEach(s => { if (!st.skills[s.id]) st.skills[s.id] = { m: 0, n: 0, c: 0, ever: false }; });
+  if (!st.grade) st.grade = "media";
   return st;
 }
 
@@ -1808,14 +1872,14 @@ const LS_KEY = "missione-grammatica-v1";
 const DOC_PATH = "progress/main";
 const Store = {
   db: null, ref: null, writing: false, pending: false, timer: null, status: "locale",
-  loadLocal() { try { const r = localStorage.getItem(LS_KEY); return r ? JSON.parse(r) : null; } catch (e) { return null; } },
-  saveLocal() { try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch (e) {} },
+  loadLocal() { return Profiles.readLocal(Profiles.active); },
+  saveLocal() { try { localStorage.setItem(Profiles.lsKey(), JSON.stringify(S)); } catch (e) {} Profiles.touch(); },
   async connect(onRemote) {
     if (!(window.claude && typeof window.claude.use === "function")) return;
     try {
       const db = await window.claude.use("db");
       if (!db) return;
-      this.db = db; this.ref = db.doc(DOC_PATH);
+      this.db = db; this.ref = db.doc(Profiles.docPath());
       const snap = await Promise.race([this.ref.get(), new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 10000))]);
       this.status = "online";
       if (snap.exists) {
@@ -2096,6 +2160,7 @@ let SESS = null;
 function header(extra = "") {
   const L = levelOf(S.xp), [lo, hi] = levelBounds(L);
   return `<header class="top">
+    ${Profiles.many() ? `<button class="pill who" id="who" type="button" title="Cambia giocatore">👤 <b>${esc(S.name || "?")}</b> ⇄</button>` : ""}
     <div class="pill">🔥 <b>${S.streak}</b></div>
     <div class="pill">⭐ <b>${S.xp}</b> XP</div>
     <div class="pill lv">Liv. <b>${L}</b><span class="mini"><i style="width:${Math.round((S.xp - lo) / (hi - lo) * 100)}%"></i></span></div>
@@ -2109,7 +2174,7 @@ function renderOnboarding() {
     <h1>Incanto Parolum</h1><p class="motto">la scuola di magia delle parole</p>
     <p>Ogni giorno <b>10 minuti</b>. Ogni risposta giusta fa crescere il tuo compagno misterioso. Che cosa uscirà dall'uovo?</p>
     <label class="lbl">Come ti chiami?</label>
-    <input id="nm" class="inp" maxlength="20" placeholder="Il tuo nome" autocomplete="off">
+    <input id="nm" class="inp" maxlength="20" placeholder="Il tuo nome" autocomplete="off" value="${esc(S.name || "")}">
     <p class="muted">Prima facciamo una <b>prova di partenza</b>: ${ITEMS.filter(i => i.d && !AR[SK[i.s].area].later).length} domande veloci per capire da dove iniziare. Non è un compito in classe: niente voti!</p>
     <button class="btn primary" id="go">Iniziamo! 🚀</button>
     <p><button class="btn ghost small" id="restore">🔄 Ho già dei progressi su un altro dispositivo</button></p>
@@ -2188,7 +2253,7 @@ function renderHome() {
     <button class="btn primary big" id="start">${doneToday ? "Un'altra lezione ▶" : "Inizia la missione di oggi ▶"}</button>
     <div class="row"><button class="btn" id="map">🗺️ Mappa</button><button class="btn ghost" id="par">👤 Area genitori</button></div>
   </section>
-  <p class="foot"><span id="sync"></span> · v1.9.1</p>`;
+  <p class="foot"><span id="sync"></span> · v2.0</p>`;
   $("#start").onclick = startSession; $("#shop").onclick = () => renderDen(); if ($("#hatch")) $("#hatch").onclick = renderHatch; $("#map").onclick = renderMap; $("#par").onclick = renderParentGate;
   updateSyncBadge();
 }
@@ -2196,6 +2261,7 @@ function renderHome() {
 // v1.9.1: «Torna alla base» anche in alto (resta visibile scorrendo): Nicola non deve scendere fino in fondo
 const backTop = () => `<div class="back-top-wrap"><button class="btn back-top" type="button">← Torna alla base</button></div>`;
 document.addEventListener("click", e => {
+  if (e.target.closest && e.target.closest("#who") && !SESS) { renderWho(); return; }
   if (!e.target.closest || !e.target.closest(".back-top")) return;
   const b = document.querySelector("#back") || document.querySelector("#home"); if (b) b.click();
 });
@@ -2503,6 +2569,7 @@ function renderParentGate() {
 }
 
 function renderParent() {
+  WHO_OPEN = false;
   const today = dayNum();
   const cal = []; for (let i = 27; i >= 0; i--) { const dt = new Date(); dt.setDate(dt.getDate() - i); const k = dayKey(dt); const d = S.days[k]; cal.push(`<span class="dday ${d && d.sess ? "on" : ""}" title="${k}${d ? `: ${d.ok}/${d.tot} giuste, ${d.xp} XP` : ""}"></span>`); }
   const activeDays = Object.values(S.days).filter(d => d.sess).length;
@@ -2536,6 +2603,7 @@ function renderParent() {
     <h3>Abilità</h3>
     <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Abilità</th><th>Padronanza</th><th>Accuratezza (tentativi)</th><th>Esercizi visti</th><th>Sfide superate</th><th>Stato</th></tr></thead><tbody>${rows}</tbody></table></div>
     <p class="muted">La <b>padronanza</b> è una media mobile che dà più peso alle risposte recenti; un'abilità è «conquistata» quando supera l'85% dopo almeno 8 tentativi. Salvataggio: <span id="sync"></span>.</p>
+    ${profilesPanel()}
     <h3>Nome nell'app</h3>
     <div class="row left"><input id="nick" class="inp" maxlength="20" value="${esc(S.name || "")}"><button class="btn" id="nicksave">Salva</button></div>
     <p class="muted">Se sincronizzi i progressi in rete, è meglio usare un soprannome invece del nome vero.</p>
@@ -2549,6 +2617,7 @@ function renderParent() {
   $("#back").onclick = boot;
   $("#nicksave").onclick = () => { S.name = $("#nick").value.trim() || S.name; Store.save(); $("#pbox").innerHTML = "<p class='note'>Nome aggiornato ✅</p>"; };
   if (IS_STANDALONE) wireSyncPanel();
+  wireProfilesPanel();
   $("#copy").onclick = async () => { try { await navigator.clipboard.writeText(JSON.stringify(S)); $("#pbox").innerHTML = "<p class='note'>Backup copiato negli appunti ✅</p>"; } catch (e) { $("#pbox").innerHTML = `<p class="muted">Copia manualmente:</p><textarea class="inp ta" readonly>${esc(JSON.stringify(S))}</textarea>`; } };
   if ($("#dl")) $("#dl").onclick = () => {
     const blob = new Blob([JSON.stringify(S, null, 1)], { type: "application/json" });
@@ -2558,17 +2627,17 @@ function renderParent() {
   if ($("#upl")) $("#upl").onchange = e => {
     const f = e.target.files[0]; if (!f) return;
     const r = new FileReader();
-    r.onload = () => { try { const st = JSON.parse(r.result); if (!st.skills) throw 0; S = normalize(st); Store.save(); renderParent(); $("#pbox").innerHTML = "<p class='note'>Progressi caricati ✅</p>"; }
+    r.onload = () => { try { const st = JSON.parse(r.result); if (!st.skills) throw 0; S = normalize(st); applyGrade(S.grade); Store.save(); renderParent(); $("#pbox").innerHTML = "<p class='note'>Progressi caricati ✅</p>"; }
       catch (_) { $("#pbox").innerHTML = "<p class='note bad'>Questo file non è un backup valido.</p>"; } };
     r.readAsText(f);
   };
   $("#imp").onclick = () => {
     $("#pbox").innerHTML = `<textarea class="inp ta" id="ta" placeholder="Incolla qui il backup"></textarea><button class="btn primary" id="doimp">Ripristina</button>`;
-    $("#doimp").onclick = () => { try { const st = JSON.parse($("#ta").value); if (!st.skills) throw 0; S = normalize(st); Store.save(); renderParent(); } catch (e) { $("#pbox").insertAdjacentHTML("beforeend", "<p class='note bad'>Backup non valido.</p>"); } };
+    $("#doimp").onclick = () => { try { const st = JSON.parse($("#ta").value); if (!st.skills) throw 0; S = normalize(st); applyGrade(S.grade); Store.save(); renderParent(); } catch (e) { $("#pbox").insertAdjacentHTML("beforeend", "<p class='note bad'>Backup non valido.</p>"); } };
   };
   $("#reset").onclick = () => {
-    $("#pbox").innerHTML = `<p class="note bad">Sicuro? Si perdono tutti i progressi su questo dispositivo${Sync.on() ? " e la sincronizzazione viene scollegata (i progressi in rete restano)" : ""}.</p><button class="btn warn" id="yes">Sì, azzera</button>`;
-    $("#yes").onclick = () => { Sync.saveCfg(null); S = freshState(); Store.save(); Sync.pushedAt = 0; boot(); };
+    $("#pbox").innerHTML = `<p class="note bad">Sicuro? Si perdono tutti i progressi di <b>${esc(S.name || "questo profilo")}</b> su questo dispositivo${Sync.on() ? " e la sincronizzazione viene scollegata (i progressi in rete restano)" : ""}.</p><button class="btn warn" id="yes">Sì, azzera</button>`;
+    $("#yes").onclick = () => { Sync.saveCfg(null); const g = S.grade, n = S.name; S = freshState(); S.grade = g; S.name = n; applyGrade(g); Store.save(); Sync.pushedAt = 0; boot(); };
   };
 }
 
@@ -2590,7 +2659,29 @@ const Sync = {
   load() { try { this.cfg = JSON.parse(localStorage.getItem(SYNC_KEY) || "null"); } catch (e) { this.cfg = null; } return this.cfg; },
   saveCfg(c) { this.cfg = c; try { c ? localStorage.setItem(SYNC_KEY, JSON.stringify(c)) : localStorage.removeItem(SYNC_KEY); } catch (e) {} },
   on() { return IS_STANDALONE && !!(this.cfg && this.cfg.token && this.cfg.owner && this.cfg.repo); },
-  url() { const c = this.cfg; return `https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/contents/${c.path || "progressi.json"}`; },
+  url(file = Profiles.file()) { const c = this.cfg; return `https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/contents/${file}`; },
+  // trova in rete i profili creati su altri dispositivi (file progressi-*.json) e li aggiunge qui
+  async discover() {
+    if (!this.on()) return false;
+    let r; try { r = await fetch(`https://api.github.com/repos/${encodeURIComponent(this.cfg.owner)}/${encodeURIComponent(this.cfg.repo)}/contents/?t=${Date.now()}`, { headers: this.headers(), cache: "no-store" }); } catch (e) { return false; }
+    if (!r.ok) return false;
+    let added = false;
+    let list = []; try { list = await r.json(); } catch (e) {}
+    if (!Array.isArray(list)) return false;
+    for (const f of list) {
+      const m = /^progressi-([a-z0-9-]+)\.json$/.exec(f.name || ""); if (!m) continue;
+      const id = m[1]; if (Profiles.entry(id)) continue;
+      try {
+        const rr = await fetch(this.url(f.name) + "?t=" + Date.now(), { headers: this.headers(), cache: "no-store" }); if (!rr.ok) continue;
+        const data = JSON.parse(this.b64dec((await rr.json()).content)); if (!data || !data.skills) continue;
+        localStorage.setItem(Profiles.lsKey(id), JSON.stringify(data));
+        Profiles.reg.list.push({ id, name: data.name || "", grade: data.grade || "media", av: data.avatar, line: data.line || "fuoco", stage: 0, lock: !!(data.secret && data.secret.length) });
+        added = true;
+      } catch (e) {}
+    }
+    if (added) Profiles.save();
+    return added;
+  },
   headers() { return { "Authorization": "Bearer " + this.cfg.token, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" }; },
   b64enc(str) { const b = new TextEncoder().encode(str); let s = ""; for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); return btoa(s); },
   b64dec(b64) { const bin = atob(b64.replace(/\s/g, "")); const u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return new TextDecoder().decode(u); },
@@ -2622,7 +2713,7 @@ const Sync = {
     try {
       const { data } = await this.get();
       this.ok();
-      if (remoteWins(data, S)) { S = normalize(data); Store.saveLocal(); this.pushedAt = S.updatedAt; return true; }
+      if (remoteWins(data, S)) { S = normalize(data); applyGrade(S.grade); Store.saveLocal(); this.pushedAt = S.updatedAt; return true; }
       if (!data || progressScore(S) > progressScore(data)) { this.busy = false; await this.push("primo salvataggio"); }
       return false;
     } catch (e) { this.fail(e); return false; } finally { this.busy = false; }
@@ -2635,7 +2726,7 @@ const Sync = {
     try {
       const { data, sha } = await this.get();
       if (remoteWins(data, S)) {   // l'altro dispositivo è più avanti: prendo la sua versione
-        S = normalize(data); Store.saveLocal(); this.pushedAt = S.updatedAt; this.ok(); if (!SESS) boot(); return;
+        S = normalize(data); applyGrade(S.grade); Store.saveLocal(); this.pushedAt = S.updatedAt; this.ok(); if (!SESS && !WHO_OPEN) boot(); return;
       }
       await this.put(sha, why); this.pushedAt = S.updatedAt; this.ok();
     } catch (e) { this.fail(e); } finally { this.busy = false; updateSyncBadge(); }
@@ -2764,16 +2855,18 @@ function wireSyncPanel() {
   const st = m => { const e = $("#sy-status"); if (e) e.textContent = m; };
   $("#sy-save").onclick = async () => {
     const prev = Sync.cfg || {};
-    const cfg = { owner: $("#sy-owner").value.trim(), repo: $("#sy-repo").value.trim(), token: $("#sy-token").value.trim() || prev.token || "", path: "progressi.json" };
+    const cfg = { owner: $("#sy-owner").value.trim(), repo: $("#sy-repo").value.trim(), token: $("#sy-token").value.trim() || prev.token || "", };
     if (!cfg.owner || !cfg.repo || !cfg.token) { st("Compila proprietario, repository e chiave."); return; }
     Sync.saveCfg(cfg); Sync.pushedAt = 0; st("Provo il collegamento…");
     try {
       const { data } = await Sync.get(); Sync.ok();
       if (remoteWins(data, S)) {
         st(`Collegato ✅ In rete ci sono progressi più recenti (${esc(data.name || "")}, ${data.xp || 0} XP): li ho caricati.`);
-        S = normalize(data); Store.saveLocal(); Sync.pushedAt = S.updatedAt;
+        S = normalize(data); applyGrade(S.grade); Store.saveLocal(); Sync.pushedAt = S.updatedAt;
       } else if (data && data.skills && progressScore(data) === progressScore(S)) { Sync.pushedAt = S.updatedAt; st("Collegato ✅ I progressi in rete e su questo dispositivo sono già allineati."); }
       else { S.updatedAt = Math.max(S.updatedAt || 0, Date.now()); Store.saveLocal(); await Sync.push("collegamento"); st(Sync.status === "ok" ? `Collegato ✅ Progressi di questo dispositivo (${S.xp} XP) salvati in rete.` : "⚠️ " + Sync.err); }
+      const before = Profiles.reg.list.length;
+      if (await Sync.discover().catch(() => false)) $("#sy-status").insertAdjacentHTML("beforeend", `<br>👨‍👩‍👦 Trovati in rete altri giocatori: ${Profiles.reg.list.slice(before).map(e => "<b>" + esc(e.name || "?") + "</b>").join(", ")}. Li trovi nella schermata «Chi gioca?».`);
     } catch (e) { Sync.fail(e); st("⚠️ Non riesco a collegarmi: " + Sync.err + "."); }
   };
   if ($("#sy-now")) $("#sy-now").onclick = async () => { st("Sincronizzo…"); const changed = await Sync.pull(); if (!changed) { Sync.pushedAt = 0; await Sync.push("manuale"); } st(Sync.status === "ok" ? "✅ " + Sync.label() : "⚠️ " + Sync.err); };
@@ -2945,16 +3038,151 @@ function duelsHTML() {
 }
 
 // ---------------- avvio (in fondo, così ogni parte dell'app è già definita) ----------------
+// ---------------- «Chi gioca?» ----------------
+let WHO_OPEN = false;
+const PARENT_OPEN = () => !!document.querySelector("#nicksave");
+const gradeLabel = g => GRADES[g] || GRADES.media;
+function whoCard(e) {
+  const av = Object.assign({}, AVATAR_DEFAULT, e.av || {});
+  return `<button class="who-card ${e.id === Profiles.active ? "on" : ""}" data-id="${esc(e.id)}" type="button">
+    <span class="who-pet">${creatureSVG(av, e.stage || 0, 96, "w" + e.id.replace(/[^a-z0-9]/gi, ""), e.line || "fuoco", false)}</span>
+    <b>${esc(e.name || "Nuovo giocatore")}</b><small>${e.lock ? "🔒 " : ""}${esc(gradeLabel(e.grade))}</small></button>`;
+}
+async function renderWho() {
+  if (SESS) return;
+  WHO_OPEN = true; keyHandler = null;
+  app().innerHTML = `<section class="card center hero">
+    <h1>Incanto Parolum</h1><p class="motto">Chi gioca oggi?</p>
+    <div class="who-grid">${Profiles.reg.list.map(whoCard).join("")}</div>
+    <p><button class="btn ghost small" id="pgate" type="button">👤 Area genitori</button></p>
+  </section>`;
+  document.querySelectorAll(".who-card").forEach(b => b.onclick = () => askSecret(b.dataset.id));
+  $("#pgate").onclick = renderParentGate;
+}
+function askSecret(id) {
+  const st = id === Profiles.active ? S : Profiles.readLocal(id);
+  const secret = st && Array.isArray(st.secret) && st.secret.length === 3 ? st.secret : null;
+  if (!secret) return switchProfile(id);
+  const e = Profiles.entry(id); let seq = [], fails = 0;
+  const draw = msg => {
+    app().innerHTML = `<section class="card center">
+      <h2>${esc(e.name || "")}, tocca il tuo disegno segreto</h2>
+      <p class="muted">${msg || "Le 3 figure, nell'ordine giusto."}</p>
+      <div class="secret-dots">${[0, 1, 2].map(k => `<span class="${k < seq.length ? "on" : ""}"></span>`).join("")}</div>
+      <div class="pics">${PICS.map((p, k) => `<button class="pic" data-k="${k}" type="button">${p}</button>`).join("")}</div>
+      <button class="btn" id="back" type="button">← Chi gioca?</button></section>`;
+    $("#back").onclick = renderWho;
+    document.querySelectorAll(".pic").forEach(b => b.onclick = () => {
+      seq.push(+b.dataset.k);
+      if (seq.length < 3) return draw(msg);
+      if (seq.every((v, k) => v === secret[k])) return switchProfile(id);
+      fails++; seq = [];
+      draw(fails >= 3 ? "Non è quello giusto. Se l'hai dimenticato, chiedi a un genitore: può cambiarlo dall'Area genitori." : "Non è quello giusto, riprova!");
+      const c = document.querySelector(".pics"); if (c) { c.classList.add("shake"); setTimeout(() => c.classList.remove("shake"), 500); }
+    });
+  };
+  draw();
+}
+async function switchProfile(id) {
+  if (id !== Profiles.active) {
+    if (Sync.on()) { try { await Sync.push("cambio giocatore"); } catch (e) {} }
+    Store.saveLocal();
+    Profiles.reg.active = id; Profiles.save();
+    loadProfileState(); Sync.pushedAt = 0; Sync.status = "";
+    if (Store.db) { Store.ref = null; Store.connect(onLabRemote); }
+  }
+  WHO_OPEN = false; boot();
+  if (Sync.on()) Sync.pull().then(changed => { if (changed) { applyGrade(S.grade); if (!SESS && !WHO_OPEN) boot(); } });
+}
+
+// ---------------- area genitori: gestione dei profili ----------------
+function secretPicker(cur) {
+  return `<div class="pics small" id="sp">${PICS.map((p, k) => `<button class="pic" data-k="${k}" type="button">${p}</button>`).join("")}</div>
+    <p class="muted">Scelti: <span id="spv">${(cur || []).map(k => PICS[k]).join(" ") || "—"}</span> <button class="btn ghost small" id="spclr" type="button">Ricomincia</button></p>`;
+}
+function wireSecretPicker(onChange) {
+  let seq = [];
+  const show = () => { $("#spv").textContent = seq.map(k => PICS[k]).join(" ") || "—"; onChange(seq.length === 3 ? seq.slice() : null); };
+  document.querySelectorAll("#sp .pic").forEach(b => b.onclick = () => { if (seq.length >= 3) seq = []; seq.push(+b.dataset.k); show(); });
+  $("#spclr").onclick = () => { seq = []; show(); };
+}
+function profilesPanel() {
+  const rows = Profiles.reg.list.map(e => `<tr><td><b>${esc(e.name || "—")}</b>${e.id === Profiles.active ? " <small>(attivo)</small>" : ""}</td><td>${esc(gradeLabel(e.grade))}</td><td>${e.lock ? "🔒 sì" : "no"}</td>
+    <td>${e.id === Profiles.active ? "" : `<button class="btn small" data-act="use" data-id="${esc(e.id)}" type="button">Apri</button> <button class="btn small warn" data-act="del" data-id="${esc(e.id)}" type="button">Togli</button>`}</td></tr>`).join("");
+  return `<h3>👨‍👩‍👦 Profili</h3>
+    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Giocatore</th><th>Classe</th><th>Disegno segreto</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+    <p class="muted">Quello che vedi in questa pagina riguarda il profilo attivo: <b>${esc(S.name || "—")}</b>.</p>
+    <div class="row left">
+      <label class="lbl">Classe di ${esc(S.name || "questo profilo")}</label>
+      <select id="pgrade" class="inp">${Object.entries(GRADES).map(([k, v]) => `<option value="${k}" ${S.grade === k ? "selected" : ""}>${v}</option>`).join("")}</select>
+      <button class="btn" id="pgsave" type="button">Salva classe</button>
+    </div>
+    <details class="sub"><summary>🔒 Disegno segreto di ${esc(S.name || "questo profilo")}</summary>
+      <p class="muted">Tre figure da toccare in ordine per entrare nel proprio profilo. Serve a non giocare per sbaglio sul profilo dell'altro, non è una protezione forte.</p>
+      ${secretPicker(S.secret)}
+      <div class="row left"><button class="btn primary" id="spsave" type="button" disabled>Salva disegno</button>${S.secret ? `<button class="btn" id="spoff" type="button">Togli il disegno</button>` : ""}</div>
+    </details>
+    <details class="sub"><summary>➕ Aggiungi un giocatore</summary>
+      <label class="lbl">Nome o soprannome</label><input id="npname" class="inp" maxlength="20" autocomplete="off">
+      <label class="lbl">Classe</label><select id="npgrade" class="inp">${Object.entries(GRADES).map(([k, v]) => `<option value="${k}" ${k === "elem4" ? "selected" : ""}>${v}</option>`).join("")}</select>
+      <label class="lbl">Disegno segreto (facoltativo): tocca 3 figure</label>
+      <div id="npsec">${secretPicker(null)}</div>
+      <button class="btn primary" id="npgo" type="button">Crea e inizia la prova di partenza</button>
+    </details>
+    <div id="prbox"></div>`;
+}
+function wireProfilesPanel() {
+  const box = msg => { $("#prbox").innerHTML = msg; };
+  $("#pgsave").onclick = () => { S.grade = $("#pgrade").value; applyGrade(S.grade); Store.save(); renderParent(); $("#prbox").innerHTML = "<p class='note'>Classe aggiornata ✅</p>"; };
+  let newSecret = null, mySecret = null;
+  // due selettori nella stessa pagina: li collego uno per volta
+  const pickers = document.querySelectorAll("#sp");
+  pickers[0].id = "sp1"; pickers[1].id = "sp2";
+  const spv = document.querySelectorAll("#spv"), clr = document.querySelectorAll("#spclr");
+  [[pickers[0], spv[0], clr[0], v => { mySecret = v; $("#spsave").disabled = !v; }], [pickers[1], spv[1], clr[1], v => { newSecret = v; }]].forEach(([pk, view, c, cb]) => {
+    let seq = []; const show = () => { view.textContent = seq.map(k => PICS[k]).join(" ") || "—"; cb(seq.length === 3 ? seq.slice() : null); };
+    pk.querySelectorAll(".pic").forEach(b => b.onclick = () => { if (seq.length >= 3) seq = []; seq.push(+b.dataset.k); show(); });
+    c.onclick = () => { seq = []; show(); };
+  });
+  $("#spsave").onclick = () => { if (!mySecret) return; S.secret = mySecret; Store.save(); renderParent(); $("#prbox").innerHTML = "<p class='note'>Disegno segreto salvato ✅</p>"; };
+  if ($("#spoff")) $("#spoff").onclick = () => { delete S.secret; Store.save(); renderParent(); $("#prbox").innerHTML = "<p class='note'>Disegno tolto.</p>"; };
+  document.querySelectorAll("[data-act=use]").forEach(b => b.onclick = () => switchProfile(b.dataset.id));
+  document.querySelectorAll("[data-act=del]").forEach(b => b.onclick = () => {
+    const e = Profiles.entry(b.dataset.id);
+    box(`<p class="note bad">Togliere <b>${esc(e.name || "questo profilo")}</b> da questo dispositivo? ${Sync.on() ? "Il file dei suoi progressi in rete resta e, se lo ricolleghi, torna." : "I suoi progressi su questo dispositivo vanno persi."}</p><button class="btn warn" id="delyes" type="button">Sì, togli</button>`);
+    $("#delyes").onclick = () => { try { localStorage.removeItem(Profiles.lsKey(e.id)); } catch (_) {} Profiles.reg.list = Profiles.reg.list.filter(x => x.id !== e.id); Profiles.save(); renderParent(); };
+  });
+  $("#npgo").onclick = async () => {
+    const name = $("#npname").value.trim(); if (!name) { box("<p class='note bad'>Scrivi un nome o un soprannome.</p>"); return; }
+    const grade = $("#npgrade").value, id = Profiles.newId(name);
+    if (Sync.on()) { try { await Sync.push("cambio giocatore"); } catch (_) {} }
+    Store.saveLocal();
+    Profiles.reg.list.push({ id, name, grade, stage: 0, line: "fuoco", lock: !!newSecret }); Profiles.reg.active = id; Profiles.save();
+    S = freshState(); S.name = name; S.grade = grade; if (newSecret) S.secret = newSecret; applyGrade(grade);
+    Sync.pushedAt = 0; Store.save(); if (Store.db) { Store.ref = null; Store.connect(onLabRemote); }
+    WHO_OPEN = false; renderOnboarding();
+  };
+}
+
+function loadProfileState() {
+  const local = Store.loadLocal();
+  S = local ? normalize(local) : freshState();
+  if (!local && Profiles.entry() && Profiles.entry().grade) S.grade = Profiles.entry().grade;
+  applyGrade(S.grade);
+}
+const onLabRemote = remote => { S = normalize(remote); applyGrade(S.grade); Store.saveLocal(); if (!SESS) boot(); };
+function syncAfterLoad() {
+  if (!(IS_STANDALONE && Sync.load())) return;
+  Sync.pull().then(changed => { if (changed) applyGrade(S.grade); if (changed && !SESS && !WHO_OPEN) boot(); })
+    .then(() => Sync.discover()).then(added => { if (added && !SESS && Profiles.many() && !WHO_OPEN && !PARENT_OPEN()) renderWho(); });
+}
 (function init() {
-  const local = Store.loadLocal(); if (local) S = normalize(local);
-  boot();
-  if (IS_STANDALONE && Sync.load()) Sync.pull().then(changed => { if (changed && !SESS) boot(); });
+  Profiles.load(); loadProfileState(); Profiles.touch();
+  if (Profiles.many()) renderWho(); else boot();
+  syncAfterLoad();
   // quando l'app va in secondo piano o si chiude, salva in rete se c'è qualcosa di nuovo
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && !SESS) Sync.push("chiusura"); });
-  Store.connect(remote => {
-    S = normalize(remote); Store.saveLocal();
-    if (!SESS) boot();   // non interrompe una sessione in corso
-  });
+  Store.connect(onLabRemote);
 })();
 
 // ---------------- dopo un errore: la spiegazione va letta ----------------
