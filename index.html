@@ -333,7 +333,7 @@ const ITEMS = [
   { id: "acc3", s: "ort_acc", t: "cloze", q: "Ho comprato pane ___ latte.", o: ["e", "è"], x: "Qui «e» unisce due cose (pane più latte): niente accento." },
   { id: "acc4", s: "ort_acc", t: "cloze", q: "Metti il libro ___, sul tavolo.", o: ["là", "la"], x: "«là» indica un luogo: vuole l'accento." },
   { id: "acc5", s: "ort_acc", t: "cloze", q: "___ mamma è uscita.", o: ["La", "Là"], x: "Qui «la» è un articolo (la mamma): niente accento." },
-  { id: "acc6", s: "ort_acc", t: "cloze", q: "Giulia ___ pettina davanti allo specchio.", o: ["si", "sì"], x: "«si» qui è un pronome (pettina se stessa): niente accento." },
+  { id: "acc6", s: "ort_acc", t: "cloze", q: "Giulia ___ pettina davanti allo specchio.", o: ["si", "sì"], x: "«si» qui è un pronome (pettina sé stessa): niente accento." },
   { id: "acc7", s: "ort_acc", t: "cloze", q: "Non mangio ___ carne né pesce.", o: ["né", "ne"], x: "«né… né…» vuol dire «e non»: vuole l'accento." },
   { id: "acc8", s: "ort_acc", t: "cloze", q: "Quante caramelle vuoi? ___ voglio tre.", o: ["Ne", "Né"], x: "«ne» qui vuol dire «di quelle»: niente accento." },
   { id: "acc9", s: "ort_acc", t: "cloze", q: "Il nonno mi ___ sempre la paghetta.", o: ["dà", "da"], x: "«dà» è il verbo dare (lui dà): vuole l'accento." },
@@ -362,7 +362,7 @@ const ITEMS = [
   { id: "q6", s: "ort_q", t: "mc", q: "Come si scrive?", o: ["cuoco", "quoco", "cquoco"], x: "«cuoco» si scrive con CU." },
   { id: "q7", s: "ort_q", t: "mc", q: "Come si scrive?", o: ["quadro", "cuadro", "cquadro"], x: "Quasi sempre si scrive QU: quadro." },
   { id: "q8", s: "ort_q", t: "mc", q: "Come si scrive?", o: ["nacque", "naque", "nacue"], x: "«nacque» (dal verbo nascere) si scrive con CQU." },
-  { id: "q9", s: "ort_q", t: "mc", q: "Come si scrive?", o: ["soqquadro", "socquadro", "soquadro"], x: "«soqquadro» è l'unica parola italiana con due Q." },
+  { id: "q9", s: "ort_q", t: "mc", q: "Come si scrive?", o: ["soqquadro", "socquadro", "soquadro"], x: "«soqquadro» è l'unica parola d'uso comune con due Q." },
   { id: "q10", s: "ort_q", t: "mc", q: "Come si scrive?", o: ["quindici", "cuindici", "cquindici"], x: "Quasi sempre si scrive QU: quindici." },
   { id: "q11", s: "ort_q", t: "mc", q: "Come si scrive?", o: ["cuocere", "quocere", "cquocere"], x: "«cuocere» si scrive con CU." },
 
@@ -431,11 +431,11 @@ const ITEMS = [
   { id: "pr2", s: "gr_pron", t: "cloze", q: "Ho telefonato a Sara e ___ ho detto la verità.", o: ["le", "gli", "la"], x: "Ho detto a chi? a lei → «le».", d: 1 },
   { id: "pr3", s: "gr_pron", t: "pick", q: "Tocca il PRONOME:", c: ["Lei", "arriva", "domani."], a: 0, x: "«Lei» sta al posto del nome di una persona: è un pronome personale." },
   { id: "pr4", s: "gr_pron", t: "cloze", q: "Ho incontrato Paolo e ___ ho dato il libro.", o: ["gli", "le", "lo"], x: "Ho dato a chi? a lui → «gli»." },
-  { id: "pr5", s: "gr_pron", t: "mc", q: "Quale è un pronome personale SOGGETTO?", o: ["noi", "ci", "vi", "li"], x: "Soggetto: io, tu, lui, lei, noi, voi, loro." },
+  { id: "pr5", s: "gr_pron", t: "mc", q: "Qual è un pronome personale SOGGETTO?", o: ["noi", "ci", "vi", "li"], x: "Soggetto: io, tu, lui, lei, noi, voi, loro." },
   { id: "pr6", s: "gr_pron", t: "cloze", q: "A ___ piace il calcio.", o: ["me", "mi", "io"], x: "Si dice «a me piace» oppure «mi piace». Mai «a me mi»!" },
   { id: "pr7", s: "gr_pron", t: "cloze", q: "Le mie amiche? ___ ho invitate alla festa.", o: ["Le", "Gli", "Li"], x: "Ho invitato chi? loro (femminile) → «le»." },
   { id: "pr8", s: "gr_pron", t: "mc", q: "In «Dammi la penna», il pronome è:", o: ["mi", "la", "penna"], x: "«Dammi» = dai a me: «mi» è il pronome. «la» qui è un articolo." },
-  { id: "pr9", s: "gr_pron", t: "cloze", q: "Ai bambini ___ piacciono i dolci.", o: ["gli", "le", "li"], x: "Piacciono a chi? a loro → «gli»." },
+  { id: "pr9", s: "gr_pron", t: "cloze", q: "I bambini sono golosi: ___ piacciono i dolci.", o: ["gli", "le", "li"], x: "Piacciono a chi? a loro → «gli». Attenzione: «Ai bambini gli piacciono» ripete due volte la stessa cosa, come «a me mi»." },
   { id: "pr10", s: "gr_pron", t: "pick", q: "Tocca il pronome SOGGETTO:", c: ["Noi", "andiamo", "al", "parco", "con", "loro."], a: 0, x: "Chi va al parco? Noi: è il pronome soggetto." },
 
   // ---------------- ANALISI LOGICA: SOGGETTO E PREDICATO ----------------
@@ -582,7 +582,7 @@ const ITEMS = [
   { id: "dp26", s: "ort_dop", t: "type", q: "La parola «perché» ha l'___ sulla e.", hint: "il segno sopra la vocale", say: "accento", a: ["accento"], x: "accento: due c." },
   { id: "dp27", s: "ort_dop", t: "type", q: "Il mio cane è molto ___: fa sempre le coccole.", hint: "dolce, pieno di affetto", say: "affettuoso", a: ["affettuoso"], x: "affettuoso: due f e due t." },
   { id: "dp28", s: "ort_dop", t: "type", q: "In giardino ho trovato uno strano ___.", hint: "una cosa", say: "oggetto", a: ["oggetto"], x: "oggetto: due g e due t." },
-  { id: "dp29", s: "ort_dop", t: "type", q: "La macchina è dal meccanico, in ___.", hint: "dove si riparano le auto", say: "officina", a: ["officina"], x: "officina: due f, una c sola. (Attenzione: ufficio ha due f e una c!)" },
+  { id: "dp29", s: "ort_dop", t: "type", q: "La macchina è dal meccanico, in ___.", hint: "dove si riparano le auto", say: "officina", a: ["officina"], x: "officina: due f e una c sola, proprio come ufficio." },
   { id: "dp30", s: "ort_dop", t: "mc", q: "Come si scrive?", o: ["obbligatorio", "obligatorio", "obbligattorio"], x: "obbligatorio: due b, una t." },
   { id: "dp31", s: "ort_dop", t: "mc", q: "Come si scrive?", o: ["subito", "subbito", "subitto"], x: "subito: nessuna doppia!" },
   { id: "dp32", s: "ort_dop", t: "mc", q: "Come si scrive?", o: ["abitudine", "abbitudine", "abitudinne"], x: "abitudine: nessuna doppia, anche se inizia per «a»." },
@@ -720,7 +720,7 @@ const ITEMS = [
   { id: "tp35", s: "gr_tempi", t: "type", q: "L'anno prossimo mia sorella ___ l'università. (finire · futuro semplice)", a: ["finirà"], x: "Futuro semplice: lei finirà (con l'accento)." },
   { id: "tp36", s: "gr_tempi", t: "type", q: "Quando ero piccolo, ___ sempre i cartoni. (guardare · imperfetto)", a: ["guardavo"], x: "Azione abituale nel passato: io guardavo." },
   { id: "tp37", s: "gr_tempi", t: "type", q: "Colombo ___ l'America nel 1492. (scoprire · passato remoto)", a: ["scoprì"], x: "Passato remoto: egli scoprì (con l'accento)." },
-  { id: "tp38", s: "gr_tempi", t: "type", q: "Quando sono arrivato al cinema, il film ___ da dieci minuti. (cominciare · trapassato prossimo)", a: ["era cominciato"], x: "Trapassato prossimo: era cominciato (prima del mio arrivo)." },
+  { id: "tp38", s: "gr_tempi", t: "type", q: "Quando sono arrivato al cinema, il film ___ da dieci minuti. (cominciare · trapassato prossimo)", a: ["era cominciato", "aveva cominciato"], x: "Trapassato prossimo: era cominciato (va bene anche «aveva cominciato»), prima del mio arrivo." },
   { id: "tp39", s: "gr_tempi", t: "type", q: "Domani loro ___ a trovarci. (venire · futuro semplice)", a: ["verranno"], x: "Futuro di venire: verranno (irregolare)." },
   { id: "tp40", s: "gr_tempi", t: "type", q: "Io non ___ mai a Londra. (essere · passato prossimo)", a: ["sono stato", "sono stata"], x: "Passato prossimo di essere: sono stato/stata." },
   { id: "tp41", s: "gr_tempi", t: "type", q: "Noi ___ in montagna ogni estate. (andare · presente)", a: ["andiamo"], x: "Presente di andare: noi andiamo." },
@@ -953,11 +953,11 @@ const ITEMS = [
   { id: "apo32", s: "ort_apo", t: "cloze", lv: 3, q: "Vado ___ ospedale a trovare la zia.", o: ["all'", "alla", "al"], x: "«ospedale» è maschile e inizia per vocale: allo → all'ospedale." },
   { id: "apo33", s: "ort_apo", t: "cloze", lv: 2, q: "Questa è ___ isola più bella.", o: ["l'", "la", "lo"], x: "Davanti a vocale: l'isola." },
   { id: "apo34", s: "ort_apo", t: "cloze", lv: 3, q: "Al museo ho conosciuto ___ artista famosa.", o: ["un'", "un"], x: "«artista famosa» è una donna: un'artista." },
-  { id: "apo35", s: "ort_apo", t: "mc", lv: 3, q: "Quale frase è tutta corretta?", o: ["Qual è l'unica amica di Sara che c'è?", "Qual'è l'unica amica di Sara che cè?", "Qual'è l'unica amica di Sara che c'è?"], x: "«qual è» senza apostrofo, «c'è» con l'apostrofo." },
+  { id: "apo35", s: "ort_apo", t: "mc", lv: 3, q: "Quale frase è tutta corretta?", o: ["Qual è il tuo zaino? C'è anche il mio?", "Qual'è il tuo zaino? Cè anche il mio?", "Qual'è il tuo zaino? C'è anche il mio?"], x: "«qual è» senza apostrofo, «c'è» con l'apostrofo." },
 
   // ======================= v1.8: ARTICOLI (ampliamento) =======================
   { id: "art11", s: "gr_art", t: "cloze", lv: 2, q: "A colazione mangio ___ yogurt.", o: ["lo", "il", "l'"], x: "Davanti a y si usa «lo»: lo yogurt." },
-  { id: "art12", s: "gr_art", t: "cloze", lv: 3, q: "Il meccanico ha cambiato ___ pneumatici.", o: ["gli", "i"], x: "Davanti a pn si usa «lo/gli»: gli pneumatici." },
+  { id: "art12", s: "gr_art", t: "cloze", lv: 3, q: "Il meccanico ha cambiato ___ pneumatici.", o: ["gli", "i"], x: "Davanti a pn la regola vuole «lo/gli»: gli pneumatici (anche se si sente spesso «i pneumatici»)." },
   { id: "art13", s: "gr_art", t: "cloze", lv: 2, q: "Mia sorella suona ___ xilofono.", o: ["lo", "il"], x: "Davanti a x si usa «lo»: lo xilofono." },
   { id: "art14", s: "gr_art", t: "cloze", lv: 3, q: "Nei miti greci ___ dei vivevano sull'Olimpo.", o: ["gli", "i"], x: "È un'eccezione: si dice «gli dei»." },
   { id: "art15", s: "gr_art", t: "cloze", lv: 2, q: "In montagna ho noleggiato ___ sci.", o: ["gli", "i"], x: "Davanti a sc si usa «gli»: gli sci." },
@@ -1073,7 +1073,7 @@ const ITEMS = [
   { id: "sg15", s: "log_sogg", t: "pick", lv: 2, q: "Tocca il SOGGETTO:", c: ["Sul tavolo", "ci sono", "tre biscotti."], a: 2, x: "Che cosa c'è? Tre biscotti." },
   { id: "sg16", s: "log_sogg", t: "pick", lv: 3, q: "Tocca il SOGGETTO:", c: ["Alla fine", "della partita", "hanno esultato", "tutti i tifosi."], a: 3, x: "Chi ha esultato? Tutti i tifosi." },
   { id: "sg17", s: "log_sogg", t: "pick", lv: 2, q: "Tocca il PREDICATO:", c: ["Il mio fratellino", "si è addormentato", "sul divano."], a: 1, x: "Il predicato è tutto il verbo: si è addormentato." },
-  { id: "sg18", s: "log_sogg", t: "pick", lv: 3, q: "Tocca il PREDICATO:", c: ["Quel film", "è", "davvero", "noioso."], a: 1, x: "Il verbo è «è» (essere): qui il predicato nominale è «è noioso», ma il verbo da toccare è «è»." },
+  { id: "sg18", s: "log_sogg", t: "mc", lv: 3, q: "In «Quel film è davvero noioso» il predicato è…", o: ["nominale: è noioso", "verbale: è", "verbale: è davvero"], x: "essere + aggettivo (noioso) = predicato nominale. «davvero» si infila in mezzo ma non fa parte del predicato." },
   { id: "sg19", s: "log_sogg", t: "mc", lv: 2, q: "In «Il cielo è nuvoloso» il predicato è:", o: ["nominale", "verbale"], x: "essere + aggettivo: predicato nominale." },
   { id: "sg20", s: "log_sogg", t: "mc", lv: 3, q: "In «La mamma è in giardino» il predicato è:", o: ["verbale", "nominale"], x: "Qui «è» significa «si trova»: predicato verbale. È nominale solo con un nome o aggettivo (è brava, è una dottoressa)." },
   { id: "sg21", s: "log_sogg", t: "mc", lv: 3, q: "In «Giulia è tornata tardi» il predicato è:", o: ["verbale", "nominale"], x: "«è tornata» è il passato prossimo di tornare: predicato verbale." },
@@ -1104,7 +1104,7 @@ const ITEMS = [
   { id: "co22", s: "log_ogg", t: "mc", lv: 2, q: "Quale frase NON ha il complemento oggetto?", o: ["Il treno parte alle otto.", "Luca prende il treno.", "Ho perso il treno."], x: "«partire» non regge un complemento oggetto: alle otto risponde a «quando?»." },
   { id: "co23", s: "log_ogg", t: "mc", lv: 3, q: "Quale frase NON ha il complemento oggetto?", o: ["Sara è arrivata in anticipo.", "Sara ha preso il bus.", "Sara li ha salutati."], x: "«arrivare» è intransitivo: non può avere complemento oggetto." },
   { id: "co24", s: "log_ogg", t: "mc", lv: 2, q: "Quale frase ha il complemento oggetto?", o: ["Il gatto mangia i croccantini.", "Il gatto dorme sul letto.", "Il gatto salta sul tavolo."], x: "Mangia che cosa? I croccantini." },
-  { id: "co25", s: "log_ogg", t: "pick", lv: 3, q: "Tocca il COMPLEMENTO OGGETTO:", c: ["Quel libro", "l'ho già", "letto", "due volte."], a: 1, x: "«l'» (= lo) sostituisce «quel libro»: complemento oggetto. Il soggetto è «io» sottinteso." },
+  { id: "co25", s: "log_ogg", t: "pick", lv: 3, q: "Tocca il COMPLEMENTO OGGETTO:", c: ["Hai visto", "il mio quaderno", "sul banco?"], a: 1, x: "Hai visto che cosa? Il mio quaderno. Il soggetto è «tu», sottinteso; «sul banco» ha la preposizione." },
   { id: "co26", s: "log_ogg", t: "pick", lv: 2, q: "Tocca il COMPLEMENTO OGGETTO:", c: ["Domenica", "i miei cugini", "mi", "hanno invitato", "a pranzo."], a: 2, x: "Hanno invitato chi? Me → mi." },
   { id: "co27", s: "log_ogg", t: "pick", lv: 3, q: "Tocca il COMPLEMENTO OGGETTO:", c: ["Ogni mattina", "il cane", "sveglia", "tutta la famiglia."], a: 3, x: "Sveglia chi? Tutta la famiglia. Chi sveglia? Il cane (soggetto)." },
   { id: "co28", s: "log_ogg", t: "mc", lv: 3, q: "In «Marco guarda la televisione» e «Marco guarda dalla finestra», il complemento oggetto c'è…", o: ["solo nella prima", "solo nella seconda", "in tutte e due"], x: "«la televisione» → che cosa? Sì. «dalla finestra» → da dove? No." },
@@ -2323,7 +2323,7 @@ function renderHome() {
     <button class="btn primary big" id="start">${doneToday ? "Un'altra lezione ▶" : "Inizia la missione di oggi ▶"}</button>
     <div class="row"><button class="btn" id="map">🗺️ Mappa</button><button class="btn ghost" id="par">👤 Area genitori</button></div>
   </section>
-  <p class="foot"><span id="sync"></span> · v2.2.1</p>`;
+  <p class="foot"><span id="sync"></span> · v2.2.2</p>`;
   $("#start").onclick = startSession; $("#shop").onclick = () => renderDen(); if ($("#hatch")) $("#hatch").onclick = renderHatch; $("#map").onclick = renderMap; $("#par").onclick = renderParentGate;
   updateSyncBadge();
 }
