@@ -46,3 +46,16 @@ cp -r dist/. ..           # copia nella radice del repository
 ```
 
 Prima di pubblicare un aggiornamento, cambia `VERSION` in `src/pwa/sw.js`: così i dispositivi scaricano la versione nuova.
+
+### Regola per gli esercizi
+
+Ogni esercizio aggiunto o modificato va controllato a mano prima di pubblicare:
+
+1. **Risposta giusta**: corretta secondo la norma insegnata a scuola; se la grafia o l'uso sono oscillanti (es. «se stesso/sé stesso», «pensare qualcuno»), l'esercizio non si usa.
+2. **Distrattori**: nessuna opzione sbagliata deve essere in realtà accettabile; per le risposte da scrivere, elencare tutte le forme corrette.
+3. **Frase**: naturale, senza costruzioni ambigue o colloquiali (es. «Ai bambini gli piacciono»).
+4. **Spiegazione**: vera, coerente con le formule delle lezioni e con gli altri esercizi.
+5. **Livello e classe**: livello (base/medio/sfida) sensato; verificare che il filtro per le elementari escluda ciò che non è adatto.
+
+Poi `node validate.js` (controlli automatici: struttura, doppioni, opzioni duplicate, spiegazioni mancanti) e i test.
+

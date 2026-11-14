@@ -100,7 +100,7 @@ const ITEMS = [
   { id: "acc3", s: "ort_acc", t: "cloze", q: "Ho comprato pane ___ latte.", o: ["e", "è"], x: "Qui «e» unisce due cose (pane più latte): niente accento." },
   { id: "acc4", s: "ort_acc", t: "cloze", q: "Metti il libro ___, sul tavolo.", o: ["là", "la"], x: "«là» indica un luogo: vuole l'accento." },
   { id: "acc5", s: "ort_acc", t: "cloze", q: "___ mamma è uscita.", o: ["La", "Là"], x: "Qui «la» è un articolo (la mamma): niente accento." },
-  { id: "acc6", s: "ort_acc", t: "cloze", q: "Giulia ___ pettina davanti allo specchio.", o: ["si", "sì"], x: "«si» qui è un pronome (Giulia pettina sé, cioè si pettina da sola): niente accento. «Sì» con l'accento è solo la risposta." },
+  { id: "acc6", s: "ort_acc", t: "cloze", q: "Giulia ___ pettina davanti allo specchio.", o: ["si", "sì"], x: "«si» qui è un pronome (Giulia si pettina da sola): niente accento. «Sì» con l'accento è solo la risposta." },
   { id: "acc7", s: "ort_acc", t: "cloze", q: "Non mangio ___ carne né pesce.", o: ["né", "ne"], x: "«né… né…» vuol dire «e non»: vuole l'accento." },
   { id: "acc8", s: "ort_acc", t: "cloze", q: "Quante caramelle vuoi? ___ voglio tre.", o: ["Ne", "Né"], x: "«ne» qui vuol dire «di quelle»: niente accento." },
   { id: "acc9", s: "ort_acc", t: "cloze", q: "Il nonno mi ___ sempre la paghetta.", o: ["dà", "da"], x: "«dà» è il verbo dare (lui dà): vuole l'accento." },
