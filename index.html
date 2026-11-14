@@ -265,8 +265,8 @@ const SKILLS = [
     rule: "Una consonante doppia si sente <b>più lunga e più forte</b>: leggi la parola ad alta voce, piano piano. Una doppia sbagliata può cambiare parola: <b>pala / palla</b>, <b>caro / carro</b>, <b>nono / nonno</b>. <br>Regole utili: <b>-zione</b> ha sempre una z sola (stazione, lezione); all'inizio, dopo <b>a-</b> spesso c'è la doppia (accanto, addosso, abbastanza).",
     ex: ["Gioco con la <b>palla</b> · Scavo con la <b>pala</b>", "sta<b>z</b>ione · le<b>z</b>ione · ma pi<b>zz</b>a", "<b>acc</b>anto · <b>add</b>osso · <b>abb</b>astanza", "a<b>e</b>reo: nessuna doppia!"] },
   { id: "ort_cie", area: "ort", icon: "🍒", name: "CIE, GIE, SCIE", pre: [],
-    rule: "Plurale dei nomi in <b>-cia / -gia</b>: se prima c'è una <b>vocale</b> la i resta (cami<b>cie</b>, cilie<b>gie</b>, vali<b>gie</b>); se prima c'è una <b>consonante</b> la i sparisce (aran<b>ce</b>, spiag<b>ge</b>, go<b>cce</b>). <br>Con <b>scie</b> da ricordare: <b>scienza, coscienza, scienziato</b>. E poi <b>cielo, società, sufficiente</b>.",
-    ex: ["ciliegia → cilie<b>gie</b> (prima c'è la vocale e)", "arancia → aran<b>ce</b> (prima c'è la consonante n)", "la <b>sc</b>ienza · il <b>c</b>ielo"] },
+    rule: "Plurale dei nomi in <b>-cia / -gia</b>: se prima c'è una <b>vocale</b> la i resta (cami<b>cie</b>, cilie<b>gie</b>, vali<b>gie</b>); se prima c'è una <b>consonante</b> la i sparisce (aran<b>ce</b>, spiag<b>ge</b>, go<b>cce</b>). <br>Con <b>scie</b> da ricordare: <b>scienza, coscienza, scienziato</b>. E poi <b>cielo, società, sufficiente</b>. <br>Nei <b>verbi</b> la i non c'è: fini<b>sce</b>, cono<b>sce</b>, e<b>sce</b>; e nemmeno al <b>futuro</b> dei verbi in -ciare/-giare: man<b>ge</b>rò, comin<b>ce</b>rà.",
+    ex: ["ciliegia → cilie<b>gie</b> (prima c'è la vocale e)", "arancia → aran<b>ce</b> (prima c'è la consonante n)", "la <b>sc</b>ienza · il <b>c</b>ielo", "ma: fini<b>sce</b> · pe<b>sce</b> · man<b>ge</b>rò"] },
 
   { id: "ort_z", area: "ort", icon: "🦓", name: "La Z: -zia, -zio, -zione", pre: [],
     rule: "Davanti a <b>-ia, -ie, -io, -ione</b> la <b>z</b> è sempre <b>una sola</b>: polizia, grazie, silenzio, stazione. <br>Eccezioni da ricordare: <b>pazzia</b>, <b>razzia</b>, e le parole che vengono da una parola con zz (carrozza → <b>carrozziere</b>). <br>Negli altri casi la z può essere doppia: pizza, piazza, pezzo.",
@@ -1148,6 +1148,31 @@ const ITEMS = [
   { id: "cp34", s: "ort_comp", t: "mc", lv: 3, q: "In quale frase la parola è giusta STACCATA?", o: ["Hanno costruito una casa senza tetto.", "Il senza tetto chiedeva aiuto.", "Ho comprato un porta ombrelli."], x: "Una casa senza tetto = una casa a cui manca il tetto: due parole. Il senzatetto e il portaombrelli sono una parola sola." },
   { id: "cp35", s: "ort_comp", t: "mc", lv: 3, q: "In quale frase c'è un errore?", o: ["Luca ha più figurine, ma io ne ho dipiù.", "Luca ha più figurine, ma io ne ho di più.", "Vorrei più tempo per giocare."], x: "«di più» è sempre staccato." },
   { id: "cp36", s: "ort_comp", t: "type", lv: 3, q: "Il bagnino ha lanciato il ___ al bambino in acqua.", hint: "ciambella che fa galleggiare", say: "salvagente", a: ["salvagente"], x: "salva + gente → salvagente: una parola sola." },
+
+  // ======================= v2.2: SCE nei verbi e futuro di -ciare/-giare =======================
+  { id: "cie33", s: "ort_cie", t: "type", lv: 2, q: "La lezione fini___ alle due.", hint: "finire, lui", say: "finisce", a: ["finisce"], x: "«finisce» si scrive senza i: fini-SCE." },
+  { id: "cie34", s: "ort_cie", t: "type", lv: 2, q: "Marco cono___ tutte le capitali d'Europa.", hint: "conoscere, lui", say: "conosce", a: ["conosce"], x: "«conosce»: SCE, senza i." },
+  { id: "cie35", s: "ort_cie", t: "type", lv: 2, q: "Ogni mattina mio padre e___ alle sette.", hint: "uscire, lui", say: "esce", a: ["esce"], x: "«esce»: SCE, senza i." },
+  { id: "cie36", s: "ort_cie", t: "type", lv: 2, q: "La pianta cre___ in fretta se la annaffi.", hint: "crescere, lei", say: "cresce", a: ["cresce"], x: "«cresce»: SCE, senza i." },
+  { id: "cie37", s: "ort_cie", t: "cloze", lv: 1, q: "Il gatto ha mangiato il ___ dal piatto.", o: ["pesce", "pescie"], x: "«pesce» si scrive senza i." },
+  { id: "cie38", s: "ort_cie", t: "cloze", lv: 1, q: "Il film ___ tra un'ora.", o: ["finisce", "finiscie"], x: "Nei verbi come finire la i non c'è: finisce." },
+  { id: "cie39", s: "ort_cie", t: "cloze", lv: 1, q: "Ho fatto la ___ giusta.", o: ["scelta", "scielta"], x: "«scelta» si scrive senza i." },
+  { id: "cie40", s: "ort_cie", t: "cloze", lv: 2, q: "Gli attori sono entrati in ___.", o: ["scena", "sciena"], x: "«scena» si scrive senza i." },
+  { id: "cie41", s: "ort_cie", t: "cloze", lv: 2, q: "Quando ___ il sole, partiamo.", o: ["nasce", "nascie"], x: "«nasce»: SCE, senza i." },
+  { id: "cie42", s: "ort_cie", t: "pick", lv: 2, q: "Tocca la parola SBAGLIATA:", c: ["Mia sorella", "capiscie", "subito", "i compiti."], a: 1, x: "Si scrive «capisce», senza i." },
+  { id: "cie43", s: "ort_cie", t: "pick", lv: 3, q: "Tocca la parola SBAGLIATA:", c: ["Lo scienziato", "riconoscie", "il pesce", "al microscopio."], a: 1, x: "«riconosce» si scrive senza i. «scienziato» invece la i ce l'ha: è una delle poche parole con SCIE." },
+  { id: "cie44", s: "ort_cie", t: "mc", lv: 3, q: "In quale frase c'è un errore?", o: ["La lezione di scienze finiscie presto.", "La lezione di scienze finisce presto.", "Lo scienziato conosce il pesce."], x: "«finisce» non vuole la i. La i c'è solo in poche parole: scienza, scienze, scienziato, coscienza." },
+  { id: "cie45", s: "ort_cie", t: "mc", lv: 3, q: "Quale gruppo è tutto corretto?", o: ["scienza · pesce · finisce", "scenza · pesce · finisce", "scienza · pescie · finiscie"], x: "SCIE solo in poche parole (scienza, coscienza, scienziato). Negli altri casi: SCE (pesce, finisce)." },
+  { id: "cie46", s: "ort_cie", t: "cloze", lv: 3, q: "Ho la ___ pulita: non ho fatto niente di male.", o: ["coscienza", "coscenza"], x: "«coscienza» è una delle poche parole con SCIE: va ricordata." },
+  { id: "cie47", s: "ort_cie", t: "cloze", lv: 1, q: "Domani ___ la pizza con i nonni.", o: ["mangerò", "mangierò"], x: "Al futuro di mangiare la i sparisce: mangerò." },
+  { id: "cie48", s: "ort_cie", t: "cloze", lv: 2, q: "La partita ___ alle quattro.", o: ["comincerà", "comincierà"], x: "Al futuro di cominciare la i sparisce: comincerà." },
+  { id: "cie49", s: "ort_cie", t: "cloze", lv: 2, q: "Quest'estate ___ in treno.", o: ["viaggeremo", "viaggieremo"], x: "Al futuro di viaggiare la i sparisce: viaggeremo." },
+  { id: "cie50", s: "ort_cie", t: "type", lv: 2, q: "Il prossimo anno ___ in Spagna. (noi, viaggiare, futuro)", hint: "futuro di viaggiare", say: "viaggeremo", a: ["viaggeremo"], x: "Al futuro di viaggiare la i sparisce: viaggeremo." },
+  { id: "cie51", s: "ort_cie", t: "type", lv: 3, q: "Quando partirai, ___ il cane alla zia? (tu, lasciare, futuro)", hint: "futuro di lasciare", say: "lascerai", a: ["lascerai"], x: "Al futuro di lasciare la i sparisce: lascerai." },
+  { id: "cie52", s: "ort_cie", t: "type", lv: 3, q: "Domani ___ i compiti presto. (io, cominciare, futuro)", hint: "futuro di cominciare", say: "comincerò", a: ["comincerò"], x: "Al futuro di cominciare la i sparisce: comincerò." },
+  { id: "cie53", s: "ort_cie", t: "type", lv: 3, q: "Stasera noi ___ fuori. (mangiare, futuro)", hint: "futuro di mangiare", say: "mangeremo", a: ["mangeremo"], x: "Al futuro di mangiare la i sparisce: mangeremo." },
+  { id: "cie54", s: "ort_cie", t: "mc", lv: 3, q: "In quale frase c'è un errore?", o: ["Domani la nonna ci lascierà le chiavi.", "Domani la nonna ci lascerà le chiavi.", "Ieri la nonna ci ha lasciato le chiavi."], x: "Al futuro di lasciare la i sparisce: lascerà." },
+  { id: "cie55", s: "ort_cie", t: "pick", lv: 3, q: "Tocca la parola SBAGLIATA:", c: ["Quando", "comincierà", "la scuola,", "mangeremo", "prima."], a: 1, x: "Si scrive «comincerà», senza i. «mangeremo» invece è giusto." },
 ];
 
 // ---------- v1.9: TRAPPOLE — formule mirate per i casi in cui si inciampa ----------
@@ -1161,10 +1186,12 @@ const TRAPS = {
   pron_lgl: { s: ["gr_pron"], t: "lo, gli o le?",
     d: "Cerca la «a». Senza «a» → <b>lo, la, li, le</b>: ho visto Marco → <b>l'</b>ho visto. Con «a» → <b>gli</b> per un maschio o per loro, <b>le</b> per una femmina: ho parlato a Marco → <b>gli</b> ho parlato; a Sara → <b>le</b> ho parlato." },
 };
+TRAPS.sce = { s: ["ort_cie"], t: "SCE o SCIE?",
+  d: "La i dopo <b>sc</b> si scrive solo in poche parole da ricordare: <b>scienza, scienze, scienziato, coscienza</b>. Negli altri casi è <b>sce</b>: fini<b>sce</b>, cono<b>sce</b>, pe<b>sce</b>, <b>sce</b>na. E al futuro di mangiare, cominciare, lasciare, viaggiare la i sparisce: man<b>ge</b>rò, comin<b>ce</b>rà, la<b>sce</b>rai." };
 TRAPS.comp = { s: ["ort_comp"], t: "una cosa sola o due parole?",
   d: "Chiediti: indica <b>un oggetto o una persona sola</b>, con un significato nuovo? Allora è una parola: il <b>portaombrelli</b>, la <b>cassaforte</b>, il <b>senzatetto</b>. Se invece una parola fa l'azione o descrive l'altra, restano staccate: Luca <b>porta l'ombrello</b>, una <b>cassa forte</b> (robusta), una casa <b>senza tetto</b>." };
 const TRAP_OF = {};
-[["comp", "cp15 cp16 cp17 cp18 cp19 cp21 cp22 cp32 cp34"], ["sogg_dopo", "sg2 sg8 sg13 sg14 sg15 sg16 sg31"], ["piacere", "sg11 sg12 sg27 sg30 pr6 pr28"],
+[["sce", "cie33 cie34 cie35 cie36 cie38 cie41 cie42 cie43 cie44 cie45 cie47 cie48 cie49 cie50 cie51 cie52 cie53 cie54 cie55"], ["comp", "cp15 cp16 cp17 cp18 cp19 cp21 cp22 cp32 cp34"], ["sogg_dopo", "sg2 sg8 sg13 sg14 sg15 sg16 sg31"], ["piacere", "sg11 sg12 sg27 sg30 pr6 pr28"],
  ["co_prep", "co2 co15 co16 co22 co23 co24 co28 co30"],
  ["pron_lgl", "pr1 pr2 pr4 pr7 pr9 pr11 pr12 pr13 pr14 pr29 pr33 pr34 pr35 pr36"]]
   .forEach(([k, ids]) => ids.split(" ").forEach(id => TRAP_OF[id] = k));
@@ -2296,7 +2323,7 @@ function renderHome() {
     <button class="btn primary big" id="start">${doneToday ? "Un'altra lezione ▶" : "Inizia la missione di oggi ▶"}</button>
     <div class="row"><button class="btn" id="map">🗺️ Mappa</button><button class="btn ghost" id="par">👤 Area genitori</button></div>
   </section>
-  <p class="foot"><span id="sync"></span> · v2.1</p>`;
+  <p class="foot"><span id="sync"></span> · v2.2</p>`;
   $("#start").onclick = startSession; $("#shop").onclick = () => renderDen(); if ($("#hatch")) $("#hatch").onclick = renderHatch; $("#map").onclick = renderMap; $("#par").onclick = renderParentGate;
   updateSyncBadge();
 }
