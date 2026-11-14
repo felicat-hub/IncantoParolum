@@ -36,16 +36,29 @@ let S = freshState();
 // ---------------- classe: il catalogo si adatta a chi gioca ----------------
 // Quarta elementare: niente modi, congiuntivo/condizionale, imperativo/participi/gerundi,
 // né esercizi con termini che si fanno più avanti (relativi, partitivi, forma passiva…).
-const GRADES = { media: "Scuola media", elem4: "Quarta elementare" };
+const GRADES = { media: "Scuola media", elem4: "Quarta elementare", elem3: "Terza elementare completata" };
+// Terza completata (inizio quarta): solo quello che di solito si è fatto entro la terza.
+// Fuori: complemento oggetto, passato remoto e tempi più lontani, gradi dell'aggettivo,
+// nomi collettivi/astratti/alterati, pronomi complemento (lo, gli, le…), predicato nominale.
+const ELEM3_SKIP = new Set(["gr_modi", "gr_indef", "gr_cong", "log_ogg"]);
+const ELEM3_RX = /passato remoto|trapassat|futuro anteriore|comparativ|superlativ|collettiv|astratt|alterat|derivat|nome composto|possessiv|dimostrativ|interrogativ|nominale|impersonal|coniugazione|irregolare|complemento|sono stati premiati/i;
+const ELEM3_OUT = new Set("q8 vb32 vb33 vb35 vb37 agg10 agg20 agg31 agg34 agg35 sg11 sg12 sg13 sg27 sg29 sg30 sg31".split(" "));
+const ELEM3_PRON = new Set("pr3 pr5 pr6 pr10 pr17 pr18 pr19 pr28 pr30 pr31".split(" "));
 const ELEM4_SKIP = new Set(["gr_modi", "gr_indef", "gr_cong"]);
 const ELEM4_RX = /congiuntiv|condizional|gerundi|participi|relativ|partitiv|passiv|forma attiva|infinito passato|trapassato remoto|futuro anteriore/i;
 function itemForGrade(i, g) {
+  if (g === "elem3") {
+    if (ELEM3_SKIP.has(i.s) || ELEM3_OUT.has(i.id)) return false;
+    if (i.s === "gr_pron") return ELEM3_PRON.has(i.id);
+    const t = [i.q, (i.o || []).join(" "), (i.c || []).join(" "), i.hint || "", i.x || ""].join(" ");
+    return !ELEM4_RX.test(i.q + " " + (i.o || []).join(" ") + " " + (i.c || []).join(" ") + " " + (i.hint || "")) && !ELEM3_RX.test(t);
+  }
   if (g !== "elem4") return true;
   return !ELEM4_SKIP.has(i.s) && !ELEM4_RX.test(i.q + " " + (i.o || []).join(" ") + " " + (i.c || []).join(" ") + " " + (i.hint || ""));
 }
 function applyGrade(g = S.grade || "media") {
   ITEMS.length = 0; ALL_ITEMS.forEach(i => { if (itemForGrade(i, g)) ITEMS.push(i); });
-  SKILLS.length = 0; ALL_SKILLS.forEach(k => { if (g !== "elem4" || !ELEM4_SKIP.has(k.id)) SKILLS.push(k); });
+  SKILLS.length = 0; ALL_SKILLS.forEach(k => { if (g === "elem3" ? !ELEM3_SKIP.has(k.id) : g !== "elem4" || !ELEM4_SKIP.has(k.id)) SKILLS.push(k); });
 }
 
 // ---------------- profili: più bambini sullo stesso dispositivo ----------------
@@ -172,7 +185,7 @@ function suggestFocus() {
   if (now.length) cands = now;
   if (!cands.length) return null;
   const core = cands.filter(s => CORE_SKILLS.includes(s.id));
-  if (core.length && (S.log || []).slice(-3).filter(l => CORE_SKILLS.includes(l.f)).length < 2) {
+  if ((S.grade || "media") === "media" && core.length && (S.log || []).slice(-3).filter(l => CORE_SKILLS.includes(l.f)).length < 2) {
     const p = id => needsBoost(id) ? sk(id).m - 1 : sk(id).m;
     return core.sort((a, b) => p(a.id) - p(b.id) || CORE_SKILLS.indexOf(a.id) - CORE_SKILLS.indexOf(b.id))[0].id;
   }
@@ -489,7 +502,7 @@ function renderHome() {
     <button class="btn primary big" id="start">${doneToday ? "Un'altra lezione ▶" : "Inizia la missione di oggi ▶"}</button>
     <div class="row"><button class="btn" id="map">🗺️ Mappa</button><button class="btn ghost" id="par">👤 Area genitori</button></div>
   </section>
-  <p class="foot"><span id="sync"></span> · v2.2.4</p>`;
+  <p class="foot"><span id="sync"></span> · v2.3</p>`;
   $("#start").onclick = startSession; $("#shop").onclick = () => renderDen(); if ($("#hatch")) $("#hatch").onclick = renderHatch; $("#map").onclick = renderMap; $("#par").onclick = renderParentGate;
   updateSyncBadge();
 }
