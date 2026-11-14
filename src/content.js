@@ -863,7 +863,7 @@ const ITEMS = [
   { id: "co14", s: "log_ogg", t: "pick", lv: 2, q: "Tocca il COMPLEMENTO OGGETTO:", c: ["Mio padre", "ha corso", "la maratona", "di Roma."], a: 2, x: "Ha corso che cosa? La maratona." },
   { id: "co15", s: "log_ogg", t: "mc", lv: 3, q: "In «Mio padre corre al parco» c'è il complemento oggetto?", o: ["No", "Sì: al parco"], x: "«al parco» ha la preposizione e risponde a «dove?»: non è complemento oggetto." },
   { id: "co16", s: "log_ogg", t: "mc", lv: 3, q: "In «Penso a te» c'è il complemento oggetto?", o: ["No: «a te» ha la preposizione", "Sì: te"], x: "«a te» risponde a «a chi?»: non è complemento oggetto." },
-  { id: "co17", s: "log_ogg", t: "mc", lv: 3, q: "In «Ti penso sempre», «ti» è…", o: ["complemento oggetto", "soggetto", "non è un complemento"], x: "Penso chi? Te → ti: complemento oggetto." },
+  { id: "co31", s: "log_ogg", t: "mc", lv: 3, q: "In «Ti aspetto all'uscita», «ti» è…", o: ["complemento oggetto", "soggetto", "non è un complemento"], x: "Aspetto chi? Te → ti: complemento oggetto (senza preposizione)." },
   { id: "co18", s: "log_ogg", t: "mc", lv: 3, q: "In «Il ladro è stato arrestato dalla polizia» il complemento oggetto è…", o: ["non c'è: la frase è passiva", "il ladro", "dalla polizia"], x: "Nelle frasi passive non c'è complemento oggetto: «il ladro» è il soggetto." },
   { id: "co19", s: "log_ogg", t: "mc", lv: 2, q: "In «Chi hai invitato?», «chi» è…", o: ["complemento oggetto", "soggetto", "predicato"], x: "Hai invitato chi? → «chi» è ciò che hai invitato: complemento oggetto." },
   { id: "co20", s: "log_ogg", t: "mc", lv: 3, q: "In «Chi ha vinto?», «chi» è…", o: ["soggetto", "complemento oggetto", "predicato"], x: "Chi ha vinto? → «chi» compie l'azione: soggetto." },
@@ -949,7 +949,7 @@ const TRAPS = {
   piacere: { s: ["log_sogg", "gr_pron"], t: "piacere, mancare, servire",
     d: "In «Mi piace <b>la musica</b>» chi piace? la musica: è lei il soggetto. «Mi», «a me», «a Luca» vogliono dire «a qualcuno»: non sono mai il soggetto. Prova: metti la cosa al plurale e il verbo cambia → mi piacci<b>ono</b> i film." },
   co_prep: { s: ["log_ogg"], t: "con la preposizione non è complemento oggetto",
-    d: "Il complemento oggetto risponde a «chi?» o «che cosa?» <b>senza preposizione davanti</b>. «Va <b>a</b> scuola», «penso <b>a</b> te», «corre <b>al</b> parco»: c'è una preposizione → non è complemento oggetto. «<b>Ti</b> penso» invece sì: penso chi? te." },
+    d: "Il complemento oggetto risponde a «chi?» o «che cosa?» <b>senza preposizione davanti</b>. «Va <b>a</b> scuola», «penso <b>a</b> te», «corre <b>al</b> parco»: c'è una preposizione → non è complemento oggetto. «<b>Ti</b> aspetto» invece sì: aspetto chi? te." },
   pron_lgl: { s: ["gr_pron"], t: "lo, gli o le?",
     d: "Cerca la «a». Senza «a» → <b>lo, la, li, le</b>: ho visto Marco → <b>l'</b>ho visto. Con «a» → <b>gli</b> per un maschio o per loro, <b>le</b> per una femmina: ho parlato a Marco → <b>gli</b> ho parlato; a Sara → <b>le</b> ho parlato." },
 };
