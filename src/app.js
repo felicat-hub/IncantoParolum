@@ -489,7 +489,7 @@ function renderHome() {
     <button class="btn primary big" id="start">${doneToday ? "Un'altra lezione ▶" : "Inizia la missione di oggi ▶"}</button>
     <div class="row"><button class="btn" id="map">🗺️ Mappa</button><button class="btn ghost" id="par">👤 Area genitori</button></div>
   </section>
-  <p class="foot"><span id="sync"></span> · v2.2.3</p>`;
+  <p class="foot"><span id="sync"></span> · v2.2.4</p>`;
   $("#start").onclick = startSession; $("#shop").onclick = () => renderDen(); if ($("#hatch")) $("#hatch").onclick = renderHatch; $("#map").onclick = renderMap; $("#par").onclick = renderParentGate;
   updateSyncBadge();
 }
@@ -671,6 +671,12 @@ function wireAnswers(item, answer) {
     keyHandler = e => { const n = Number(e.key); if (n >= 1 && n <= bs.length) bs[n - 1].click(); };
   }
 }
+// Esercizi «trova l'errore»: la risposta giusta è la forma SBAGLIATA. Non va mostrata in verde
+// come se fosse da imparare: la segno barrata, come errore trovato.
+const isHunt = item => /c'è un errore|SBAGLIAT/.test(item.q);
+const answerHTML = item => isHunt(item)
+  ? `L'errore era qui: <b class="hunt-ans"><s>${esc(correctText(item))}</s></b>`
+  : `Risposta giusta: <b class="right-ans">${esc(correctText(item))}</b>`;
 function correctText(item) { return item.t === "pick" ? item.c[item.a] : item.t === "type" ? item.a[0] : item.o[0]; }
 function markAnswer(item, ok, el) {
   if (item.t === "type") {
@@ -682,7 +688,7 @@ function markAnswer(item, ok, el) {
   document.querySelectorAll(".opt, .chunk").forEach(b => {
     b.disabled = true;
     const right = item.t === "pick" ? Number(b.dataset.i) === item.a : b.dataset.v === item.o[0];
-    if (right) b.classList.add("right");
+    if (right) b.classList.add(isHunt(item) ? "found" : "right");
   });
   if (!ok && el) el.classList.add("wrong");
   const bl = document.querySelector(".blank"); if (bl) { bl.textContent = item.o[0]; bl.classList.add(ok ? "right" : "fixed"); }
@@ -732,7 +738,7 @@ function startRaffica() {
       if (cb.up) { const f = document.createElement("div"); f.className = "combo-pop"; f.textContent = "COMBO ×" + cb.mult + "!"; document.body.appendChild(f); setTimeout(() => f.remove(), 1100); }
       markAnswer(item, ok, el); Store.save();
       $("#fb").className = "fb mini-fb " + (ok ? "good" : "bad");
-      $("#fb").innerHTML = ok ? `+${res.gain + cb.bonus} XP${cb.mult > 1 ? ` <span class="cmb">×${cb.mult}</span>` : ""}` : `Era: <b>${esc(correctText(item))}</b>`;
+      $("#fb").innerHTML = ok ? `+${res.gain + cb.bonus} XP${cb.mult > 1 ? ` <span class="cmb">×${cb.mult}</span>` : ""}` : isHunt(item) ? `Errore: <s>${esc(correctText(item))}</s>` : `Era: <b>${esc(correctText(item))}</b>`;
       setTimeout(() => { busy = false; show(); }, ok ? 650 : 1700);
     });
   };
@@ -1441,7 +1447,7 @@ function diffHTML(typed, right) {
 }
 function errorFeedback(item, typed, diag) {
   const right = correctText(item);
-  const top = typed !== undefined && item.t === "type" ? diffHTML(typed.trim(), right) : `<p>Risposta giusta: <b class="right-ans">${esc(right)}</b></p>`;
+  const top = typed !== undefined && item.t === "type" ? diffHTML(typed.trim(), right) : `<p>${answerHTML(item)}</p>`;
   if (diag) return top;
   const tr = TRAP_OF[item.id] && TRAPS[TRAP_OF[item.id]];
   return top + `<div class="why">💡 ${item.x}</div>` + (tr ? `<div class="trap">🧪 <b>${tr.t}</b><br>${tr.d}</div>` : "") +
