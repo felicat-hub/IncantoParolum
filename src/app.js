@@ -40,11 +40,11 @@ const GRADES = { media: "Scuola media", elem4: "Quarta elementare", elem3: "Terz
 // Terza completata (inizio quarta): solo quello che di solito si è fatto entro la terza.
 // Fuori: complemento oggetto, passato remoto e tempi più lontani, gradi dell'aggettivo,
 // nomi collettivi/astratti/alterati, pronomi complemento (lo, gli, le…), predicato nominale.
-const ELEM3_SKIP = new Set(["gr_modi", "gr_indef", "gr_cong", "log_ogg"]);
+const ELEM3_SKIP = new Set(["gr_modi", "gr_indef", "gr_cong", "log_ogg", "gr_forma"]);
 const ELEM3_RX = /passato remoto|trapassat|futuro anteriore|comparativ|superlativ|collettiv|astratt|alterat|derivat|nome composto|possessiv|dimostrativ|interrogativ|nominale|impersonal|coniugazione|irregolare|complemento|sono stati premiati/i;
 const ELEM3_OUT = new Set("q8 vb32 vb33 vb35 vb37 agg10 agg20 agg31 agg34 agg35 sg11 sg12 sg13 sg27 sg29 sg30 sg31".split(" "));
 const ELEM3_PRON = new Set("pr3 pr5 pr6 pr10 pr17 pr18 pr19 pr28 pr30 pr31".split(" "));
-const ELEM4_SKIP = new Set(["gr_modi", "gr_indef", "gr_cong"]);
+const ELEM4_SKIP = new Set(["gr_modi", "gr_indef", "gr_cong", "gr_forma"]);
 const ELEM4_RX = /congiuntiv|condizional|gerundi|participi|relativ|partitiv|passiv|forma attiva|infinito passato|trapassato remoto|futuro anteriore/i;
 function itemForGrade(i, g) {
   if (g === "elem3") {
@@ -176,7 +176,7 @@ const isErr = it => it && it.lw !== undefined && it.b <= 1;     // sbagliato e n
 const errItems = id => ITEMS.filter(i => i.s === id && isErr(S.items[i.id]));
 const needsBoost = id => isMastered(id) && sk(id).m < 0.6 && errItems(id).length >= 2;   // conquistata, ma ora vacilla
 // Lacuna principale dichiarata all'inizio: modi e tempi verbali. Hanno la precedenza (2 missioni su 3).
-const CORE_SKILLS = ["gr_tempi", "gr_modi", "gr_aus", "gr_indef", "gr_cong"];
+const CORE_SKILLS = ["gr_tempi", "gr_modi", "gr_aus", "gr_indef", "gr_cong", "gr_forma"];
 function suggestFocus() {
   if (S.focus && isAvailable(S.focus) && (!isMastered(S.focus) || hasNews(S.focus) || needsBoost(S.focus))) return S.focus;
   if (S.focusChosen && isMastered(S.focusChosen)) S.focusChosen = null;
@@ -339,7 +339,7 @@ function buildSession() {
 // Prima di ogni domanda: se sta sbagliando troppo, inserisce un esercizio facile e
 // trasforma il prossimo "da scrivere" in uno "a scelta"; se va benissimo, alza il livello.
 function balance(ph) {
-  if (SESS.mode !== "session" || SESS.tot < 4 || SESS.tot - SESS.lastAdjust < 3) return;
+  if (SESS.mode !== "session" || SESS.exam || SESS.tot < 4 || SESS.tot - SESS.lastAdjust < 3) return;
   if (ph.key !== "ripasso" && ph.key !== "nuovo") return;
   const acc = SESS.ok / SESS.tot, rest = ph.items.slice(SESS.qi);
   if (acc < TARGET_LOW && SESS.boosts < MAX_BOOSTS) {
@@ -499,11 +499,12 @@ function renderHome() {
       <div><small>Ripassi in attesa</small><b>${dueN}</b></div>
       <div><small>Abilità conquistate</small><b>${mastered} / ${SKILLS.length}</b></div>
     </div>
-    <button class="btn primary big" id="start">${doneToday ? "Un'altra lezione ▶" : "Inizia la missione di oggi ▶"}</button>
+    ${examActive() ? `<div class="exam-card"><b>📝 Verifica ${examWhen()}: ${SK[S.exam.s].icon} ${esc(SK[S.exam.s].name)}</b><small>Allenamento di circa 20 domande, dalle più facili alle più difficili. Puoi rifarlo quante volte vuoi.</small><button class="btn primary big" id="exam" type="button">Allenati per la verifica ▶</button></div>` : ""}
+    <button class="btn ${examActive() ? "" : "primary "}big" id="start">${doneToday ? "Un'altra lezione ▶" : "Inizia la missione di oggi ▶"}</button>
     <div class="row"><button class="btn" id="map">🗺️ Mappa</button><button class="btn ghost" id="par">👤 Area genitori</button></div>
   </section>
-  <p class="foot"><span id="sync"></span> · v2.3.1</p>`;
-  $("#start").onclick = startSession; $("#shop").onclick = () => renderDen(); if ($("#hatch")) $("#hatch").onclick = renderHatch; $("#map").onclick = renderMap; $("#par").onclick = renderParentGate;
+  <p class="foot"><span id="sync"></span> · v2.4</p>`;
+  $("#start").onclick = startSession; if ($("#exam")) $("#exam").onclick = startExam; $("#shop").onclick = () => renderDen(); if ($("#hatch")) $("#hatch").onclick = renderHatch; $("#map").onclick = renderMap; $("#par").onclick = renderParentGate;
   updateSyncBadge();
 }
 
@@ -546,6 +547,36 @@ function toast(msg) { const t = $("#toast"); if (!t) return; t.textContent = msg
 
 // ---------------- flusso esercizi ----------------
 function startSession() { SESS = buildSession(); next(); }
+
+// ---------------- 📝 Ripasso per la verifica ----------------
+// Il genitore sceglie l'argomento e il giorno; finché la verifica non è passata, nella home compare
+// un allenamento intensivo: formula, poi esercizi base → medi → sfide, con gli errori ripresi subito.
+const examActive = () => S.exam && SK[S.exam.s] && ITEMS.some(i => i.s === S.exam.s) && dayKey() <= S.exam.until;
+function examWhen() {
+  const t = new Date(); t.setDate(t.getDate() + 1);
+  const tom = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
+  return S.exam.until === dayKey() ? "oggi" : S.exam.until === tom ? "domani" : S.exam.until.split("-").reverse().join("/");
+}
+function buildExam() {
+  const id = S.exam.s, pool = ITEMS.filter(i => i.s === id);
+  const err = shuffle(pool.filter(i => S.items[i.id] && isErr(S.items[i.id])));
+  const rank = i => (S.items[i.id] ? (S.items[i.id].c < S.items[i.id].n ? 0 : 2) : 1);   // sbagliati, poi nuovi, poi già fatti
+  const byL = L => shuffle(pool.filter(i => lvl(i) === L && !err.includes(i))).sort((a, b) => rank(a) - rank(b));
+  const p1 = err.filter(i => lvl(i) === 1).concat(byL(1)).slice(0, 5);
+  const withTyped = (L, n, nt) => { const all = byL(L), e = err.filter(i => lvl(i) === L);   // almeno nt esercizi da scrivere
+    const t = all.filter(i => i.t === "type" && !e.includes(i)).slice(0, nt);
+    return e.concat(t, all.filter(i => !t.includes(i))).slice(0, n); };
+  const p2 = withTyped(2, 9, 3), p3 = withTyped(3, 8, 3);
+  const phases = [
+    { key: "nuovo", label: "📝 Verifica · 1. Si parte", skill: id, items: interleave(p1), lessonShown: false },
+    { key: "nuovo", label: "📝 Verifica · 2. Esercitazione", skill: id, items: interleave(p2), lessonShown: true },
+    { key: "nuovo", label: "📝 Verifica · 3. Le domande difficili", skill: id, items: interleave(p3), lessonShown: true },
+  ].filter(ph => ph.items.length);
+  const used = new Set(phases.flatMap(ph => ph.items.map(i => i.id)));
+  return { mode: "session", exam: true, phases, pi: 0, qi: 0, retried: new Set(), ok: 0, tot: 0, xp: 0, mastered: [], start: Date.now(), focus: id,
+           factor: 1, used, boosts: 0, lastAdjust: -10, adjust: [], xpBefore: S.xp, availBefore: SKILLS.filter(s => isAvailable(s.id)).map(s => s.id) };
+}
+function startExam() { SESS = buildExam(); next(); }
 
 function next() {
   const ph = SESS.phases[SESS.pi];
@@ -858,6 +889,7 @@ function renderParent() {
     <h3>Abilità</h3>
     <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Abilità</th><th>Padronanza</th><th>Accuratezza (tentativi)</th><th>Esercizi visti</th><th>Sfide superate</th><th>Stato</th></tr></thead><tbody>${rows}</tbody></table></div>
     <p class="muted">La <b>padronanza</b> è una media mobile che dà più peso alle risposte recenti; un'abilità è «conquistata» quando supera l'85% dopo almeno 8 tentativi. Salvataggio: <span id="sync"></span>.</p>
+    ${examPanel()}
     ${profilesPanel()}
     <h3>Nome nell'app</h3>
     <div class="row left"><input id="nick" class="inp" maxlength="20" value="${esc(S.name || "")}"><button class="btn" id="nicksave">Salva</button></div>
@@ -872,7 +904,7 @@ function renderParent() {
   $("#back").onclick = boot;
   $("#nicksave").onclick = () => { S.name = $("#nick").value.trim() || S.name; Store.save(); $("#pbox").innerHTML = "<p class='note'>Nome aggiornato ✅</p>"; };
   if (IS_STANDALONE) wireSyncPanel();
-  wireProfilesPanel();
+  wireProfilesPanel(); wireExamPanel();
   $("#copy").onclick = async () => { try { await navigator.clipboard.writeText(JSON.stringify(S)); $("#pbox").innerHTML = "<p class='note'>Backup copiato negli appunti ✅</p>"; } catch (e) { $("#pbox").innerHTML = `<p class="muted">Copia manualmente:</p><textarea class="inp ta" readonly>${esc(JSON.stringify(S))}</textarea>`; } };
   if ($("#dl")) $("#dl").onclick = () => {
     const blob = new Blob([JSON.stringify(S, null, 1)], { type: "application/json" });
@@ -1360,6 +1392,23 @@ function wireSecretPicker(onChange) {
   const show = () => { $("#spv").textContent = seq.map(k => PICS[k]).join(" ") || "—"; onChange(seq.length === 3 ? seq.slice() : null); };
   document.querySelectorAll("#sp .pic").forEach(b => b.onclick = () => { if (seq.length >= 3) seq = []; seq.push(+b.dataset.k); show(); });
   $("#spclr").onclick = () => { seq = []; show(); };
+}
+function examPanel() {
+  const t = new Date(); t.setDate(t.getDate() + 1);
+  const def = S.exam && S.exam.until >= dayKey() ? S.exam.until : `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
+  return `<h3>📝 Verifica in arrivo</h3>
+    <p class="muted">Scegli l'argomento: fino al giorno della verifica, nella schermata iniziale di ${esc(S.name || "questo profilo")} compare un allenamento dedicato.</p>
+    <div class="row left">
+      <select id="exs" class="inp">${SKILLS.map(k => `<option value="${k.id}" ${(S.exam ? S.exam.s : "gr_forma") === k.id ? "selected" : ""}>${k.icon} ${esc(k.name)}</option>`).join("")}</select>
+      <input id="exd" class="inp" type="date" value="${def}">
+      <button class="btn primary" id="exon" type="button">Attiva</button>
+      ${examActive() ? `<button class="btn" id="exoff" type="button">Togli</button>` : ""}
+    </div>
+    ${examActive() ? `<p class="note">Attivo: ${SK[S.exam.s].icon} <b>${esc(SK[S.exam.s].name)}</b>, verifica ${examWhen()}.</p>` : ""}`;
+}
+function wireExamPanel() {
+  $("#exon").onclick = () => { const d = $("#exd").value; if (!d || d < dayKey()) { $("#exd").focus(); return; } S.exam = { s: $("#exs").value, until: d }; Store.save(); renderParent(); };
+  if ($("#exoff")) $("#exoff").onclick = () => { delete S.exam; Store.save(); renderParent(); };
 }
 function profilesPanel() {
   const rows = Profiles.reg.list.map(e => `<tr><td><b>${esc(e.name || "—")}</b>${e.id === Profiles.active ? " <small>(attivo)</small>" : ""}</td><td>${esc(gradeLabel(e.grade))}</td><td>${e.lock ? "🔒 sì" : "no"}</td>
