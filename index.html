@@ -77,6 +77,7 @@ h1{font-size:2rem;margin:.2em 0;font-weight:900}h2{font-size:1.45rem;margin:.2em
 .secret-dots{display:flex;gap:10px;justify-content:center}.secret-dots span{width:16px;height:16px;border-radius:50%;border:2px solid var(--line)}.secret-dots span.on{background:var(--pri);border-color:var(--pri)}
 .shake{animation:shk .4s}@keyframes shk{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
 details.sub{margin:10px 0;padding:8px 12px;border:2px solid var(--line);border-radius:14px}details.sub summary{cursor:pointer;font-weight:800}
+.exam-card{display:flex;flex-direction:column;gap:6px;margin:14px 0;padding:14px;border:2px solid #e8590c;border-radius:18px;background:#fff3e0}.exam-card b{font-size:1.1rem}.exam-card small{color:#7a4a1c}
 .trap{margin-top:10px;color:#2a2340;font-weight:500;background:#f3ecff;border-left:4px solid #7c3aed;border-radius:10px;padding:10px 12px;font-size:.95rem;line-height:1.4}
 .qtag.sfida{background:#fff1e0;color:#c2410c;margin-left:6px}
 .qtag{display:inline-block;background:var(--s);color:var(--c);font-weight:800;font-size:.85rem;border-radius:99px;padding:3px 12px}
@@ -294,6 +295,9 @@ const SKILLS = [
   { id: "gr_tempi", area: "gr", icon: "⏳", name: "I tempi dell'indicativo", pre: ["gr_verbo"],
     rule: "Tempi semplici: presente (<b>mangio</b>), imperfetto (<b>mangiavo</b>), passato remoto (<b>mangiai</b>), futuro semplice (<b>mangerò</b>). <br>Tempi composti = avere/essere + participio: passato prossimo (<b>ho mangiato</b>), trapassato prossimo (<b>avevo mangiato</b>), trapassato remoto (<b>ebbi mangiato</b>), futuro anteriore (<b>avrò mangiato</b>). <br>Trucco: il tempo dell'ausiliare ti dice il nome del tempo composto (ho = presente → passato prossimo; avevo = imperfetto → trapassato prossimo).",
     ex: ["Ieri <b>sono andato</b> al cinema (passato prossimo)", "Da piccolo <b>andavo</b> al mare (imperfetto)", "Domani <b>partiremo</b> (futuro semplice)"] },
+  { id: "gr_forma", area: "gr", icon: "🔁", name: "Tipo e forma del verbo", pre: ["gr_verbo"],
+    rule: "<b>Transitivo</b>: l'azione passa direttamente su un oggetto, che risponde a «chi? che cosa?» <b>senza preposizione</b> (La mamma lava <b>i jeans</b>). <b>Intransitivo</b>: l'azione non passa su un oggetto (Il nonno <b>dorme</b>; Lavoro <b>a</b> un progetto). Un transitivo senza oggetto è in <b>uso assoluto</b> (Papà <b>legge</b> ogni sera). <br><b>Attiva</b>: il soggetto compie l'azione. <b>Passiva</b>: il soggetto la subisce (Il quadro <b>è stato dipinto</b> da Botticelli). Solo i transitivi hanno il passivo: essere + participio, oppure venire + participio, ma solo nei tempi semplici. <br><b>Riflessivo proprio</b>: mi, ti, si… fanno da complemento oggetto (Marcello <b>si</b> guarda). <b>Apparente</b>: mi, ti, si… vogliono dire «a me, a te, a sé» e c'è un altro oggetto (Mi lavo <b>le mani</b>). <b>Reciproco</b>: l'azione si fa a vicenda (Luca e Anna <b>si abbracciano</b>). <b>Intransitivo pronominale</b>: la particella fa parte del verbo (pentir<b>si</b>, vergognar<b>si</b>, accorger<b>si</b>). <br><b>Si impersonale</b>: nessun soggetto vero (Si dorme bene). <b>Si passivante</b>: c'è un soggetto e il verbo si accorda con lui (Si vendono <b>case</b> = case sono vendute).",
+    ex: ["Ho salito <b>le scale</b> (transitivo) · Sono salito <b>in</b> solaio (intransitivo)", "Il gatto <b>è stato salvato</b> dai pompieri (passivo) · Sei <b>arrivata</b> (passato prossimo)", "Si lava (proprio) · Si lava <b>le mani</b> (apparente) · Si abbracciano (reciproco)"] },
   { id: "gr_aus", area: "gr", icon: "🤝", name: "Essere o avere? I tempi composti", pre: ["gr_verbo"],
     rule: "I tempi composti si formano con un <b>ausiliare</b> (essere o avere) + il <b>participio passato</b>. <br>Si usa <b>avere</b> con i verbi che hanno un complemento oggetto (ho mangiato una mela) e con molti altri (ho dormito, ho riso, ho pianto). <br>Si usa <b>essere</b> con molti verbi di movimento o di cambiamento (sono andato, è nato, è diventato), con i riflessivi (mi sono lavato) e con «essere» stesso (sono stato). <br>Con <b>essere</b> il participio si accorda con il soggetto: Anna è uscit<b>a</b>, i ragazzi sono partit<b>i</b>.",
     ex: ["<b>Ho</b> letto un libro · <b>Abbiamo</b> riso tanto", "<b>Sono</b> arrivato · <b>Siamo</b> nati in maggio", "Sara è cadut<b>a</b> · Loro si sono svegliat<b>i</b>"] },
@@ -1175,6 +1179,63 @@ const ITEMS = [
   { id: "cie53", s: "ort_cie", t: "type", lv: 3, q: "Stasera noi ___ fuori. (mangiare, futuro)", hint: "futuro di mangiare", say: "mangeremo", a: ["mangeremo"], x: "Al futuro di mangiare la i sparisce: mangeremo." },
   { id: "cie54", s: "ort_cie", t: "mc", lv: 3, q: "In quale frase c'è un errore?", o: ["Domani la nonna ci lascierà le chiavi.", "Domani la nonna ci lascerà le chiavi.", "Ieri la nonna ci ha lasciato le chiavi."], x: "Al futuro di lasciare la i sparisce: lascerà." },
   { id: "cie55", s: "ort_cie", t: "pick", lv: 3, q: "Tocca la parola SBAGLIATA:", c: ["Quando", "comincierà", "la scuola,", "mangeremo", "prima."], a: 1, x: "Si scrive «comincerà», senza i. «mangeremo» invece è giusto." },
+
+  // ======================= v2.4: TIPO E FORMA DEL VERBO =======================
+  { id: "fv1", s: "gr_forma", t: "mc", lv: 1, d: 1, q: "In «La mamma ha lavato i jeans» il verbo è…", o: ["transitivo", "intransitivo"], x: "Ha lavato che cosa? i jeans, senza preposizione: transitivo." },
+  { id: "fv2", s: "gr_forma", t: "mc", lv: 1, q: "In «Il nonno dorme sul divano» il verbo è…", o: ["intransitivo", "transitivo"], x: "«Dorme che cosa?» non ha senso; «sul divano» dice dove. Intransitivo." },
+  { id: "fv3", s: "gr_forma", t: "mc", lv: 3, q: "In «Molti artisti hanno lavorato a quell'opera» il verbo è…", o: ["intransitivo: «a quell'opera» ha la preposizione", "transitivo: l'oggetto è «quell'opera»"], x: "«a quell'opera» comincia con la preposizione «a»: non è complemento oggetto. Qui lavorare è intransitivo." },
+  { id: "fv4", s: "gr_forma", t: "mc", lv: 3, q: "In «Il ragioniere ha proceduto alla revisione dei conti» il verbo è…", o: ["intransitivo", "transitivo"], x: "«alla revisione» ha la preposizione: procedere è intransitivo." },
+  { id: "fv5", s: "gr_forma", t: "mc", lv: 3, q: "In «Siamo saliti in un vecchio solaio», «in un vecchio solaio» è…", o: ["un complemento con preposizione: salire qui è intransitivo", "il complemento oggetto: salire qui è transitivo"], x: "«in un vecchio solaio» dice dove, con la preposizione «in». Anche l'ausiliare essere (siamo saliti) è un indizio: intransitivo." },
+  { id: "fv6", s: "gr_forma", t: "mc", lv: 3, q: "In «Ho salito le scale di corsa» il verbo è…", o: ["transitivo", "intransitivo"], x: "Ho salito che cosa? le scale, senza preposizione, e con l'ausiliare avere: transitivo. Lo stesso verbo può essere transitivo o intransitivo a seconda della frase." },
+  { id: "fv7", s: "gr_forma", t: "pick", lv: 2, q: "Tocca il verbo INTRANSITIVO:", c: ["Ieri ho prestato", "il quaderno a Lucia,", "poi", "sono partito", "per Roma."], a: 3, x: "«sono partito» non ha un oggetto: intransitivo. «ho prestato il quaderno» invece è transitivo." },
+  { id: "fv8", s: "gr_forma", t: "pick", lv: 2, q: "Tocca il verbo TRANSITIVO:", c: ["Il bambino", "ha sbadigliato,", "poi", "ha chiuso", "il libro."], a: 3, x: "Ha chiuso che cosa? il libro: transitivo. «ha sbadigliato» non ha oggetto: intransitivo." },
+  { id: "fv9", s: "gr_forma", t: "mc", lv: 2, q: "Quale di questi verbi è intransitivo?", o: ["arrivare", "mangiare", "leggere"], x: "Non si può «arrivare qualcosa»: arrivare è intransitivo. Mangiare e leggere possono avere un oggetto." },
+  { id: "fv10", s: "gr_forma", t: "mc", lv: 2, q: "In «Il cane abbaiava al gatto del vicino» il verbo è…", o: ["intransitivo", "transitivo"], x: "«al gatto» ha la preposizione: abbaiare è intransitivo." },
+  { id: "fv11", s: "gr_forma", t: "mc", lv: 2, q: "In quale frase un verbo transitivo è usato in senso assoluto (senza oggetto)?", o: ["Mio padre legge tutte le sere.", "Mio padre legge il giornale.", "Mio padre arriva tardi."], x: "Leggere è transitivo, ma qui non ha l'oggetto: uso assoluto. «arriva» invece è un verbo intransitivo." },
+  { id: "fv12", s: "gr_forma", t: "mc", lv: 3, q: "In «Avete bevuto alla loro salute?» il verbo bere è…", o: ["transitivo usato in senso assoluto", "intransitivo"], x: "Bere è transitivo (bevo l'acqua), ma qui non ha l'oggetto: «alla loro salute» ha la preposizione. Uso assoluto." },
+  { id: "fv13", s: "gr_forma", t: "mc", lv: 3, q: "In «Il ragazzo ha negato la sua responsabilità» il verbo è…", o: ["transitivo con il complemento oggetto", "transitivo usato in senso assoluto", "intransitivo"], x: "Ha negato che cosa? la sua responsabilità: c'è l'oggetto, quindi non è uso assoluto." },
+  { id: "fv14", s: "gr_forma", t: "cloze", lv: 2, q: "Francesco ___ cresciuto i suoi figli da solo.", o: ["ha", "è"], x: "Qui crescere ha l'oggetto (i suoi figli): è transitivo e vuole avere." },
+  { id: "fv15", s: "gr_forma", t: "cloze", lv: 2, q: "L'oleandro ___ cresciuto bene nel giardino.", o: ["è", "ha"], x: "Qui crescere non ha oggetto: è intransitivo e vuole essere." },
+  { id: "fv16", s: "gr_forma", t: "cloze", lv: 2, q: "Da dove ___ passato per arrivare qui?", o: ["sei", "hai"], x: "Passare da un luogo è intransitivo: vuole essere." },
+  { id: "fv17", s: "gr_forma", t: "cloze", lv: 2, q: "Quest'estate ___ passato le vacanze in montagna.", o: ["ho", "sono"], x: "Ho passato che cosa? le vacanze: qui passare è transitivo e vuole avere." },
+  { id: "fv18", s: "gr_forma", t: "cloze", lv: 1, q: "I cugini ___ partiti per Venezia.", o: ["sono", "hanno"], x: "Partire è intransitivo: vuole essere." },
+  { id: "fv19", s: "gr_forma", t: "cloze", lv: 3, q: "Il nostro gatto ___ vissuto una bella vita.", o: ["ha", "è"], x: "Qui vivere ha un oggetto (una bella vita): vuole avere." },
+  { id: "fv20", s: "gr_forma", t: "cloze", lv: 1, q: "Mio padre ___ sorriso volentieri.", o: ["ha", "è"], x: "Sorridere vuole l'ausiliare avere: ha sorriso." },
+  { id: "fv21", s: "gr_forma", t: "mc", lv: 1, d: 1, q: "«Il quadro è stato dipinto da Botticelli»: il soggetto (il quadro)…", o: ["subisce l'azione: forma passiva", "compie l'azione: forma attiva"], x: "Il quadro non dipinge: è dipinto da Botticelli. Forma passiva." },
+  { id: "fv22", s: "gr_forma", t: "mc", lv: 1, q: "«Giovanni ha raccontato il suo viaggio»: il soggetto (Giovanni)…", o: ["compie l'azione: forma attiva", "subisce l'azione: forma passiva"], x: "È Giovanni che racconta: forma attiva." },
+  { id: "fv23", s: "gr_forma", t: "mc", lv: 2, q: "«Comprami due pagnotte!»: il soggetto sottinteso (tu)…", o: ["compie l'azione", "subisce l'azione"], x: "Sei tu che compri: compi l'azione. «mi» vuol dire «per me»." },
+  { id: "fv24", s: "gr_forma", t: "mc", lv: 3, q: "«Sei stato chiamato dal preside»: «sei stato chiamato» è…", o: ["la forma passiva di un verbo transitivo", "il tempo composto di un verbo intransitivo"], x: "Chiamare è transitivo (chiamo qualcuno). Qui il soggetto subisce, e c'è chi compie l'azione: dal preside. Forma passiva." },
+  { id: "fv25", s: "gr_forma", t: "mc", lv: 3, q: "«Sei arrivata di corsa, giusto in tempo»: «sei arrivata» è…", o: ["il tempo composto di un verbo intransitivo", "la forma passiva di un verbo transitivo"], x: "Arrivare è intransitivo e non può avere il passivo: «sei arrivata» è il passato prossimo, con l'ausiliare essere." },
+  { id: "fv26", s: "gr_forma", t: "mc", lv: 2, q: "«Il pilota è ripartito subito dopo l'arrivo»: «è ripartito» è…", o: ["il tempo composto di un verbo intransitivo", "la forma passiva di un verbo transitivo"], x: "Ripartire è intransitivo: «è» qui è solo l'ausiliare del passato prossimo." },
+  { id: "fv27", s: "gr_forma", t: "mc", lv: 2, q: "«Il gatto è stato salvato dai pompieri»: «è stato salvato» è…", o: ["la forma passiva di un verbo transitivo", "il tempo composto di un verbo intransitivo"], x: "Salvare è transitivo e il gatto subisce l'azione, fatta dai pompieri: forma passiva." },
+  { id: "fv28", s: "gr_forma", t: "mc", lv: 2, q: "Quale verbo NON può avere la forma passiva?", o: ["arrivare", "costruire", "leggere"], x: "Solo i verbi transitivi hanno la forma passiva: arrivare è intransitivo." },
+  { id: "fv29", s: "gr_forma", t: "type", lv: 2, q: "Volgi al passivo. Il vento spinge le barche → Le barche ___ dal vento.", hint: "presente passivo", a: ["sono spinte", "vengono spinte"], x: "Presente passivo: sono spinte (oppure vengono spinte)." },
+  { id: "fv30", s: "gr_forma", t: "type", lv: 2, q: "Volgi al passivo. Marco ha costruito la casetta → La casetta ___ da Marco.", hint: "passato prossimo passivo", a: ["è stata costruita"], x: "Passato prossimo passivo: è stata costruita, al femminile come la casetta. Nei tempi composti non si usa «venire»." },
+  { id: "fv31", s: "gr_forma", t: "type", lv: 3, q: "Volgi al passivo. I cacciatori inseguiranno la volpe → La volpe ___ dai cacciatori.", hint: "futuro passivo", a: ["sarà inseguita", "verrà inseguita"], x: "Futuro passivo: sarà inseguita (oppure verrà inseguita)." },
+  { id: "fv32", s: "gr_forma", t: "type", lv: 3, q: "Volgi al passivo. Noi coglieremo le mele → Le mele ___ da noi.", hint: "futuro passivo", a: ["saranno colte", "verranno colte"], x: "Futuro passivo: saranno colte. Attenzione: «avremo colto» non è passivo, è il futuro anteriore attivo." },
+  { id: "fv33", s: "gr_forma", t: "type", lv: 2, q: "Volgi al passivo. Il preside chiamò gli alunni → Gli alunni ___ dal preside.", hint: "passato remoto passivo", a: ["furono chiamati", "vennero chiamati"], x: "Passato remoto passivo: furono chiamati (oppure vennero chiamati)." },
+  { id: "fv34", s: "gr_forma", t: "type", lv: 2, q: "Volgi all'attivo. La torta è stata mangiata da Luca → Luca ___ la torta.", hint: "passato prossimo attivo", a: ["ha mangiato"], x: "Chi compie l'azione (Luca) diventa soggetto: Luca ha mangiato la torta." },
+  { id: "fv35", s: "gr_forma", t: "type", lv: 3, q: "Volgi all'attivo. La volpe venne inseguita dai cacciatori → I cacciatori ___ la volpe.", hint: "passato remoto attivo", a: ["inseguirono"], x: "venne inseguita è un passato remoto passivo: all'attivo diventa inseguirono." },
+  { id: "fv36", s: "gr_forma", t: "type", lv: 3, q: "Volgi all'attivo. Il libro sarà letto da tutti → Tutti ___ il libro.", hint: "futuro attivo", a: ["leggeranno"], x: "sarà letto è un futuro passivo: all'attivo diventa leggeranno." },
+  { id: "fv37", s: "gr_forma", t: "mc", lv: 3, q: "In quale frase c'è un errore?", o: ["La casa è venuta costruita in un anno.", "La casa è stata costruita in un anno.", "La casa venne costruita in un anno."], x: "Con «venire» il passivo si fa solo nei tempi semplici (viene, veniva, venne, verrà costruita). Nei tempi composti si usa essere: è stata costruita." },
+  { id: "fv38", s: "gr_forma", t: "pick", lv: 2, q: "Tocca il verbo in forma PASSIVA:", c: ["I ragazzi nuotano", "e un gruppo di delfini", "è stato avvistato", "da tutti."], a: 2, x: "Il gruppo di delfini non avvista: è avvistato da tutti. Forma passiva." },
+  { id: "fv39", s: "gr_forma", t: "mc", lv: 2, q: "«Si dorme bene in montagna»: il si è…", o: ["impersonale", "passivante"], x: "Non c'è un soggetto vero: dorme la gente, in generale. Si impersonale." },
+  { id: "fv40", s: "gr_forma", t: "mc", lv: 2, q: "«In quel negozio si riparano biciclette»: il si è…", o: ["passivante", "impersonale"], x: "C'è un soggetto (biciclette) e il verbo si accorda con lui: le biciclette sono riparate. Si passivante." },
+  { id: "fv41", s: "gr_forma", t: "mc", lv: 3, q: "«Si accetterà qualunque reclamo»: il si è…", o: ["passivante", "impersonale"], x: "Qualunque reclamo sarà accettato: c'è un soggetto. Si passivante." },
+  { id: "fv42", s: "gr_forma", t: "mc", lv: 3, q: "«Si mangia?» (cioè: è pronto?): il si è…", o: ["impersonale", "passivante"], x: "Non c'è una cosa che viene mangiata: il soggetto è generico. Si impersonale. In «si mangia la pizza», invece, è passivante: la pizza è mangiata." },
+  { id: "fv43", s: "gr_forma", t: "mc", lv: 3, q: "«Partendo dalla Liguria si arriva in Corsica in quattro ore»: il si è…", o: ["impersonale", "passivante"], x: "Arrivare è intransitivo e non ha il passivo: il si non può essere passivante. Si impersonale." },
+  { id: "fv44", s: "gr_forma", t: "mc", lv: 2, q: "«Si discute troppo di calcio»: il si è…", o: ["impersonale", "passivante"], x: "«di calcio» ha la preposizione: non è un soggetto. Si impersonale." },
+  { id: "fv45", s: "gr_forma", t: "mc", lv: 1, q: "«Marcello si guarda allo specchio»: il verbo è riflessivo…", o: ["proprio", "apparente", "reciproco"], x: "Marcello guarda chi? lui, Marcello: il «si» fa da complemento oggetto. Riflessivo proprio." },
+  { id: "fv46", s: "gr_forma", t: "mc", lv: 2, q: "«Mia cugina si prepara la colazione»: il verbo è riflessivo…", o: ["apparente", "proprio", "reciproco"], x: "Prepara che cosa? la colazione: è questo l'oggetto. «si» vuol dire «per sé»: riflessivo apparente." },
+  { id: "fv47", s: "gr_forma", t: "mc", lv: 1, q: "«Luca e Anna si abbracciano»: il verbo è riflessivo…", o: ["reciproco", "proprio", "apparente"], x: "Luca abbraccia Anna e Anna abbraccia Luca: a vicenda. Riflessivo reciproco." },
+  { id: "fv48", s: "gr_forma", t: "mc", lv: 3, q: "«Mi lavo le mani»: il verbo è riflessivo…", o: ["apparente", "proprio", "reciproco"], x: "Lavo che cosa? le mani. «mi» vuol dire «a me»: riflessivo apparente. In «Mi lavo» da solo, invece, sarebbe proprio." },
+  { id: "fv49", s: "gr_forma", t: "mc", lv: 3, q: "«Io e i miei compagni ci siamo scambiati i regali»: il verbo è riflessivo…", o: ["reciproco", "proprio", "apparente"], x: "I regali passano dagli uni agli altri, a vicenda: riflessivo reciproco." },
+  { id: "fv50", s: "gr_forma", t: "mc", lv: 2, q: "«Il passero si lava le piume nella sabbia»: il verbo è riflessivo…", o: ["apparente", "proprio"], x: "Lava che cosa? le piume: il «si» vuol dire «a sé». Riflessivo apparente." },
+  { id: "fv51", s: "gr_forma", t: "mc", lv: 2, q: "«Giovanni si rade tutte le mattine»: il verbo è riflessivo…", o: ["proprio", "apparente"], x: "Rade chi? Giovanni stesso: il «si» fa da complemento oggetto. Riflessivo proprio." },
+  { id: "fv52", s: "gr_forma", t: "mc", lv: 2, q: "«Ci siamo pentiti di quello che abbiamo detto»: pentirsi è…", o: ["intransitivo pronominale", "riflessivo proprio"], x: "Non esiste «pentire qualcuno»: la particella fa parte del verbo. Intransitivo pronominale." },
+  { id: "fv53", s: "gr_forma", t: "mc", lv: 3, q: "In quale frase c'è un verbo intransitivo pronominale?", o: ["Non mi sono accorto dell'errore.", "Mi sono pettinato in fretta.", "Ci siamo salutati alla stazione."], x: "Accorgersi esiste solo con la particella: intransitivo pronominale. Pettinarsi è riflessivo proprio, salutarsi è reciproco." },
+  { id: "fv54", s: "gr_forma", t: "mc", lv: 2, q: "«Perché ti vergogni?»: il verbo è…", o: ["intransitivo pronominale", "riflessivo apparente", "riflessivo reciproco"], x: "Vergognarsi si usa solo con la particella, che non ha valore riflessivo: intransitivo pronominale." },
+  { id: "fv55", s: "gr_forma", t: "mc", lv: 3, q: "«Mi sono imbattuta nel sindaco alla festa»: il verbo è…", o: ["intransitivo pronominale", "riflessivo proprio"], x: "Imbattersi si usa solo con la particella e non vuol dire che imbatto me: intransitivo pronominale." },
 ];
 
 // ---------- v1.9: TRAPPOLE — formule mirate per i casi in cui si inciampa ----------
@@ -1190,10 +1251,18 @@ const TRAPS = {
 };
 TRAPS.sce = { s: ["ort_cie"], t: "SCE o SCIE?",
   d: "La i dopo <b>sc</b> si scrive solo in poche parole da ricordare: <b>scienza, scienze, scienziato, coscienza</b>. Negli altri casi è <b>sce</b>: fini<b>sce</b>, cono<b>sce</b>, pe<b>sce</b>, <b>sce</b>na. E al futuro di mangiare, cominciare, lasciare, viaggiare la i sparisce: man<b>ge</b>rò, comin<b>ce</b>rà, la<b>sce</b>rai." };
+TRAPS.trans = { s: ["gr_forma"], t: "c'è una preposizione?",
+  d: "Dopo il verbo chiedi «chi? che cosa?». Se la risposta comincia con una preposizione (a, di, da, in, con, su, per…), <b>non</b> è complemento oggetto: lavorare <b>a</b> un'opera, procedere <b>alla</b> revisione, salire <b>in</b> solaio. In quella frase il verbo è intransitivo." };
+TRAPS.passivo = { s: ["gr_forma"], t: "passivo o passato prossimo?",
+  d: "Guarda il verbo: se è <b>transitivo</b> e il soggetto subisce l'azione (spesso c'è «da qualcuno»), è passivo: è stato salvato <b>dai pompieri</b>. Se è <b>intransitivo</b> (arrivare, partire, ripartire, piovere), «essere» è solo l'ausiliare: sei arrivata, è ripartito." };
+TRAPS.si = { s: ["gr_forma"], t: "si impersonale o passivante?",
+  d: "Cerca una cosa che subisce l'azione: se c'è e il verbo si accorda con lei, il si è <b>passivante</b> (si riparano <b>biciclette</b> = biciclette sono riparate). Se non c'è (si dorme, si arriva, si discute <b>di</b> calcio), è <b>impersonale</b>." };
+TRAPS.rifl = { s: ["gr_forma"], t: "proprio, apparente o reciproco?",
+  d: "C'è un altro oggetto dopo il verbo? Allora è <b>apparente</b> (mi lavo <b>le mani</b>). Se no, e l'azione torna sul soggetto, è <b>proprio</b> (mi lavo). Se sono in due o più e lo fanno a vicenda, è <b>reciproco</b> (si abbracciano)." };
 TRAPS.comp = { s: ["ort_comp"], t: "una cosa sola o due parole?",
   d: "Chiediti: indica <b>un oggetto o una persona sola</b>, con un significato nuovo? Allora è una parola: il <b>portaombrelli</b>, la <b>cassaforte</b>, il <b>senzatetto</b>. Se invece una parola fa l'azione o descrive l'altra, restano staccate: Luca <b>porta l'ombrello</b>, una <b>cassa forte</b> (robusta), una casa <b>senza tetto</b>." };
 const TRAP_OF = {};
-[["sce", "cie33 cie34 cie35 cie36 cie38 cie41 cie42 cie43 cie44 cie45 cie47 cie48 cie49 cie50 cie51 cie52 cie53 cie54 cie55"], ["comp", "cp15 cp16 cp17 cp18 cp19 cp21 cp22 cp32 cp34"], ["sogg_dopo", "sg2 sg8 sg13 sg14 sg15 sg16 sg31"], ["piacere", "sg11 sg12 sg27 sg30 pr6 pr28"],
+[["trans", "fv3 fv4 fv5 fv6 fv10 fv12"], ["passivo", "fv24 fv25 fv26 fv27 fv28 fv32 fv37"], ["si", "fv39 fv40 fv41 fv42 fv43 fv44"], ["rifl", "fv45 fv46 fv48 fv49 fv50 fv51"], ["sce", "cie33 cie34 cie35 cie36 cie38 cie41 cie42 cie43 cie44 cie45 cie47 cie48 cie49 cie50 cie51 cie52 cie53 cie54 cie55"], ["comp", "cp15 cp16 cp17 cp18 cp19 cp21 cp22 cp32 cp34"], ["sogg_dopo", "sg2 sg8 sg13 sg14 sg15 sg16 sg31"], ["piacere", "sg11 sg12 sg27 sg30 pr6 pr28"],
  ["co_prep", "co2 co15 co16 co22 co23 co24 co28 co30"],
  ["pron_lgl", "pr1 pr2 pr4 pr7 pr9 pr11 pr12 pr13 pr14 pr29 pr33 pr34 pr35 pr36"]]
   .forEach(([k, ids]) => ids.split(" ").forEach(id => TRAP_OF[id] = k));
@@ -1783,6 +1852,7 @@ const POWERS = {
   ort_dop:  { icon: "👯", name: "Doppio colpo", d: "Colpisce due volte, come le doppie." },
   ort_cie:  { icon: "🔍", name: "Lente magica", d: "Scova ogni i nascosta." },
   ort_z:    { icon: "🦓", name: "Zampata a zeta", d: "Graffia una zeta sola, proprio dove serve." },
+  gr_forma: { icon: "🔁", name: "Rovescio magico", d: "Trasforma l'attacco del mostro: il colpo torna indietro." },
   ort_comp: { icon: "🧩", name: "Incastro perfetto", d: "Unisce i pezzi giusti e separa quelli sbagliati." },
   gr_art:   { icon: "🛡️", name: "Scudo degli articoli", d: "Ogni parola ha la sua protezione." },
   gr_nome:  { icon: "📜", name: "Memoria dei nomi", d: "Non dimentica mai un nome." },
@@ -1876,11 +1946,11 @@ const GRADES = { media: "Scuola media", elem4: "Quarta elementare", elem3: "Terz
 // Terza completata (inizio quarta): solo quello che di solito si è fatto entro la terza.
 // Fuori: complemento oggetto, passato remoto e tempi più lontani, gradi dell'aggettivo,
 // nomi collettivi/astratti/alterati, pronomi complemento (lo, gli, le…), predicato nominale.
-const ELEM3_SKIP = new Set(["gr_modi", "gr_indef", "gr_cong", "log_ogg"]);
+const ELEM3_SKIP = new Set(["gr_modi", "gr_indef", "gr_cong", "log_ogg", "gr_forma"]);
 const ELEM3_RX = /passato remoto|trapassat|futuro anteriore|comparativ|superlativ|collettiv|astratt|alterat|derivat|nome composto|possessiv|dimostrativ|interrogativ|nominale|impersonal|coniugazione|irregolare|complemento|sono stati premiati/i;
 const ELEM3_OUT = new Set("q8 vb32 vb33 vb35 vb37 agg10 agg20 agg31 agg34 agg35 sg11 sg12 sg13 sg27 sg29 sg30 sg31".split(" "));
 const ELEM3_PRON = new Set("pr3 pr5 pr6 pr10 pr17 pr18 pr19 pr28 pr30 pr31".split(" "));
-const ELEM4_SKIP = new Set(["gr_modi", "gr_indef", "gr_cong"]);
+const ELEM4_SKIP = new Set(["gr_modi", "gr_indef", "gr_cong", "gr_forma"]);
 const ELEM4_RX = /congiuntiv|condizional|gerundi|participi|relativ|partitiv|passiv|forma attiva|infinito passato|trapassato remoto|futuro anteriore/i;
 function itemForGrade(i, g) {
   if (g === "elem3") {
@@ -2012,7 +2082,7 @@ const isErr = it => it && it.lw !== undefined && it.b <= 1;     // sbagliato e n
 const errItems = id => ITEMS.filter(i => i.s === id && isErr(S.items[i.id]));
 const needsBoost = id => isMastered(id) && sk(id).m < 0.6 && errItems(id).length >= 2;   // conquistata, ma ora vacilla
 // Lacuna principale dichiarata all'inizio: modi e tempi verbali. Hanno la precedenza (2 missioni su 3).
-const CORE_SKILLS = ["gr_tempi", "gr_modi", "gr_aus", "gr_indef", "gr_cong"];
+const CORE_SKILLS = ["gr_tempi", "gr_modi", "gr_aus", "gr_indef", "gr_cong", "gr_forma"];
 function suggestFocus() {
   if (S.focus && isAvailable(S.focus) && (!isMastered(S.focus) || hasNews(S.focus) || needsBoost(S.focus))) return S.focus;
   if (S.focusChosen && isMastered(S.focusChosen)) S.focusChosen = null;
@@ -2175,7 +2245,7 @@ function buildSession() {
 // Prima di ogni domanda: se sta sbagliando troppo, inserisce un esercizio facile e
 // trasforma il prossimo "da scrivere" in uno "a scelta"; se va benissimo, alza il livello.
 function balance(ph) {
-  if (SESS.mode !== "session" || SESS.tot < 4 || SESS.tot - SESS.lastAdjust < 3) return;
+  if (SESS.mode !== "session" || SESS.exam || SESS.tot < 4 || SESS.tot - SESS.lastAdjust < 3) return;
   if (ph.key !== "ripasso" && ph.key !== "nuovo") return;
   const acc = SESS.ok / SESS.tot, rest = ph.items.slice(SESS.qi);
   if (acc < TARGET_LOW && SESS.boosts < MAX_BOOSTS) {
@@ -2335,11 +2405,12 @@ function renderHome() {
       <div><small>Ripassi in attesa</small><b>${dueN}</b></div>
       <div><small>Abilità conquistate</small><b>${mastered} / ${SKILLS.length}</b></div>
     </div>
-    <button class="btn primary big" id="start">${doneToday ? "Un'altra lezione ▶" : "Inizia la missione di oggi ▶"}</button>
+    ${examActive() ? `<div class="exam-card"><b>📝 Verifica ${examWhen()}: ${SK[S.exam.s].icon} ${esc(SK[S.exam.s].name)}</b><small>Allenamento di circa 20 domande, dalle più facili alle più difficili. Puoi rifarlo quante volte vuoi.</small><button class="btn primary big" id="exam" type="button">Allenati per la verifica ▶</button></div>` : ""}
+    <button class="btn ${examActive() ? "" : "primary "}big" id="start">${doneToday ? "Un'altra lezione ▶" : "Inizia la missione di oggi ▶"}</button>
     <div class="row"><button class="btn" id="map">🗺️ Mappa</button><button class="btn ghost" id="par">👤 Area genitori</button></div>
   </section>
-  <p class="foot"><span id="sync"></span> · v2.3.1</p>`;
-  $("#start").onclick = startSession; $("#shop").onclick = () => renderDen(); if ($("#hatch")) $("#hatch").onclick = renderHatch; $("#map").onclick = renderMap; $("#par").onclick = renderParentGate;
+  <p class="foot"><span id="sync"></span> · v2.4</p>`;
+  $("#start").onclick = startSession; if ($("#exam")) $("#exam").onclick = startExam; $("#shop").onclick = () => renderDen(); if ($("#hatch")) $("#hatch").onclick = renderHatch; $("#map").onclick = renderMap; $("#par").onclick = renderParentGate;
   updateSyncBadge();
 }
 
@@ -2382,6 +2453,36 @@ function toast(msg) { const t = $("#toast"); if (!t) return; t.textContent = msg
 
 // ---------------- flusso esercizi ----------------
 function startSession() { SESS = buildSession(); next(); }
+
+// ---------------- 📝 Ripasso per la verifica ----------------
+// Il genitore sceglie l'argomento e il giorno; finché la verifica non è passata, nella home compare
+// un allenamento intensivo: formula, poi esercizi base → medi → sfide, con gli errori ripresi subito.
+const examActive = () => S.exam && SK[S.exam.s] && ITEMS.some(i => i.s === S.exam.s) && dayKey() <= S.exam.until;
+function examWhen() {
+  const t = new Date(); t.setDate(t.getDate() + 1);
+  const tom = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
+  return S.exam.until === dayKey() ? "oggi" : S.exam.until === tom ? "domani" : S.exam.until.split("-").reverse().join("/");
+}
+function buildExam() {
+  const id = S.exam.s, pool = ITEMS.filter(i => i.s === id);
+  const err = shuffle(pool.filter(i => S.items[i.id] && isErr(S.items[i.id])));
+  const rank = i => (S.items[i.id] ? (S.items[i.id].c < S.items[i.id].n ? 0 : 2) : 1);   // sbagliati, poi nuovi, poi già fatti
+  const byL = L => shuffle(pool.filter(i => lvl(i) === L && !err.includes(i))).sort((a, b) => rank(a) - rank(b));
+  const p1 = err.filter(i => lvl(i) === 1).concat(byL(1)).slice(0, 5);
+  const withTyped = (L, n, nt) => { const all = byL(L), e = err.filter(i => lvl(i) === L);   // almeno nt esercizi da scrivere
+    const t = all.filter(i => i.t === "type" && !e.includes(i)).slice(0, nt);
+    return e.concat(t, all.filter(i => !t.includes(i))).slice(0, n); };
+  const p2 = withTyped(2, 9, 3), p3 = withTyped(3, 8, 3);
+  const phases = [
+    { key: "nuovo", label: "📝 Verifica · 1. Si parte", skill: id, items: interleave(p1), lessonShown: false },
+    { key: "nuovo", label: "📝 Verifica · 2. Esercitazione", skill: id, items: interleave(p2), lessonShown: true },
+    { key: "nuovo", label: "📝 Verifica · 3. Le domande difficili", skill: id, items: interleave(p3), lessonShown: true },
+  ].filter(ph => ph.items.length);
+  const used = new Set(phases.flatMap(ph => ph.items.map(i => i.id)));
+  return { mode: "session", exam: true, phases, pi: 0, qi: 0, retried: new Set(), ok: 0, tot: 0, xp: 0, mastered: [], start: Date.now(), focus: id,
+           factor: 1, used, boosts: 0, lastAdjust: -10, adjust: [], xpBefore: S.xp, availBefore: SKILLS.filter(s => isAvailable(s.id)).map(s => s.id) };
+}
+function startExam() { SESS = buildExam(); next(); }
 
 function next() {
   const ph = SESS.phases[SESS.pi];
@@ -2694,6 +2795,7 @@ function renderParent() {
     <h3>Abilità</h3>
     <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Abilità</th><th>Padronanza</th><th>Accuratezza (tentativi)</th><th>Esercizi visti</th><th>Sfide superate</th><th>Stato</th></tr></thead><tbody>${rows}</tbody></table></div>
     <p class="muted">La <b>padronanza</b> è una media mobile che dà più peso alle risposte recenti; un'abilità è «conquistata» quando supera l'85% dopo almeno 8 tentativi. Salvataggio: <span id="sync"></span>.</p>
+    ${examPanel()}
     ${profilesPanel()}
     <h3>Nome nell'app</h3>
     <div class="row left"><input id="nick" class="inp" maxlength="20" value="${esc(S.name || "")}"><button class="btn" id="nicksave">Salva</button></div>
@@ -2708,7 +2810,7 @@ function renderParent() {
   $("#back").onclick = boot;
   $("#nicksave").onclick = () => { S.name = $("#nick").value.trim() || S.name; Store.save(); $("#pbox").innerHTML = "<p class='note'>Nome aggiornato ✅</p>"; };
   if (IS_STANDALONE) wireSyncPanel();
-  wireProfilesPanel();
+  wireProfilesPanel(); wireExamPanel();
   $("#copy").onclick = async () => { try { await navigator.clipboard.writeText(JSON.stringify(S)); $("#pbox").innerHTML = "<p class='note'>Backup copiato negli appunti ✅</p>"; } catch (e) { $("#pbox").innerHTML = `<p class="muted">Copia manualmente:</p><textarea class="inp ta" readonly>${esc(JSON.stringify(S))}</textarea>`; } };
   if ($("#dl")) $("#dl").onclick = () => {
     const blob = new Blob([JSON.stringify(S, null, 1)], { type: "application/json" });
@@ -3196,6 +3298,23 @@ function wireSecretPicker(onChange) {
   const show = () => { $("#spv").textContent = seq.map(k => PICS[k]).join(" ") || "—"; onChange(seq.length === 3 ? seq.slice() : null); };
   document.querySelectorAll("#sp .pic").forEach(b => b.onclick = () => { if (seq.length >= 3) seq = []; seq.push(+b.dataset.k); show(); });
   $("#spclr").onclick = () => { seq = []; show(); };
+}
+function examPanel() {
+  const t = new Date(); t.setDate(t.getDate() + 1);
+  const def = S.exam && S.exam.until >= dayKey() ? S.exam.until : `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
+  return `<h3>📝 Verifica in arrivo</h3>
+    <p class="muted">Scegli l'argomento: fino al giorno della verifica, nella schermata iniziale di ${esc(S.name || "questo profilo")} compare un allenamento dedicato.</p>
+    <div class="row left">
+      <select id="exs" class="inp">${SKILLS.map(k => `<option value="${k.id}" ${(S.exam ? S.exam.s : "gr_forma") === k.id ? "selected" : ""}>${k.icon} ${esc(k.name)}</option>`).join("")}</select>
+      <input id="exd" class="inp" type="date" value="${def}">
+      <button class="btn primary" id="exon" type="button">Attiva</button>
+      ${examActive() ? `<button class="btn" id="exoff" type="button">Togli</button>` : ""}
+    </div>
+    ${examActive() ? `<p class="note">Attivo: ${SK[S.exam.s].icon} <b>${esc(SK[S.exam.s].name)}</b>, verifica ${examWhen()}.</p>` : ""}`;
+}
+function wireExamPanel() {
+  $("#exon").onclick = () => { const d = $("#exd").value; if (!d || d < dayKey()) { $("#exd").focus(); return; } S.exam = { s: $("#exs").value, until: d }; Store.save(); renderParent(); };
+  if ($("#exoff")) $("#exoff").onclick = () => { delete S.exam; Store.save(); renderParent(); };
 }
 function profilesPanel() {
   const rows = Profiles.reg.list.map(e => `<tr><td><b>${esc(e.name || "—")}</b>${e.id === Profiles.active ? " <small>(attivo)</small>" : ""}</td><td>${esc(gradeLabel(e.grade))}</td><td>${e.lock ? "🔒 sì" : "no"}</td>
